@@ -1,13 +1,13 @@
 export const SITE = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
-  author: "Sat Naing",
-  profile: "https://satnaing.dev/",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
-  title: "AstroPaper",
+  website: "https://410666.xyz/", // replace this with your deployed domain
+  author: "蓝色观者",
+  profile: "https://410666.xyz/",
+  desc: "杀戮尖塔重度玩家 | 紫皮人爱好者 | 独立全栈折腾记录",
+  title: "观者终端",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
-  postPerPage: 4,
+  postPerPage: 3,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
   showBackButton: true, // show back button in post detail
