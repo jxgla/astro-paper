@@ -284,6 +284,20 @@ import profileImg from './_profile.png';
     #send-btn:active { transform: scale(.95); }
     #send-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
     #send-btn svg { color: #fff; }
+
+    /* ── 状态栏 ── */
+    #status-bar {
+      max-width: var(--chat-width); margin: 0 auto 6px;
+      min-height: 18px; font-size: 12px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 2px; transition: opacity .2s;
+    }
+    #status-bar:empty { display: none; }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent); animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
   </style>
 </head>
 <body>
@@ -323,6 +337,7 @@ import profileImg from './_profile.png';
   </main>
 
   <footer id="footer">
+    <div id="status-bar"></div>
     <div id="img-preview-bar"></div>
     <div id="input-wrap">
       <button id="attach-btn" title="附加文件">
@@ -375,6 +390,13 @@ import profileImg from './_profile.png';
   const previewBar  = document.getElementById("img-preview-bar");
   const dropOverlay = document.getElementById("drop-overlay");
   const toastEl     = document.getElementById("toast");
+  const statusBar   = document.getElementById("status-bar");
+
+  function setStatus(text, dot = true) {
+    statusBar.innerHTML = text
+      ? `${dot ? '<span class="status-dot"></span>' : ''}${text}`
+      : '';
+  }
 
   const history     = [];
   let isStreaming   = false;
@@ -540,6 +562,7 @@ import profileImg from './_profile.png';
     inputEl.value = ""; inputEl.style.height = "auto";
     pendingImages = []; pendingTexts = [];
     renderPreview(); isStreaming = true; sendBtn.disabled = true;
+    setStatus("正在连接…");
 
     appendUserMsg(text, images.map(i => i.dataUrl), texts.map(t => t.name));
 
@@ -562,10 +585,10 @@ import profileImg from './_profile.png';
     history.push({ role: "user", content: userContent });
 
     const { bubble, mdContent } = appendAssistantMsg();
-    let rawAccum = "";
-    let requestOk = false;
+    let rawAccum  = "";
+    let requestOk = false;  // 是否拿到了 HTTP 200
+    let gotContent = false; // 是否真正收到过 delta 文本
 
-    // 显示"思考中"动画
     let thinkIndicator = null;
     function showThinking() {
       if (thinkIndicator) return;
@@ -575,32 +598,36 @@ import profileImg from './_profile.png';
       mdContent.appendChild(thinkIndicator);
       scrollToBottom();
     }
-    function hideThinking() {
-      thinkIndicator?.remove(); thinkIndicator = null;
-    }
+    function hideThinking() { thinkIndicator?.remove(); thinkIndicator = null; }
 
-    // 流式光标
+    showThinking(); // ★一发出请求就立刻显示思考中
+
     let cursor = null;
     function ensureCursor(container) {
-      if (!cursor) {
-        cursor = document.createElement("span");
-        cursor.className = "stream-cursor";
-      }
+      if (!cursor) { cursor = document.createElement("span"); cursor.className = "stream-cursor"; }
       container.appendChild(cursor);
     }
     function removeCursor() { cursor?.remove(); cursor = null; }
+
+    // 取消控制（超时防御）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort("请求超时 (120s)"), 120000);
 
     try {
       const res = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ model: modelSel.value, messages: history }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
         throw new Error(err.error ?? `HTTP ${res.status}`);
       }
       requestOk = true;
+      setStatus("生成中…");
 
       const reader  = res.body.getReader();
       const decoder = new TextDecoder();
@@ -624,10 +651,13 @@ import profileImg from './_profile.png';
             if (typeof delta !== "string") continue;
 
             rawAccum += delta;
+            gotContent = true;
 
             if (stillThinking(rawAccum)) {
+              setStatus("思考中…");
               showThinking();
             } else {
+              setStatus("生成中…");
               hideThinking();
               const cleaned = cleanThink(rawAccum);
               mdContent.innerHTML = renderMd(cleaned);
@@ -639,15 +669,34 @@ import profileImg from './_profile.png';
       }
 
     } catch (err) {
-      history.pop(); // 弹出失败的用户消息，防止污染后续对话
+      clearTimeout(timeoutId);
+      const isAbort = err.name === "AbortError" || err === "请求超时 (120s)";
+      const errMsg = isAbort ? "请求超时，可能是API地址网络不通或上游无响应" : err.message;
+      
+      // 请求完全失败（未拿到 200）：弹出用户消息，历史保持干净
+      if (!requestOk) history.pop();
       hideThinking(); removeCursor();
-      mdContent.innerHTML = `<p style="color:#dc2626">⚠️ 请求失败：${err.message}</p>`;
+      setStatus(`❌ ${errMsg}`, false);
+      setTimeout(() => setStatus(""), 4000);
+      mdContent.innerHTML = `<p style="color:#dc2626">⚠️ 请求失败：${errMsg}</p>`;
     } finally {
       hideThinking(); removeCursor();
-      const finalText = cleanThink(rawAccum);
-      if (finalText) mdContent.innerHTML = renderMd(finalText);
-      if (requestOk) history.push({ role: "assistant", content: finalText });
+      const finalText = cleanThink(rawAccum).trim();
+      if (finalText) {
+        mdContent.innerHTML = renderMd(finalText);
+        // 只有真正有内容时才压入历史，防止空 assistant 污染后续对话
+        if (requestOk) history.push({ role: "assistant", content: finalText });
+      } else if (requestOk && !gotContent) {
+        // 拿到 200 但没有任何 delta：上游可能返回了非流式错误体
+        // 弹出用户消息，历史保持干净
+        history.pop();
+      }
+      if (!mdContent.textContent && !mdContent.querySelector('p')) {
+        // 气泡完全空：移除气泡避免留白
+        bubble.closest('.msg-row')?.remove();
+      }
       isStreaming = false;
+      if (!statusBar.textContent.startsWith("❌")) setStatus("");
       updateSendBtn();
     }
   }
