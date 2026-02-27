@@ -679,9 +679,17 @@ import profileImg from './_profile.png';
     }
     function removeCursor() { cursor?.remove(); cursor = null; }
 
-    // 取消控制（超时防御）
+    // 取消控制（超时防御，增加动态心跳）
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort("请求超时 (120s)"), 120000);
+    let timeoutId;
+    function resetTimeout(ms = 120000) {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => controller.abort("请求超时或卡死"), ms);
+    }
+    resetTimeout(120000); // 初始连接最长120秒
+
+    let errorHTML = "";
+    let isBlocked = false;
 
     try {
       const res = await fetch(WORKER_URL, {
@@ -690,7 +698,8 @@ import profileImg from './_profile.png';
         body: JSON.stringify({ model: modelSel.value, messages: history, mode: currentMode }),
         signal: controller.signal,
       });
-      clearTimeout(timeoutId);
+      // 拿到头部后重置超时时间
+      resetTimeout(60000); 
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -705,6 +714,7 @@ import profileImg from './_profile.png';
 
       while (true) {
         const { done, value } = await reader.read();
+        resetTimeout(60000); // 每次收到流心跳都续命 60 秒
         if (done) break;
         sseBuf += decoder.decode(value, { stream: true });
         const parts = sseBuf.split("\n\n");
@@ -739,34 +749,44 @@ import profileImg from './_profile.png';
       }
 
     } catch (err) {
-      clearTimeout(timeoutId);
-      const isAbort = err.name === "AbortError" || err === "请求超时 (120s)";
-      const errMsg = isAbort ? "请求超时，可能是API地址网络不通或上游无响应" : err.message;
+      const isAbort = err.name === "AbortError" || err === "请求超时或卡死";
+      const errMsg = isAbort ? "请求超时，可能是API地址网络不通或流被强行掐断" : err.message;
+      const tErr = errMsg.toLowerCase();
       
-      // 请求完全失败（未拿到 200）：弹出用户消息，历史保持干净
-      if (!requestOk) history.pop();
+      // 判断是否触发了上游/Cloudflare的安全盾（通常直接掐网或返回40X）
+      isBlocked = tErr.includes("network error") || tErr.includes("400") || tErr.includes("403");
+
       hideThinking(); removeCursor();
-      setStatus(`❌ ${errMsg}`, false);
+      setStatus(isBlocked ? `⚠️ 触发拦截` : `❌ 请求失败`, false);
       setTimeout(() => setStatus(""), 4000);
-      mdContent.innerHTML = `<p style="color:#dc2626">⚠️ 请求失败：${errMsg}</p>`;
+
+      if (isBlocked) {
+        errorHTML = renderMd(`呜呜，触发了不可言说的神秘**审查法则**（网络拦截 / ${errMsg}）🤫\n\n是不是词汇太火爆/敏感啦？这题超出了宝宝的承受范围，换个清爽点的词汇再试一次吧！🙈\n\n> *系统提示：为防止上下文污染，您刚刚的消息已被自动撤回，直接继续聊天即可。*`);
+      } else {
+        errorHTML = `<p style="color:#dc2626">⚠️ 请求异常：${errMsg}</p>`;
+      }
     } finally {
+      if (timeoutId) clearTimeout(timeoutId);
       hideThinking(); removeCursor();
+      
       const finalText = cleanThink(rawAccum).trim();
-      if (finalText) {
-        mdContent.innerHTML = renderMd(finalText);
-        // 只有真正有内容时才压入历史，防止空 assistant 污染后续对话
-        if (requestOk) history.push({ role: "assistant", content: finalText });
-      } else if (requestOk && !gotContent) {
-        // 拿到 200 但没有任何 delta：上游可能返回了非流式错误体
-        // 弹出用户消息，历史保持干净
+      
+      if (errorHTML) {
+        // 有报错（或者拦截），无论拿到多少部分内容，都附上报错，并撤回用户消息
         history.pop();
+        mdContent.innerHTML = (finalText ? renderMd(finalText) + "<br><br>" : "") + errorHTML;
+      } else if (finalText) {
+        // 一切正常，且有实在的文本
+        mdContent.innerHTML = renderMd(finalText);
+        history.push({ role: "assistant", content: finalText });
+      } else {
+        // 请求OK，但完全是空心气泡（上游吐出了 200，但立刻结束没给字）
+        history.pop();
+        mdContent.innerHTML = renderMd(`哎呀，你的脑洞太超前，直接撞上了**道德守卫的空气墙**！\n\n什么都画/写不出来……换个柔和点、安全点的描述再来吧！😳\n\n> *系统提示：您的上一条消息已被防污染机制撤回，不会影响接下来的对话*`);
       }
-      if (!mdContent.textContent && !mdContent.querySelector('p')) {
-        // 气泡完全空：移除气泡避免留白
-        bubble.closest('.msg-row')?.remove();
-      }
+
       isStreaming = false;
-      if (!statusBar.textContent.startsWith("❌")) setStatus("");
+      if (!statusBar.textContent.startsWith("❌") && !statusBar.textContent.startsWith("⚠️")) setStatus("");
       updateSendBtn();
     }
   }
