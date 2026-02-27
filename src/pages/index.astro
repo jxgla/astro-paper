@@ -24,7 +24,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
   <main id="main-content" data-layout="index" class="app-layout">
     <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
       <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        Mingalaba
+        观者终端
       </h1>
       <a
         target="_blank"
@@ -41,23 +41,14 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         <span class="sr-only">RSS Feed</span>
       </a>
 
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
+      <p class="mt-2 text-skin-base/80">
+        杀戮尖塔重度玩家 · 独立全栈折腾记录 · 运行在 Cloudflare 边缘节点
       </p>
-      <p class="mt-2">
-        Read the blog posts or check
-        <LinkButton
-          class="underline decoration-dashed underline-offset-4 hover:text-accent"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton> for more info.
+      <p class="mt-1 text-skin-base/60 text-sm">
+        本站部署了一个基于 Cloudflare Worker 的 <strong>Grok AI 镜像站</strong>，免登录、免翻墙，支持多模型切换，完全免费开放体验。
       </p>
+
       {
-        // only display if at least one social link is enabled
         SOCIALS.length > 0 && (
           <div class="mt-4 flex max-sm:flex-col sm:items-center">
             <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">Social Links:</div>
@@ -66,15 +57,17 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         )
       }
 
-      <div class="mt-6">
+      <!-- C 位大按钮：引流到 AI Chat -->
+      <div class="mt-8">
+        <p class="mb-3 text-xs text-skin-base/50">🔥 本站特供 · 免排队直接调用 Grok 最新模型</p>
         <a
           href="/chat"
-          class="inline-flex items-center gap-2 rounded-lg border border-border bg-transparent px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
+          class="group relative inline-flex items-center gap-3 overflow-hidden rounded-xl px-8 py-3.5 text-base font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+          style="background: linear-gradient(135deg, #7c6cf0 0%, #5a4fcf 60%, #3b82f6 100%);"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          AI Chat
+          <span class="text-xl">🚀</span>
+          <span>立即启动 Grok 终端</span>
+          <span class="text-white/60 text-sm font-normal">grok-4.1-fast ›</span>
         </a>
       </div>
     </section>
