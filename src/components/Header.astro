@@ -72,6 +72,15 @@ const isActive = (path: string) => {
         ]}
       >
         <li class="col-span-2">
+          <a
+            href="/chat"
+            class:list={[{ "active-nav": isActive("/chat") }]}
+            style="font-weight: 600;"
+          >
+            🤖 AI Chat
+          </a>
+        </li>
+        <li class="col-span-2">
           <a href="/posts" class:list={{ "active-nav": isActive("/posts") }}>
             Posts
           </a>
