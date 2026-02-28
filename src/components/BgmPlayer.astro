@@ -198,15 +198,15 @@
 <script>
   function initBgm() {
     // Check if initialization runs
-    const audio = document.getElementById("bgm-audio");
+    const audio = document.getElementById("bgm-audio") as HTMLAudioElement | null;
     const disk = document.getElementById("bgm-disk");
     const controls = document.getElementById("bgm-controls");
-    const playBtn = document.getElementById("bgm-play-btn");
+    const playBtn = document.getElementById("bgm-play-btn") as HTMLButtonElement | null;
     const iconPlay = document.getElementById("bgm-icon-play");
     const iconPause = document.getElementById("bgm-icon-pause");
-    const volumeSlider = document.getElementById("bgm-volume");
+    const volumeSlider = document.getElementById("bgm-volume") as HTMLInputElement | null;
 
-    if (!audio || !disk) return;
+    if (!audio || !disk || !controls || !playBtn || !iconPlay || !iconPause || !volumeSlider) return;
 
     // ViewTransitions may run script multiple times but persist DOM
     if (audio.dataset.initialized === "true") {
@@ -224,22 +224,22 @@
     });
 
     function updateIcons() {
-      if (audio.paused) {
-        disk.classList.remove("playing");
-        iconPlay.style.display = "block";
-        iconPause.style.display = "none";
+      if (audio!.paused) {
+        disk!.classList.remove("playing");
+        iconPlay!.style.display = "block";
+        iconPause!.style.display = "none";
       } else {
-        disk.classList.add("playing");
-        iconPlay.style.display = "none";
-        iconPause.style.display = "block";
+        disk!.classList.add("playing");
+        iconPlay!.style.display = "none";
+        iconPause!.style.display = "block";
       }
     }
 
     playBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play().catch(e => console.log("Audio play prevented:", e));
+      if (audio!.paused) {
+        audio!.play().catch(e => console.log("Audio play prevented:", e));
       } else {
-        audio.pause();
+        audio!.pause();
       }
     });
 
@@ -247,7 +247,7 @@
     audio.addEventListener("pause", updateIcons);
 
     volumeSlider.addEventListener("input", (e) => {
-      audio.volume = parseFloat(e.target.value);
+      audio!.volume = parseFloat((e.target as HTMLInputElement).value);
     });
     
     updateIcons();
