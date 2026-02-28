@@ -1,0 +1,266 @@
+---
+// src/components/BgmPlayer.astro
+---
+
+<div id="bgm-player-container" transition:persist="bgm-player">
+  <audio id="bgm-audio" loop preload="auto">
+    <source src="/BGM.mp3" type="audio/mpeg" />
+  </audio>
+
+  <div class="bgm-player">
+    <div class="disk" id="bgm-disk" title="Music Player">
+      <svg viewBox="0 0 24 24" fill="none" class="disk-svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+      <div class="note-icon">🎵</div>
+    </div>
+    
+    <div class="controls" id="bgm-controls">
+      <button id="bgm-play-btn" title="播放/暂停">
+        <svg id="bgm-icon-play" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <svg id="bgm-icon-pause" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+      </button>
+      <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.15" title="音量控制" />
+    </div>
+  </div>
+</div>
+
+<style>
+  #bgm-player-container {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .bgm-player {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .disk {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1a1a2e;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 0 2px rgba(255,255,255,0.1) inset;
+    animation: spin 5s linear infinite;
+    animation-play-state: paused;
+    z-index: 2;
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  
+  .disk:hover {
+    transform: scale(1.05);
+  }
+
+  .disk-svg {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+  }
+  
+  .note-icon {
+    position: absolute;
+    font-size: 14px;
+    right: -2px;
+    bottom: -2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .disk.playing .note-icon {
+    opacity: 1;
+    animation: bounce-fade 2s infinite;
+  }
+
+  .disk.playing {
+    animation-play-state: running;
+    box-shadow: 0 0 15px rgba(99, 85, 245, 0.4), 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  @keyframes bounce-fade {
+    0% { transform: translateY(0) scale(1) rotate(0); opacity: 0.3; }
+    50% { transform: translateY(-10px) scale(1.2) rotate(10deg); opacity: 1; }
+    100% { transform: translateY(-20px) scale(1) rotate(20deg); opacity: 0; }
+  }
+
+  .controls {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 0 24px 24px 0;
+    padding: 6px 16px 6px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-left: -24px;
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateX(-15px) scaleX(0.9);
+    transform-origin: left center;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1;
+  }
+
+  .controls.open {
+    transform: translateX(0) scaleX(1);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  html[data-theme="dark"] .controls {
+    background: rgba(30, 30, 46, 0.85);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  .controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .controls button:hover {
+    background: rgba(0,0,0,0.06);
+  }
+
+  html[data-theme="dark"] .controls button {
+    color: #eee;
+  }
+  html[data-theme="dark"] .controls button:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .controls button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #bgm-volume {
+    width: 60px;
+    cursor: pointer;
+    height: 4px;
+    border-radius: 2px;
+    appearance: none;
+    background: #dde0e4;
+    outline: none;
+  }
+  
+  #bgm-volume::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6355f5;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  
+  #bgm-volume::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+  
+  html[data-theme="dark"] #bgm-volume {
+    background: #444;
+  }
+  html[data-theme="dark"] #bgm-volume::-webkit-slider-thumb {
+    background: #8b80f9;
+  }
+</style>
+
+<script>
+  function initBgm() {
+    // Check if initialization runs
+    const audio = document.getElementById("bgm-audio");
+    const disk = document.getElementById("bgm-disk");
+    const controls = document.getElementById("bgm-controls");
+    const playBtn = document.getElementById("bgm-play-btn");
+    const iconPlay = document.getElementById("bgm-icon-play");
+    const iconPause = document.getElementById("bgm-icon-pause");
+    const volumeSlider = document.getElementById("bgm-volume");
+
+    if (!audio || !disk) return;
+
+    // ViewTransitions may run script multiple times but persist DOM
+    if (audio.dataset.initialized === "true") {
+      // Audio is already hooked up, we only need to sync state in case UI was re-rendered.
+      // With transition:persist, the exact same DOM node remains, so event listeners are intact!
+      return; 
+    }
+    audio.dataset.initialized = "true";
+
+    // Set default volume 15%
+    audio.volume = 0.15;
+
+    disk.addEventListener("click", () => {
+      controls.classList.toggle("open");
+    });
+
+    function updateIcons() {
+      if (audio.paused) {
+        disk.classList.remove("playing");
+        iconPlay.style.display = "block";
+        iconPause.style.display = "none";
+      } else {
+        disk.classList.add("playing");
+        iconPlay.style.display = "none";
+        iconPause.style.display = "block";
+      }
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play().catch(e => console.log("Audio play prevented:", e));
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio.addEventListener("play", updateIcons);
+    audio.addEventListener("pause", updateIcons);
+
+    volumeSlider.addEventListener("input", (e) => {
+      audio.volume = parseFloat(e.target.value);
+    });
+    
+    updateIcons();
+    volumeSlider.value = audio.volume.toString();
+  }
+
+  // Hook into Astro's router lifecycle to ensure proper init across transitions
+  document.addEventListener("astro:page-load", initBgm);
+  
+  // Fallback for direct loads or disabled ViewTransitions
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initBgm);
+  } else {
+    initBgm();
+  }
+</script>

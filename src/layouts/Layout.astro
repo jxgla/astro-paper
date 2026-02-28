@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { SITE } from "@/config";
 import "@/styles/global.css";
+import BgmPlayer from "@/components/BgmPlayer.astro";
 
 type Props = {
   title?: string;
@@ -169,6 +170,9 @@ const structuredData = {
   </head>
   <body>
     <slot />
+    
+    <!-- 全局BGM播放器 -->
+    <BgmPlayer />
 
     <!-- Load full theme logic -->
     <script src="../scripts/theme.ts"></script>
