@@ -8,8 +8,8 @@ import profileImg from './_profile.png';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="profile-img" content={profileImg.src ?? profileImg} />
   <link rel="icon" type="image/png" href={profileImg.src ?? profileImg} />
-  <title>免费 Grok AI 在线体验 | 无需登录，多模型支持</title>
-  <meta name="description" content="部署在 Cloudflare 边缘节点的 Grok AI 镜像站。免登录、免翻墙，支持 grok-4.1-fast / grok-4.1-mini / grok-4.1-thinking 多模型切换，即开即用，完全免费。" />
+  <title>免费 Bot AI 在线体验 | 无需登录，多模型支持</title>
+  <meta name="description" content="部署在 Cloudflare 边缘节点的 Bot 镜像站。免登录、免翻墙，支持 4.1-fast / 4.1-mini / 4.1-thinking 多模型切换，即开即用，完全免费。" />
   <!-- Markdown 渲染 + 安全过滤 -->
   <script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
@@ -231,6 +231,33 @@ import profileImg from './_profile.png';
     .md-content hr { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
     .md-content img { max-width: 100%; border-radius: 8px; margin: .5em 0; }
 
+    /* ── 复制与操作按钮 ── */
+    .msg-actions {
+      display: flex; gap: 8px; align-items: center; margin-top: 4px;
+      opacity: 0; transition: opacity 0.2s; align-self: flex-start;
+    }
+    .msg-row:hover .msg-actions { opacity: 1; }
+    .msg-row.user .msg-actions { align-self: flex-end; }
+    
+    .action-btn {
+      background: none; border: none; color: var(--text-muted); font-size: 12px;
+      cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px;
+      border-radius: 4px; transition: background 0.2s, color 0.2s;
+    }
+    .action-btn:hover { background: rgba(0,0,0,0.05); color: var(--accent); }
+    .msg-row.user .action-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* 选区跟随复制按钮 */
+    #selection-copy-btn {
+      position: absolute; z-index: 1000; display: none;
+      background: #111; color: #fff; border: none; border-radius: 6px;
+      padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: popIn 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    #selection-copy-btn:hover { background: #333; }
+    @keyframes popIn { 0%{ transform: scale(0.8); opacity: 0; } 100%{ transform: scale(1); opacity: 1; } }
+
     /* 思考中指示器 */
     .thinking-indicator {
       color: var(--text-muted); font-size: 13px; font-style: italic;
@@ -359,12 +386,18 @@ import profileImg from './_profile.png';
       返回
     </a>
     <h1>Chatbot</h1>
-    <select id="model-select" title="选择模型">
-      <option value="fast">4.1-fast</option>
-      <option value="mini">4.1-mini</option>
-      <option value="thinking">4.1-thinking</option>
-      <option value="beta">4.20-beta</option>
-    </select>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button id="export-btn" class="action-btn" title="导出为 Markdown" style="font-size:14px; padding:4px 8px; border:1px solid var(--border);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导出
+      </button>
+      <select id="model-select" title="选择模型">
+        <option value="fast">4.1-fast</option>
+        <option value="mini">4.1-mini</option>
+        <option value="thinking">4.1-thinking</option>
+        <option value="beta">4.20-beta</option>
+      </select>
+    </div>
   </header>
   <div id="notice-bar">⚡ 聊天 / 画图模式额度有限，聊天记录不会保存。请勿上传个人敏感信息。</div>
 
@@ -439,6 +472,13 @@ import profileImg from './_profile.png';
   const statusBar   = document.getElementById("status-bar");
   const modeBtn     = document.getElementById("mode-btn");
   const modeMenu    = document.getElementById("mode-menu");
+  const exportBtn   = document.getElementById("export-btn");
+
+  // 划词复制所需节点
+  const selCopyBtn = document.createElement("button");
+  selCopyBtn.id = "selection-copy-btn";
+  selCopyBtn.textContent = "复制";
+  document.body.appendChild(selCopyBtn);
 
   let currentMode = "chat"; // "chat" | "image"
 
@@ -497,6 +537,7 @@ import profileImg from './_profile.png';
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) send(); }
   });
   sendBtn.addEventListener("click", send);
+  exportBtn.addEventListener("click", exportHistory);
   attachBtn.addEventListener("click", () => attachFile.click());
   attachFile.addEventListener("change", () => { addFiles(Array.from(attachFile.files ?? [])); attachFile.value = ""; });
 
@@ -606,12 +647,68 @@ import profileImg from './_profile.png';
     const mdContent = document.createElement("div"); mdContent.className = "md-content";
     bubble.appendChild(mdContent);
 
-    wrap.appendChild(bubble); row.appendChild(avatar); row.appendChild(wrap);
+    // 复制按钮组 (默认隐藏，流完成后或 hover 时显示)
+    const actions = document.createElement("div"); actions.className = "msg-actions";
+    const copyBtn = document.createElement("button"); copyBtn.className = "action-btn";
+    copyBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制`;
+    // onclick 会在 finally 里绑定实际的 finalText
+    actions.appendChild(copyBtn);
+
+    wrap.appendChild(bubble); wrap.appendChild(actions); row.appendChild(avatar); row.appendChild(wrap);
     messagesEl.appendChild(row); scrollToBottom();
-    return { bubble, mdContent };
+    return { bubble, mdContent, copyBtn };
   }
 
   function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  // ── 导出聊天记录导出 ──
+  function exportHistory() {
+    if (!history.length) { showToast("⚠️ 当前没有可导出的聊天记录"); return; }
+    let md = "# Grok AI 聊天记录\\n\\n";
+    history.forEach(m => {
+      const role = m.role === "user" ? "**👤 用户**:" : "**🤖 AI**:";
+      let content = "";
+      if (typeof m.content === "string") content = m.content;
+      else if (Array.isArray(m.content)) {
+        content = m.content.find(p => p.type === "text")?.text ?? "[图片]";
+      }
+      md += `${role}\\n\\n${content}\\n\\n---\\n\\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `Grok_Chat_${new Date().toISOString().replace(/[:.]/g,"_")}.md`;
+    a.click();
+    showToast("✅ 已导出为 Markdown 文件");
+  }
+
+  // ── 划词复制功能 ──
+  let selectedText = "";
+  document.addEventListener("selectionchange", () => {
+    const sel = window.getSelection();
+    selectedText = sel ? sel.toString().trim() : "";
+    if (!selectedText) { selCopyBtn.style.display = "none"; }
+  });
+  messagesEl.addEventListener("mouseup", (e) => {
+    if (!selectedText) return;
+    const rect = window.getSelection()?.getRangeAt(0).getBoundingClientRect();
+    if (!rect) return;
+    // 弹在选区正上方
+    selCopyBtn.style.display = "block";
+    selCopyBtn.style.left = `${rect.left + (rect.width / 2) - 25}px`;
+    selCopyBtn.style.top  = `${rect.top - 35 + window.scrollY}px`;
+  });
+  // 隐藏划词按钮
+  document.addEventListener("mousedown", (e) => {
+    if (e.target !== selCopyBtn) selCopyBtn.style.display = "none";
+  });
+  selCopyBtn.addEventListener("click", () => {
+    if (selectedText) navigator.clipboard.writeText(selectedText).then(() => {
+      showToast("✅ 已复制所选内容");
+      window.getSelection()?.removeAllRanges();
+      selCopyBtn.style.display = "none";
+    });
+  });
 
   // ── think 标签过滤 ──
   function cleanThink(raw) {
@@ -654,7 +751,7 @@ import profileImg from './_profile.png';
     }
     history.push({ role: "user", content: userContent });
 
-    const { bubble, mdContent } = appendAssistantMsg();
+    const { bubble, mdContent, copyBtn } = appendAssistantMsg();
     let rawAccum  = "";
     let requestOk = false;  // 是否拿到了 HTTP 200
     let gotContent = false; // 是否真正收到过 delta 文本
@@ -775,16 +872,25 @@ import profileImg from './_profile.png';
         // 有报错（或者拦截），无论拿到多少部分内容，都附上报错，并撤回用户消息
         history.pop();
         mdContent.innerHTML = (finalText ? renderMd(finalText) + "<br><br>" : "") + errorHTML;
+        copyBtn.style.display = "none"; // 报错时不给复制
       } else if (finalText) {
         // 一切正常，且有实在的文本
         mdContent.innerHTML = renderMd(finalText);
         history.push({ role: "assistant", content: finalText });
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(finalText).then(() => showToast("✅ 已复制完整回复"));
+        };
       } else {
         // 请求OK，但完全是空心气泡（上游吐出了 200，但立刻结束没给字）
         history.pop();
         mdContent.innerHTML = renderMd(`哎呀，你的脑洞太超前，直接撞上了**道德守卫的空气墙**！\n\n什么都画/写不出来……换个柔和点、安全点的描述再来吧！😳\n\n> *系统提示：您的上一条消息已被防污染机制撤回，不会影响接下来的对话*`);
+        copyBtn.style.display = "none";
       }
 
+      const emptyBubble = !mdContent.innerHTML.trim() && !mdContent.textContent.trim();
+      if (emptyBubble) {
+        bubble.closest('.msg-row')?.remove();
+      }
       isStreaming = false;
       if (!statusBar.textContent.startsWith("❌") && !statusBar.textContent.startsWith("⚠️")) setStatus("");
       updateSendBtn();
