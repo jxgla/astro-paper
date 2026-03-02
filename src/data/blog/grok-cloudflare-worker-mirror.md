@@ -1,5 +1,5 @@
 ---
-title: 我用 Cloudflare Worker 给自己搭了个 Grok AI 聊天室
+title: 我用 Cloudflare Worker 搭了一个 Grok + GPT/Codex 多模型 AI 网关
 author: 蓝色观者
 pubDatetime: 2026-02-27T08:00:00Z
 slug: grok-cloudflare-worker-mirror
@@ -10,14 +10,14 @@ tags:
   - Cloudflare
   - AI工具
   - 架构记录
-description: "没有复杂的后端，没有服务器账单，纯靠 Cloudflare Worker + KV，搭了一个有限流、有防刷、CORS 处理正确的私有化 Grok AI 聊天界面。记录一下折腾过程。"
+description: "没有复杂后端，没有服务器账单，纯靠 Cloudflare Worker + KV，做了一个安全优先、支持 Grok 与 GPT/Codex 的多模型 AI 网关。记录一下完整实现。"
 ---
 
 ## 起因
 
-故事很俗：某天想用 Grok，但各种套壳和官方网站体验都不理想——要么需要登录、要么广告满天飞、要么需要科学上网。于是想着能不能自己搞一个专属的入口，让自己和朋友可以直接打开就用。
+故事很俗：某天想同时用 Grok 和 GPT/Codex，但各种套壳与官方入口体验都不理想——要么需要登录、要么广告满天飞、要么访问不稳定。于是想着自己做一个统一入口，让朋友和我打开即用。
 
-最终结果：[直接体验 → 我的 Grok 聊天室](/chat)
+最终结果：[直接体验 → 我的 AI 多模型终端](/chat)
 
 ---
 
@@ -28,7 +28,7 @@ description: "没有复杂的后端，没有服务器账单，纯靠 Cloudflare 
        ↓  fetch POST
 Cloudflare Worker（安全网关）
        ↓  转发请求
-Grok API 上游
+多 Provider 上游（Grok / GPT / Codex）
        ↓  SSE 流式返回
 Cloudflare Worker 透传
        ↓
@@ -138,6 +138,19 @@ async function checkRateLimit(kv, ip, type, max) {
 4. `npx wrangler deploy` 发布
 
 前端 Astro 部署到 Cloudflare Pages，Worker 绑定自定义域名，整套跑起来月账单：**￥0**
+
+---
+
+## 近期更新（2026-03）
+
+上线后又补了一波工程化细节，值得单独记一下：
+
+- **中英文内容彻底隔离**：中文界面只展示中文博文，英文界面只展示英文博文，避免 SEO 与用户认知混乱
+- **英文站路径完善**：新增 `/en`、`/en/chat`、`/en/posts`，并补齐中英文切换入口
+- **网关按 locale 注入提示词**：Worker 根据 `locale` 选择中英文系统钢印，英文站对话稳定输出英文
+- **修复流式过程切模型/切模式竞争态**：当回复流还在进行中，前端锁定模式/模型切换，避免触发错误拦截文案（“空气墙”）
+
+这几个点都不是“花活”，是上线后真实流量下必须补齐的稳定性与一致性工作。
 
 ---
 

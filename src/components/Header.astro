@@ -14,11 +14,30 @@ const { pathname } = Astro.url;
 const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
 
-const isActive = (path: string) => {
-  const currentPathArray = currentPath.split("/").filter(p => p.trim());
-  const pathArray = path.split("/").filter(p => p.trim());
+const isEn = currentPath === "/en" || currentPath.startsWith("/en/");
+const basePrefix = isEn ? "/en" : "";
+const langSwitchHref = isEn
+  ? (currentPath === "/en" ? "/" : currentPath.replace(/^\/en/, ""))
+  : `/en${currentPath === "/" ? "" : currentPath}`;
+const langSwitchLabel = isEn ? "CN" : "EN";
+const chatNavLabel = isEn ? "🤖 Chat" : "🤖 AI Chat";
 
-  return currentPath === path || currentPathArray[0] === pathArray[0];
+const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts"]);
+const brandTitle = isEn ? "VibeWatcher" : SITE.title;
+
+const withLocale = (path: string) => {
+  if (!path.startsWith("/")) return path;
+  if (!isEn) return path;
+  if (!EN_LOCALIZED_PATHS.has(path)) return path;
+  return path === "/" ? "/en" : `/en${path}`;
+};
+
+const isActive = (path: string) => {
+  const localizedPath = withLocale(path);
+  const currentPathArray = currentPath.split("/").filter(p => p.trim());
+  const pathArray = localizedPath.split("/").filter(p => p.trim());
+
+  return currentPath === localizedPath || currentPathArray[0] === pathArray[0];
 };
 ---
 
@@ -43,10 +62,10 @@ const isActive = (path: string) => {
     ]}
   >
     <a
-      href="/"
+      href={withLocale("/")}
       class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
     >
-      {SITE.title}
+      {brandTitle}
     </a>
     <nav
       id="nav-menu"
@@ -66,40 +85,40 @@ const isActive = (path: string) => {
         id="menu-items"
         class:list={[
           "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-          "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
+          "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent [&>li>a]:whitespace-nowrap sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
           "hidden",
           "sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
         ]}
       >
         <li class="col-span-2">
           <a
-            href="/chat"
+            href={withLocale("/chat")}
             class:list={[{ "active-nav": isActive("/chat") }]}
             style="font-weight: 600;"
           >
-            🤖 AI Chat
+            {chatNavLabel}
           </a>
         </li>
         <li class="col-span-2">
-          <a href="/posts" class:list={{ "active-nav": isActive("/posts") }}>
-            Posts
+          <a href={withLocale("/posts")} class:list={{ "active-nav": isActive("/posts") }}>
+            {isEn ? "Posts" : "Posts"}
           </a>
         </li>
         <li class="col-span-2">
-          <a href="/tags" class:list={{ "active-nav": isActive("/tags") }}>
-            Tags
+          <a href={withLocale("/tags")} class:list={{ "active-nav": isActive("/tags") }}>
+            {isEn ? "Tags" : "Tags"}
           </a>
         </li>
         <li class="col-span-2">
-          <a href="/about" class:list={{ "active-nav": isActive("/about") }}>
-            About
+          <a href={withLocale("/about")} class:list={{ "active-nav": isActive("/about") }}>
+            {isEn ? "About" : "About"}
           </a>
         </li>
         {
           SITE.showArchives && (
             <li class="col-span-2">
               <LinkButton
-                href="/archives"
+                href={withLocale("/archives")}
                 class:list={[
                   "focus-outline flex justify-center p-3 sm:p-1",
                   {
@@ -116,8 +135,18 @@ const isActive = (path: string) => {
           )
         }
         <li class="col-span-1 flex items-center justify-center">
+          <a
+            href={langSwitchHref}
+            class="focus-outline rounded-full border border-border px-3 py-2 text-xs font-semibold tracking-wide transition hover:border-accent hover:text-accent"
+            title={isEn ? "切换到中文" : "Switch to English"}
+            aria-label={isEn ? "switch-to-chinese" : "switch-to-english"}
+          >
+            {langSwitchLabel}
+          </a>
+        </li>
+        <li class="col-span-1 flex items-center justify-center">
           <LinkButton
-            href="/search"
+            href={withLocale("/search")}
             class:list={[
               "focus-outline flex p-3 sm:p-1",
               { "[&>svg]:stroke-accent": isActive("/search") },

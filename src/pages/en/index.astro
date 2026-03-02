@@ -12,19 +12,21 @@ import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
 
-const posts = await getCollection("blog", ({ data, id }) => !data.draft && !id.endsWith("-en"));
+const posts = await getCollection("blog");
 
-const sortedPosts = getSortedPosts(posts);
+// EN home: prioritize localized EN posts first (filename suffix -en)
+const enPostsOnly = posts.filter(p => p.id.endsWith("-en"));
+const sortedPosts = getSortedPosts(enPostsOnly);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 ---
 
-<Layout>
+<Layout title={`AI Terminal | English | ${SITE.title}`}>
   <Header />
   <main id="main-content" data-layout="index" class="app-layout">
     <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
       <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        观者终端
+        AI Terminal
       </h1>
       <a
         target="_blank"
@@ -42,10 +44,10 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
       </a>
 
       <p class="mt-2 text-skin-base/80">
-        杀戮尖塔重度玩家 · 独立全栈折腾记录 · 运行在 Cloudflare 边缘节点
+        Security-first AI gateway notes · Cloudflare edge deployment · practical engineering logs
       </p>
       <p class="mt-1 text-skin-base/60 text-sm">
-        本站部署了一个基于 Cloudflare Worker 的 <strong>AI 多模型网关</strong>，免登录、免翻墙，支持 Grok / GPT / Codex 多模型切换，完全免费开放体验。
+        This site runs a Cloudflare Worker based <strong>multi-model AI gateway</strong> with Grok / GPT / Codex switching, SSE streaming, and layered abuse protection.
       </p>
 
       {
@@ -57,21 +59,19 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         )
       }
 
-      <!-- C 位大按钮：引流到 AI Chat -->
       <div class="mt-8">
-        <p class="mb-3 text-xs text-skin-base/50">🔥 本站特供 · 免排队直接调用 Grok / GPT / Codex 模型</p>
+        <p class="mb-3 text-xs text-skin-base/50">🔥 English access · secure edge gateway · instant model switching</p>
         <a
-          href="/chat"
+          href="/en/chat"
           class="group relative inline-flex items-center gap-3 overflow-hidden rounded-xl px-8 py-3.5 text-base font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
           style="background: linear-gradient(135deg, #7c6cf0 0%, #5a4fcf 60%, #3b82f6 100%);"
         >
           <span class="text-xl">🚀</span>
-          <span>立即启动 AI 终端</span>
+          <span>Launch AI Terminal</span>
           <span class="text-white/60 text-sm font-normal">grok-4.1-fast / gpt-5.3-codex ›</span>
         </a>
       </div>
     </section>
-
 
     {
       featuredPosts.length > 0 && (
@@ -121,7 +121,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     const indexLayout = (document.querySelector("#main-content") as HTMLElement)
       ?.dataset?.layout;
     if (indexLayout) {
-      sessionStorage.setItem("backUrl", "/");
+      sessionStorage.setItem("backUrl", "/en");
     }
   });
 </script>
