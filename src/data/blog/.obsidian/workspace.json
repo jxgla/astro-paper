@@ -11,14 +11,10 @@
             "id": "4394fe420dd8b5b6",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "grok-cloudflare-worker-mirror.md",
-                "mode": "preview",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "grok-cloudflare-worker-mirror"
+              "title": "新标签页"
             }
           }
         ]
@@ -183,9 +179,12 @@
       "bases:新建数据库": false
     }
   },
-  "active": "dfb8bebb6b957a82",
+  "active": "4394fe420dd8b5b6",
   "lastOpenFiles": [
     "aura_tech_review.md",
-    "aura_development_journey.md"
+    "aura_development_journey.md",
+    "hello-world.md",
+    "grok-cloudflare-worker-mirror.md",
+    "grok-cloudflare-worker-mirror-en.md"
   ]
 }

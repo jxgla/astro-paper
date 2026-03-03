@@ -27,29 +27,50 @@ const {
 /* ========== Formatted Datetime ========== */
 const isModified = modDatetime && modDatetime > pubDatetime;
 
-const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
+const pubDatetimeObj = dayjs(pubDatetime).tz(
   postTimezone || SITE.timezone
 );
+const pubDate = pubDatetimeObj.format("D MMM, YYYY"); 
 
-const date = datetime.format("D MMM, YYYY"); // e.g., '22 Mar, 2025'
+let modDate = null;
+let modDatetimeObj = null;
+if (isModified) {
+  modDatetimeObj = dayjs(modDatetime).tz(postTimezone || SITE.timezone);
+  modDate = modDatetimeObj.format("D MMM, YYYY");
+}
+
+const isEnglish = Astro.url.pathname.startsWith("/en");
+const pubLabel = isEnglish ? "Published:" : "发布于:";
+const modLabel = isEnglish ? "Updated:" : "更新于:";
 ---
 
-<div class:list={["flex items-center gap-x-2 opacity-80", className]}>
-  <IconCalendar
-    class:list={[
-      "inline-block size-6 min-w-5.5",
-      { "scale-90": size === "sm" },
-    ]}
-  />
+<div class:list={["flex items-center gap-x-2 opacity-80 flex-wrap", className]}>
+  <div class="flex items-center gap-1">
+    <IconCalendar
+      class:list={[
+        "inline-block size-6 min-w-5.5",
+        { "scale-90": size === "sm" },
+      ]}
+    />
+    <span class:list={["text-sm font-medium", { "sm:text-base": size === "lg" }]}>
+      {pubLabel}
+    </span>
+    <time
+      class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+      datetime={pubDatetimeObj.toISOString()}>{pubDate}</time>
+  </div>
+  
   {
     isModified && (
-      <span class:list={["text-sm", { "sm:text-base": size === "lg" }]}>
-        Updated:
-      </span>
+      <div class="flex items-center gap-1">
+        <span class="opacity-50 mx-1 hidden sm:inline">|</span>
+        <span class:list={["text-sm font-medium ml-2 sm:ml-0", { "sm:text-base": size === "lg" }]}>
+          📝 {modLabel}
+        </span>
+        <time
+          class:list={["text-sm", { "sm:text-base": size === "lg" }]}
+          datetime={modDatetimeObj!.toISOString()}>{modDate}</time>
+      </div>
     )
   }
-  <time
-    class:list={["text-sm", { "sm:text-base": size === "lg" }]}
-    datetime={datetime.toISOString()}>{date}</time
-  >
 </div>
