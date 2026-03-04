@@ -12,7 +12,7 @@ type Props = {
   profile?: string;
   description?: string;
   ogImage?: string;
-  canonicalURL?: string;
+  canonicalURL?: string | URL;
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
@@ -30,23 +30,44 @@ const {
   scrollSmooth = false,
 } = Astro.props;
 
+const canonicalHref = canonicalURL instanceof URL ? canonicalURL.href : String(canonicalURL);
 const socialImageURL = new URL(ogImage, Astro.url);
+const socialImageHref = socialImageURL.href;
+const isoPublished = pubDatetime?.toISOString();
+const isoModified = modDatetime?.toISOString();
 
-const structuredData = {
+const websiteStructuredData = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: `${title}`,
-  image: `${socialImageURL}`,
-  datePublished: `${pubDatetime?.toISOString()}`,
-  ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-  author: [
-    {
-      "@type": "Person",
-      name: `${author}`,
-      ...(profile && { url: profile }),
-    },
-  ],
+  "@type": "WebSite",
+  name: SITE.title,
+  description: SITE.desc,
+  url: SITE.website,
 };
+
+const structuredData = [
+  websiteStructuredData,
+  ...(isoPublished
+    ? [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: title,
+          description,
+          image: socialImageHref,
+          mainEntityOfPage: canonicalHref,
+          datePublished: isoPublished,
+          ...(isoModified && { dateModified: isoModified }),
+          author: [
+            {
+              "@type": "Person",
+              name: author,
+              ...(profile && { url: profile }),
+            },
+          ],
+        },
+      ]
+    : []),
+];
 ---
 
 <!doctype html>
@@ -73,13 +94,13 @@ const structuredData = {
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="author" content={author} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:url" content={canonicalHref} />
+    <meta property="og:image" content={socialImageHref} />
 
     <!-- Article Published/Modified time -->
     {
@@ -101,10 +122,10 @@ const structuredData = {
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:url" content={canonicalHref} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={socialImageURL} />
+    <meta property="twitter:image" content={socialImageHref} />
 
     <!-- Google JSON-LD Structured data -->
     <script
