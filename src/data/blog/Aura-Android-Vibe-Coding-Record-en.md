@@ -2,6 +2,13 @@
 title: "From a Web Mirror to an AI Assistant on My Phone: I Built an Android App in Two Days (Vibe Coding Practice Log)"
 pubDatetime: 2026-03-04T10:00:00Z
 modDatetime: 2026-03-04T10:00:00Z
+description: "A two-day Android Aura build log: moving from web mirror sessions to persistent mobile AI assistant experience with multi-model collaboration and release-stage stability fixes."
+tags:
+  - Android
+  - vibe-coding
+  - AI app
+featured: false
+draft: false
 ---
 
 After finishing the web mirror version, the first issue I hit was not “the model isn’t strong enough,” but something much more practical:
