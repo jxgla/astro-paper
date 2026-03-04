@@ -1,9 +1,9 @@
 export const SITE = {
   website: "https://410666.xyz/", // replace this with your deployed domain
-  author: "蓝色观者",
+  author: "VibeWatcher",
   profile: "https://410666.xyz/",
-  desc: "杀戮尖塔重度玩家 | 紫皮人爱好者 | 独立全栈折腾记录",
-  title: "观者终端",
+  desc: "观者终端：Grok + GPT 镜像站，提供免登录 AI 对话与后续工具站服务，部署于 Cloudflare 边缘网络。",
+  title: "观者终端 | Grok + GPT 镜像站与 AI 工具站",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
@@ -18,6 +18,6 @@ export const SITE = {
   },
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
-  lang: "en", // html lang code. Set this empty and default will be "en"
-  timezone: "Asia/Bangkok", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  lang: "zh-CN", // html lang code. Set this empty and default will be "en"
+  timezone: "Asia/Shanghai", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 } as const;
