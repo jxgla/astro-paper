@@ -7,7 +7,7 @@ tags:
   - Android
   - vibe-coding
   - AI app
-featured: false
+featured: true
 draft: false
 ---
 

@@ -23,7 +23,12 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 
 <Layout title={`AI Terminal | English | ${SITE.title}`}>
   <Header />
-  <main id="main-content" data-layout="index" class="app-layout">
+  <main id="main-content" data-layout="index" class="app-layout relative pb-24 md:pb-40">
+    <div aria-hidden="true" class="ambient-shell pointer-events-none">
+      <div class="ambient-orb ambient-orb-left"></div>
+      <div class="ambient-orb ambient-orb-right"></div>
+      <div class="ambient-grid"></div>
+    </div>
     <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
       <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
         AI Terminal
@@ -111,9 +116,120 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>
     </div>
+
+    <div
+      id="chatbot-reserved-slot"
+      aria-hidden="true"
+      class="chatbot-slot-placeholder hidden md:block"
+    >
+      <div class="chatbot-slot-border"></div>
+      <div class="chatbot-slot-label">Reserved chatbot area (mount later)</div>
+    </div>
   </main>
   <Footer />
 </Layout>
+
+<style>
+  .ambient-shell {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .ambient-orb {
+    position: absolute;
+    width: clamp(20rem, 28vw, 32rem);
+    height: clamp(20rem, 28vw, 32rem);
+    border-radius: 999px;
+    filter: blur(24px);
+    opacity: 0.6;
+    animation: ambientDrift 16s ease-in-out infinite;
+  }
+
+  .ambient-orb-left {
+    left: clamp(-12rem, -8vw, -6rem);
+    top: 18vh;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.38) 0%, rgba(59, 130, 246, 0) 72%);
+  }
+
+  .ambient-orb-right {
+    right: clamp(-12rem, -8vw, -6rem);
+    top: 32vh;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.32) 0%, rgba(56, 189, 248, 0) 72%);
+    animation-delay: -8s;
+  }
+
+  .ambient-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.42) 0%, transparent 78%);
+  }
+
+  .chatbot-slot-placeholder {
+    position: fixed;
+    right: 1.35rem;
+    bottom: 1.35rem;
+    width: min(22rem, calc(100vw - 2.4rem));
+    height: 22rem;
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--background) 80%, transparent);
+    box-shadow: 0 18px 55px rgba(15, 23, 42, 0.22);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    z-index: 35;
+  }
+
+  .chatbot-slot-border {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed color-mix(in oklab, var(--accent) 48%, transparent);
+    border-radius: inherit;
+  }
+
+  .chatbot-slot-label {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.7rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    color: color-mix(in oklab, var(--foreground) 58%, transparent);
+  }
+
+  @keyframes ambientDrift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(0, -14px, 0) scale(1.035);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .ambient-shell {
+      opacity: 0.72;
+    }
+  }
+
+  :global(html[data-theme="light"]) .ambient-orb-left {
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.24) 0%, rgba(37, 99, 235, 0) 72%);
+  }
+
+  :global(html[data-theme="light"]) .ambient-orb-right {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.18) 0%, rgba(14, 165, 233, 0) 72%);
+  }
+
+  :global(html[data-theme="light"]) .chatbot-slot-placeholder {
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+    background: color-mix(in oklab, white 80%, transparent);
+  }
+</style>
 
 <script>
   document.addEventListener("astro:page-load", () => {
