@@ -11,10 +11,14 @@
             "id": "4394fe420dd8b5b6",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Aura-Android-Vibe-Coding-实践记录.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "Aura-Android-Vibe-Coding-实践记录"
             }
           }
         ]
@@ -181,10 +185,12 @@
   },
   "active": "4394fe420dd8b5b6",
   "lastOpenFiles": [
-    "aura_tech_review.md",
-    "aura_development_journey.md",
     "hello-world.md",
     "grok-cloudflare-worker-mirror.md",
-    "grok-cloudflare-worker-mirror-en.md"
+    "grok-cloudflare-worker-mirror-en.md",
+    "Aura-Android-Vibe-Coding-Record-en.md",
+    "Aura-Android-Vibe-Coding-实践记录.md",
+    "aura_tech_review.md",
+    "aura_development_journey.md"
   ]
 }

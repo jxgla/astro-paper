@@ -1,13 +1,13 @@
 ---
-title: "从网页镜像到手机里的 AI 助手：我用两天做了一个 Android App（Vibe Coding 实践记录）"
+title: 从网页镜像到手机里的 AI 助手：我用两天做了一个 Android App（Vibe Coding 实践记录）
 pubDatetime: 2026-03-04T04:00:00Z
 modDatetime: 2026-03-04T04:00:00Z
-description: "两天完成 Aura Android AI 助手的实战记录：从网页镜像到移动端连续对话体验，覆盖多模型协作、发布排障与适老化交互设计。"
+description: 两天完成 Aura Android AI 助手的实战记录：从网页镜像到移动端连续对话体验，覆盖多模型协作、发布排障与适老化交互设计。
 tags:
   - Android
   - vibe-coding
   - AI应用
-featured: false
+featured: true
 draft: false
 ---
 
