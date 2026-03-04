@@ -11,6 +11,7 @@ import IconRss from "@/assets/icons/IconRss.svg";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
+import HomeChatbotWidget from "@/components/HomeChatbotWidget.astro";
 
 const posts = await getCollection("blog");
 
@@ -122,8 +123,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
       aria-hidden="true"
       class="chatbot-slot-placeholder hidden md:block"
     >
-      <div class="chatbot-slot-border"></div>
-      <div class="chatbot-slot-label">Reserved chatbot area (mount later)</div>
+      <HomeChatbotWidget locale="en" />
     </div>
   </main>
   <Footer />
@@ -178,27 +178,17 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     width: min(22rem, calc(100vw - 2.4rem));
     height: 22rem;
     border-radius: 1rem;
-    background: color-mix(in oklab, var(--background) 80%, transparent);
-    box-shadow: 0 18px 55px rgba(15, 23, 42, 0.22);
-    backdrop-filter: blur(8px);
-    pointer-events: none;
+    height: min(36rem, calc(100vh - 2.4rem));
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    pointer-events: auto;
     z-index: 35;
   }
 
-  .chatbot-slot-border {
-    position: absolute;
-    inset: 0;
-    border: 1px dashed color-mix(in oklab, var(--accent) 48%, transparent);
-    border-radius: inherit;
-  }
-
+  .chatbot-slot-border,
   .chatbot-slot-label {
-    position: absolute;
-    left: 0.9rem;
-    bottom: 0.7rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.02em;
-    color: color-mix(in oklab, var(--foreground) 58%, transparent);
+    display: none;
   }
 
   @keyframes ambientDrift {
@@ -226,8 +216,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
   }
 
   :global(html[data-theme="light"]) .chatbot-slot-placeholder {
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
-    background: color-mix(in oklab, white 80%, transparent);
+    background: transparent;
   }
 </style>
 
