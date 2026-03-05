@@ -211,15 +211,15 @@ const copy = locale === "en"
     align-content: start;
   }
 
-  .homebot-msg {
+  :global(.homebot-msg) {
     display: flex;
   }
 
-  .homebot-msg-user {
+  :global(.homebot-msg-user) {
     justify-content: flex-end;
   }
 
-  .homebot-bubble {
+  :global(.homebot-bubble) {
     max-width: 85%;
     padding: 0.55rem 0.7rem;
     border-radius: 0.75rem;
@@ -231,7 +231,7 @@ const copy = locale === "en"
     white-space: pre-wrap;
   }
 
-  .homebot-msg-user .homebot-bubble {
+  :global(.homebot-msg-user .homebot-bubble) {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     border-color: transparent;
     color: #fff;
