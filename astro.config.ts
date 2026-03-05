@@ -57,6 +57,16 @@ export default defineConfig({
         context: "client",
         optional: true,
       }),
+      PUBLIC_CHATBOT_API_ENDPOINT: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
+      PUBLIC_CHATBOT_METRICS_ENDPOINT: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
     },
   },
   experimental: {

@@ -144,6 +144,22 @@ PUBLIC_GOOGLE_SITE_VERIFICATION=your-google-site-verification-value
 
 > See [this discussion](https://github.com/satnaing/astro-paper/discussions/334#discussioncomment-10139247) for adding AstroPaper to the Google Search Console.
 
+## Home Chatbot Environment Variables
+
+The homepage chatbot widget reads public runtime variables from `.env`.
+
+```bash
+PUBLIC_CHATBOT_API_ENDPOINT=https://your-worker-or-gateway-endpoint
+PUBLIC_CHATBOT_METRICS_ENDPOINT=https://your-metrics-endpoint(optional)
+```
+
+- Add them to your local `.env` (you can copy from `.env.example`).
+- For Cloudflare Pages, set the same variables in **Pages > Settings > Environment variables**.
+- If endpoint variable is missing, the homepage widget shows a fallback message and does not send requests.
+- `PUBLIC_CHATBOT_METRICS_ENDPOINT` is optional and can receive widget event telemetry.
+- Keep API tokens private in Worker Secrets (for example `openclaw-worker` `ROBOT_SECRET_TOKEN` / `OPENCLAW_TOKEN`), not in frontend public vars.
+- Minimal manual regression script: `plans/home-chatbot-regression-checklist.md`.
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
