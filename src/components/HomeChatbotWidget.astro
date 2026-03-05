@@ -4,6 +4,8 @@ interface Props {
 }
 
 const { locale = "zh" } = Astro.props as Props;
+const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "";
+const chatbotMetricsEndpoint = import.meta.env.PUBLIC_CHATBOT_METRICS_ENDPOINT || "";
 
 const copy = locale === "en"
   ? {
@@ -37,8 +39,8 @@ const copy = locale === "en"
 <div
   class="homebot"
   data-homebot
-  data-api="https://api.gemnwong.dpdns.org"
-  data-auth="1406"
+  data-api={chatbotApi}
+  data-metrics-endpoint={chatbotMetricsEndpoint}
   data-locale={locale}
 >
   <button type="button" class="homebot-fab" data-homebot-fab aria-label={copy.open} title={copy.open}>
@@ -288,7 +290,7 @@ const copy = locale === "en"
     host.dataset.inited = "1";
 
     const api = host.dataset.api || "";
-    const auth = host.dataset.auth || "";
+    const metricsEndpoint = host.dataset.metricsEndpoint || "";
     const locale = host.dataset.locale || "zh";
 
     const fab = host.querySelector("[data-homebot-fab]");
@@ -302,10 +304,72 @@ const copy = locale === "en"
     if (!fab || !panel || !closeBtn || !messagesEl || !form || !input || !send) return;
 
     const textMap = locale === "en"
-      ? { thinking: "Thinking", error: "Network error", empty: "(No response)" }
-      : { thinking: "正在思考", error: "通信故障", empty: "（机器人没有回复）" };
+      ? {
+          thinking: "Thinking",
+          error: "Network error",
+          empty: "(No response)",
+          config: "Chatbot is temporarily unavailable (missing endpoint config).",
+        }
+      : {
+          thinking: "正在思考",
+          error: "通信故障",
+          empty: "（机器人没有回复）",
+          config: "机器人暂时不可用（缺少 endpoint 配置）。",
+        };
 
     let isOpen = false;
+
+    const emitMetric = (eventName, extra = {}) => {
+      const payload = {
+        event: eventName,
+        locale,
+        path: location.pathname,
+        ts: Date.now(),
+        ...extra,
+      };
+
+      try {
+        window.dispatchEvent(new CustomEvent("homebot:metric", { detail: payload }));
+      } catch {
+        // noop
+      }
+
+      try {
+        if (typeof window.gtag === "function") {
+          window.gtag("event", eventName, payload);
+        }
+      } catch {
+        // noop
+      }
+
+      try {
+        if (typeof window.plausible === "function") {
+          window.plausible(`homebot_${eventName}`, { props: payload });
+        }
+      } catch {
+        // noop
+      }
+
+      if (!metricsEndpoint) return;
+
+      try {
+        const body = JSON.stringify(payload);
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(metricsEndpoint, body);
+        } else {
+          fetch(metricsEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body,
+            keepalive: true,
+          }).catch(() => {
+            // noop
+          });
+        }
+      } catch {
+        // noop
+      }
+    };
 
     const syncState = () => {
       host.classList.toggle("is-open", isOpen);
@@ -315,11 +379,13 @@ const copy = locale === "en"
     fab.addEventListener("click", () => {
       isOpen = !isOpen;
       syncState();
+      emitMetric(isOpen ? "open" : "close", { source: "fab" });
     });
 
     closeBtn.addEventListener("click", () => {
       isOpen = false;
       syncState();
+      emitMetric("close", { source: "panel_close" });
     });
 
     const addBubble = (text, isUser) => {
@@ -339,18 +405,27 @@ const copy = locale === "en"
       const text = input.value.trim();
       if (!text) return;
 
+      if (!api) {
+        addBubble(textMap.config, false);
+        emitMetric("config_missing", { has_api: Boolean(api) });
+        return;
+      }
+
       input.value = "";
       send.disabled = true;
       addBubble(text, true);
       const thinkingEl = addBubble(textMap.thinking, false);
+      const startedAt = Date.now();
+      emitMetric("send", { text_length: text.length });
 
       try {
+        const headers = {
+          "Content-Type": "application/json",
+        };
+
         const res = await fetch(api, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: auth,
-          },
+          headers,
           body: JSON.stringify({ message: text }),
         });
 
@@ -366,6 +441,11 @@ const copy = locale === "en"
         if (!res.ok) {
           const err = (data && data.error) || `HTTP ${res.status}`;
           addBubble(String(err), false);
+          emitMetric("error", {
+            status: res.status,
+            latency_ms: Date.now() - startedAt,
+            kind: "http",
+          });
           return;
         }
 
@@ -374,9 +454,17 @@ const copy = locale === "en"
           (data && data.error) ||
           textMap.empty;
         addBubble(String(reply), false);
+        emitMetric("success", {
+          latency_ms: Date.now() - startedAt,
+          reply_length: String(reply).length,
+        });
       } catch (err) {
         thinkingEl.remove();
         addBubble(`${textMap.error}: ${(err && err.message) || "unknown"}`, false);
+        emitMetric("error", {
+          latency_ms: Date.now() - startedAt,
+          kind: "network",
+        });
       } finally {
         send.disabled = false;
       }
