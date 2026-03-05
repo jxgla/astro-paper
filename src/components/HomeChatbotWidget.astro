@@ -26,7 +26,7 @@ const copy = locale === "en"
   : {
       title: "鼓掌 · 机器人",
       status: "在线",
-      welcome: "嘿！我是站点机器人，欢迎随便聊聊。",
+      welcome: "嘿！我是鼓掌集气人，欢迎随便聊聊。",
       placeholder: "说点什么...",
       thinking: "正在思考",
       send: "发送",
@@ -490,6 +490,7 @@ const copy = locale === "en"
 
     let isOpen = false;
     let isMaximized = false;
+    let isPending = false;
 
     const escapeHtml = inputText =>
       String(inputText)
@@ -660,6 +661,8 @@ const copy = locale === "en"
       expandBtn.textContent = isMaximized ? "🗗" : "⛶";
       expandBtn.title = isMaximized ? textMap.collapse : textMap.expand;
       expandBtn.setAttribute("aria-label", isMaximized ? textMap.collapse : textMap.expand);
+      input.disabled = isPending;
+      send.disabled = isPending;
       if (isOpen) input.focus();
     };
 
@@ -716,6 +719,7 @@ const copy = locale === "en"
 
     form.addEventListener("submit", async e => {
       e.preventDefault();
+      if (isPending) return;
       const text = input.value.trim();
       if (!text) return;
 
@@ -726,7 +730,8 @@ const copy = locale === "en"
       }
 
       input.value = "";
-      send.disabled = true;
+      isPending = true;
+      syncState();
       addBubble(text, true);
       const thinkingEl = addBubble(textMap.thinking, false);
       const startedAt = Date.now();
@@ -780,7 +785,8 @@ const copy = locale === "en"
           kind: "network",
         });
       } finally {
-        send.disabled = false;
+        isPending = false;
+        syncState();
       }
     });
   }
