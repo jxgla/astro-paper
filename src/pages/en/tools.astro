@@ -977,6 +977,20 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       return canvas;
     };
 
+    const buildPosterPreviewImage = (canvas: HTMLCanvasElement) => {
+      const img = document.createElement("img");
+      img.src = canvas.toDataURL("image/png");
+      img.alt = "MBTI share card preview";
+      img.style.width = "180px";
+      img.style.maxWidth = "100%";
+      img.style.height = "auto";
+      img.style.display = "block";
+      img.style.borderRadius = "0.9rem";
+      img.style.border = "1px solid color-mix(in oklab, var(--foreground) 14%, transparent)";
+      img.style.boxShadow = "0 12px 40px rgba(15, 23, 42, 0.22)";
+      return img;
+    };
+
     const renderList = (title: string, items: string[]) => {
       if (!items?.length) return "";
       return `<h4>${esc(title)}</h4><ul>${items.map(item => `<li>${esc(item)}</li>`).join("")}</ul>`;
@@ -1122,8 +1136,8 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         return;
       }
       posterPreview.innerHTML = "";
-      posterPreview.appendChild(canvas);
       latestPosterDataUrl = canvas.toDataURL("image/png");
+      posterPreview.appendChild(buildPosterPreviewImage(canvas));
       posterModal.hidden = false;
       status.textContent = "Share card generated.";
     };
