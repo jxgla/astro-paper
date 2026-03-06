@@ -16,7 +16,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       <div class="tools-grid">
         <article id="mbti-match" class="tool-card">
           <h3>MBTI 匹配测试</h3>
-          <p>输入两个 MBTI，快速查看恋爱、友情、沟通与踩雷点分析。</p>
+          <p>看看你和 TA 是一见来电、慢热变香，还是典型的高甜高拉扯组合。</p>
           <span class="tool-badge">New</span>
 
           <form class="tool-form" data-mbti-form data-tools-api-base={toolsApiBase}>
@@ -40,9 +40,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <button type="button" class="tool-btn-secondary" data-mbti-deep>AI 深度解读</button>
               <button type="button" class="tool-btn-secondary" data-mbti-swap>交换顺序</button>
               <button type="button" class="tool-btn-secondary" data-mbti-copy>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-mbti-poster>分享卡片</button>
             </div>
 
-            <p class="tool-status" data-mbti-status>先选两个 MBTI，即可得到基础匹配分析。AI 深度解读默认使用 grok-4.1-fast。</p>
+            <p class="tool-status" data-mbti-status>先选两个 MBTI，马上看你们是高甜、慢热，还是越爱越容易互相气到。</p>
 
             <div class="tool-result-wrap" data-mbti-result-wrap hidden>
               <div class="mbti-score-card">
@@ -57,6 +58,21 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
               <div class="tool-result mbti-result-block" data-mbti-result></div>
               <div class="tool-result mbti-result-block" data-mbti-deep-result hidden></div>
+            </div>
+
+            <div class="temp-mail-modal" data-mbti-poster-modal hidden>
+              <div class="temp-mail-modal-backdrop" data-mbti-poster-close></div>
+              <div class="temp-mail-modal-panel" role="dialog" aria-modal="true" aria-label="分享卡片">
+                <div class="temp-mail-modal-head">
+                  <strong>分享卡片</strong>
+                  <button type="button" class="tool-btn-secondary" data-mbti-poster-close>关闭</button>
+                </div>
+                <div class="mbti-poster-preview" data-mbti-poster-preview></div>
+                <div class="tool-actions">
+                  <button type="button" class="tool-btn-primary" data-mbti-poster-download>下载 PNG</button>
+                  <button type="button" class="tool-btn-secondary" data-mbti-poster-copy>复制文案</button>
+                </div>
+              </div>
             </div>
           </form>
         </article>
@@ -423,6 +439,18 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     margin-top: 0.2rem;
   }
 
+  .mbti-poster-preview {
+    display: flex;
+    justify-content: center;
+  }
+
+  .mbti-poster-preview canvas {
+    width: min(100%, 360px);
+    border-radius: 0.9rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.22);
+  }
+
   @media (max-width: 720px) {
     .mbti-grid {
       grid-template-columns: 1fr;
@@ -730,6 +758,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const deepBtn = form.querySelector("[data-mbti-deep]");
     const swapBtn = form.querySelector("[data-mbti-swap]");
     const copyBtn = form.querySelector("[data-mbti-copy]");
+    const posterBtn = form.querySelector("[data-mbti-poster]");
     const status = form.querySelector("[data-mbti-status]");
     const resultWrap = form.querySelector("[data-mbti-result-wrap]");
     const pairEl = form.querySelector("[data-mbti-pair]");
@@ -737,6 +766,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const dimensionsEl = form.querySelector("[data-mbti-dimensions]");
     const resultEl = form.querySelector("[data-mbti-result]");
     const deepResultEl = form.querySelector("[data-mbti-deep-result]");
+    const posterModal = form.querySelector("[data-mbti-poster-modal]");
+    const posterCloseBtns = form.querySelectorAll("[data-mbti-poster-close]");
+    const posterPreview = form.querySelector("[data-mbti-poster-preview]");
+    const posterDownloadBtn = form.querySelector("[data-mbti-poster-download]");
+    const posterCopyBtn = form.querySelector("[data-mbti-poster-copy]");
 
     if (!(typeAEl instanceof HTMLSelectElement)) return;
     if (!(typeBEl instanceof HTMLSelectElement)) return;
@@ -744,6 +778,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(deepBtn instanceof HTMLButtonElement)) return;
     if (!(swapBtn instanceof HTMLButtonElement)) return;
     if (!(copyBtn instanceof HTMLButtonElement)) return;
+    if (!(posterBtn instanceof HTMLButtonElement)) return;
     if (!(status instanceof HTMLElement)) return;
     if (!(resultWrap instanceof HTMLElement)) return;
     if (!(pairEl instanceof HTMLElement)) return;
@@ -751,12 +786,17 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(dimensionsEl instanceof HTMLElement)) return;
     if (!(resultEl instanceof HTMLElement)) return;
     if (!(deepResultEl instanceof HTMLElement)) return;
+    if (!(posterModal instanceof HTMLElement)) return;
+    if (!(posterPreview instanceof HTMLElement)) return;
+    if (!(posterDownloadBtn instanceof HTMLButtonElement)) return;
+    if (!(posterCopyBtn instanceof HTMLButtonElement)) return;
 
     const apiBase = (form.dataset.toolsApiBase || "").replace(/\/$/, "");
     const apiUrl = `${apiBase}${MBTI_API_PATH}`;
     const types = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
     let latestPlainText = "";
     let busy = false;
+    let latestPosterDataUrl = "";
 
     const labels = {
       romance: "恋爱",
@@ -781,6 +821,111 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       swapBtn.disabled = next;
       typeAEl.disabled = next;
       typeBEl.disabled = next;
+    };
+
+    const wrapText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number, maxLines = 8) => {
+      const words = String(text || "").split("");
+      let line = "";
+      let lines = 0;
+      for (const ch of words) {
+        const test = line + ch;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          y += lineHeight;
+          lines += 1;
+          line = ch;
+          if (lines >= maxLines) break;
+        } else {
+          line = test;
+        }
+      }
+      if (line && lines < maxLines) {
+        ctx.fillText(line, x, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    const buildPoster = () => {
+      if (!pairEl.textContent || pairEl.textContent === "-- × --") return null;
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const gradient = ctx.createLinearGradient(0, 0, 1080, 1440);
+      gradient.addColorStop(0, "#1d4ed8");
+      gradient.addColorStop(0.45, "#7c3aed");
+      gradient.addColorStop(1, "#0f172a");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.beginPath();
+      ctx.arc(920, 180, 180, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(140, 1240, 220, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 64px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillText("MBTI 匹配测试", 80, 120);
+      ctx.font = "32px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.88)";
+      ctx.fillText("这组到底是高甜、慢热，还是上头又拉扯？", 80, 176);
+
+      ctx.fillStyle = "rgba(255,255,255,0.16)";
+      ctx.fillRect(80, 240, 920, 180);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 72px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillText(pairEl.textContent || "", 120, 332);
+      ctx.font = "bold 34px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillStyle = "#bfdbfe";
+      ctx.fillText(`综合匹配度 ${overallEl.textContent || "--"}`, 120, 388);
+
+      const summaryText = resultEl.querySelector("p")?.textContent || latestPlainText.split("\n")[2] || "";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 42px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillText("一句话总结", 80, 500);
+      ctx.font = "30px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.94)";
+      let cursorY = wrapText(ctx, summaryText, 80, 555, 920, 42, 4);
+
+      const cards = Array.from(dimensionsEl.children).slice(0, 5).map(node => ({
+        title: node.querySelector("strong")?.textContent || "",
+        value: node.querySelector("span")?.textContent || "",
+      }));
+      const startY = cursorY + 30;
+      cards.forEach((card, index) => {
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const x = 80 + col * 455;
+        const y = startY + row * 130;
+        ctx.fillStyle = "rgba(255,255,255,0.14)";
+        ctx.fillRect(x, y, 425, 100);
+        ctx.fillStyle = "rgba(255,255,255,0.78)";
+        ctx.font = "28px Segoe UI, Microsoft YaHei, sans-serif";
+        ctx.fillText(card.title, x + 28, y + 38);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 38px Segoe UI, Microsoft YaHei, sans-serif";
+        ctx.fillText(String(card.value), x + 28, y + 78);
+      });
+
+      const noteY = startY + 3 * 130 + 40;
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 38px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillText("适合发朋友圈的一句", 80, noteY);
+      ctx.font = "30px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      wrapText(ctx, `${pairEl.textContent || "这组"}：${summaryText}`, 80, noteY + 54, 920, 40, 6);
+
+      ctx.fillStyle = "rgba(255,255,255,0.66)";
+      ctx.font = "24px Segoe UI, Microsoft YaHei, sans-serif";
+      ctx.fillText("仅供娱乐参考 · 410666.xyz/tools", 80, 1360);
+
+      return canvas;
     };
 
     const renderList = (title: string, items: string[]) => {
@@ -820,6 +965,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       deepResultEl.hidden = true;
       deepResultEl.innerHTML = "";
       latestPlainText = buildPlainText(analysis);
+      latestPosterDataUrl = "";
     };
 
     const ensureTypes = () => {
@@ -896,6 +1042,53 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       try {
         await navigator.clipboard.writeText(latestPlainText);
         status.textContent = "分析结果已复制。";
+      } catch {
+        status.textContent = "复制失败，请手动复制。";
+      }
+    });
+
+    const openPoster = () => {
+      const canvas = buildPoster();
+      if (!canvas) {
+        status.textContent = "请先生成分析结果。";
+        return;
+      }
+      posterPreview.innerHTML = "";
+      posterPreview.appendChild(canvas);
+      latestPosterDataUrl = canvas.toDataURL("image/png");
+      posterModal.hidden = false;
+      status.textContent = "分享卡片已生成。";
+    };
+
+    posterBtn.addEventListener("click", openPoster);
+    posterCloseBtns.forEach(btn => {
+      if (!(btn instanceof HTMLElement)) return;
+      btn.addEventListener("click", () => {
+        posterModal.hidden = true;
+      });
+    });
+
+    posterDownloadBtn.addEventListener("click", () => {
+      if (!latestPosterDataUrl) {
+        openPoster();
+      }
+      if (!latestPosterDataUrl) return;
+      const a = document.createElement("a");
+      a.href = latestPosterDataUrl;
+      a.download = `mbti-${typeAEl.value || "A"}-${typeBEl.value || "B"}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    posterCopyBtn.addEventListener("click", async () => {
+      if (!latestPlainText) {
+        status.textContent = "请先生成分析结果。";
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(latestPlainText);
+        status.textContent = "分享文案已复制。";
       } catch {
         status.textContent = "复制失败，请手动复制。";
       }
