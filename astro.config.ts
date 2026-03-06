@@ -67,6 +67,11 @@ export default defineConfig({
         context: "client",
         optional: true,
       }),
+      PUBLIC_TOOLS_API_BASE: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
     },
   },
   experimental: {
