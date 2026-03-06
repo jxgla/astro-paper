@@ -79,7 +79,18 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         <article id="temp-mail" class="tool-card">
           <h3>临时邮箱</h3>
           <p>快速生成临时邮箱用于注册验证与一次性收件场景。</p>
-          <span class="tool-badge">Available soon</span>
+          <span class="tool-badge">Beta</span>
+
+          <div class="tool-form" data-temp-mail data-tools-api-base={toolsApiBase}>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-temp-mail-create>生成邮箱</button>
+              <button type="button" class="tool-btn-secondary" data-temp-mail-refresh>刷新收件箱</button>
+            </div>
+
+            <p class="tool-status" data-temp-mail-status>点击生成临时邮箱后即可开始收件。</p>
+            <div class="tool-mailbox" data-temp-mail-address>尚未生成邮箱</div>
+            <div class="tool-result" data-temp-mail-list>暂无邮件</div>
+          </div>
         </article>
       </div>
     </section>
@@ -245,6 +256,16 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     padding: 0.6rem;
     font-size: 0.71rem;
     line-height: 1.38;
+  }
+
+  .tool-mailbox {
+    border-radius: 0.62rem;
+    border: 1px dashed color-mix(in oklab, var(--foreground) 18%, transparent);
+    padding: 0.55rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--background) 97%, transparent);
   }
 
   .tool-badge {
@@ -447,5 +468,74 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     });
   }
 
+  const TEMP_MAIL_API_PATH = "/api/tools/temp-mail";
+
+  function initTempMailTool() {
+    const root = document.querySelector("[data-temp-mail]");
+    if (!(root instanceof HTMLElement)) return;
+    if (root.dataset.inited === "1") return;
+    root.dataset.inited = "1";
+
+    const createBtn = root.querySelector("[data-temp-mail-create]");
+    const refreshBtn = root.querySelector("[data-temp-mail-refresh]");
+    const status = root.querySelector("[data-temp-mail-status]");
+    const mailboxEl = root.querySelector("[data-temp-mail-address]");
+    const listEl = root.querySelector("[data-temp-mail-list]");
+
+    if (!(createBtn instanceof HTMLButtonElement)) return;
+    if (!(refreshBtn instanceof HTMLButtonElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(mailboxEl instanceof HTMLElement)) return;
+    if (!(listEl instanceof HTMLElement)) return;
+
+    const apiBase = (root.dataset.toolsApiBase || "").replace(/\/$/, "");
+    const apiUrl = `${apiBase}${TEMP_MAIL_API_PATH}`;
+    let currentMailbox = "";
+
+    const renderEmails = (list: any[]) => {
+      if (!Array.isArray(list) || list.length === 0) {
+        listEl.textContent = "暂无邮件";
+        return;
+      }
+      listEl.textContent = list
+        .slice(0, 10)
+        .map(item => `• ${item.subject || "(无主题)"}\n  ${item.sender || "unknown"} · ${item.received_at || ""}`)
+        .join("\n\n");
+    };
+
+    const fetchInbox = async () => {
+      if (!currentMailbox) {
+        status.textContent = "请先生成邮箱。";
+        return;
+      }
+      status.textContent = "正在刷新收件箱...";
+      const res = await fetch(`${apiUrl}?action=emails&mailbox=${encodeURIComponent(currentMailbox)}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        status.textContent = data?.error ? `收件失败：${data.error}` : `收件失败：HTTP ${res.status}`;
+        return;
+      }
+      renderEmails(data.data || []);
+      status.textContent = `收件箱已刷新${data.requestId ? `（请求ID: ${data.requestId}）` : ""}`;
+    };
+
+    createBtn.addEventListener("click", async () => {
+      status.textContent = "正在生成邮箱...";
+      const res = await fetch(`${apiUrl}?action=create`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        status.textContent = data?.error ? `生成失败：${data.error}` : `生成失败：HTTP ${res.status}`;
+        return;
+      }
+      currentMailbox = data?.data?.email || "";
+      mailboxEl.textContent = currentMailbox || "生成失败";
+      status.textContent = `邮箱已生成${data.requestId ? `（请求ID: ${data.requestId}）` : ""}`;
+      renderEmails([]);
+    });
+
+    refreshBtn.addEventListener("click", fetchInbox);
+  }
+
   document.addEventListener("astro:page-load", initClashTool);
+  document.addEventListener("astro:page-load", initTempMailTool);
 </script>
