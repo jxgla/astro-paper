@@ -66,7 +66,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
             <div class="temp-mail-modal" data-mbti-poster-modal hidden>
               <div class="temp-mail-modal-backdrop" data-mbti-poster-close></div>
-              <div class="temp-mail-modal-panel" role="dialog" aria-modal="true" aria-label="分享卡片">
+              <div class="temp-mail-modal-panel temp-mail-modal-panel-poster" role="dialog" aria-modal="true" aria-label="分享卡片">
                 <div class="temp-mail-modal-head">
                   <strong>分享卡片</strong>
                   <button type="button" class="tool-btn-secondary" data-mbti-poster-close>关闭</button>
@@ -481,8 +481,8 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   }
 
   .mbti-poster-preview canvas {
-    width: min(100%, 280px);
-    max-height: 70vh;
+    width: min(100%, 180px);
+    max-height: 52vh;
     object-fit: contain;
     border-radius: 0.9rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
@@ -555,6 +555,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     padding: 0.8rem;
     display: grid;
     gap: 0.5rem;
+  }
+
+  .temp-mail-modal-panel-poster {
+    width: min(420px, calc(100vw - 1.5rem));
+    max-height: calc(100vh - 3rem);
   }
 
   .temp-mail-modal-head {
