@@ -1026,12 +1026,16 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       await requestAnalysis("analyze");
     });
 
-    deepBtn.addEventListener("click", async () => {
+    deepBtn.addEventListener("click", async e => {
+      e.preventDefault();
+      e.stopPropagation();
       if (busy) return;
       await requestAnalysis("deep");
     });
 
-    swapBtn.addEventListener("click", () => {
+    swapBtn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
       const nextA = typeBEl.value;
       const nextB = typeAEl.value;
       typeAEl.value = nextA;
@@ -1039,7 +1043,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       status.textContent = "Swapped.";
     });
 
-    copyBtn.addEventListener("click", async () => {
+    copyBtn.addEventListener("click", async e => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!latestPlainText) {
         status.textContent = "Generate a result first.";
         return;
@@ -1065,15 +1071,23 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       status.textContent = "Share card generated.";
     };
 
-    posterBtn.addEventListener("click", openPoster);
+    posterBtn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openPoster();
+    });
     posterCloseBtns.forEach(btn => {
       if (!(btn instanceof HTMLElement)) return;
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
         posterModal.hidden = true;
       });
     });
 
-    posterDownloadBtn.addEventListener("click", () => {
+    posterDownloadBtn.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!latestPosterDataUrl) {
         openPoster();
       }
@@ -1086,7 +1100,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       a.remove();
     });
 
-    posterCopyBtn.addEventListener("click", async () => {
+    posterCopyBtn.addEventListener("click", async e => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!latestPlainText) {
         status.textContent = "Generate a result first.";
         return;
