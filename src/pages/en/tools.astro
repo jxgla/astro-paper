@@ -329,6 +329,18 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       sourceUrlInput.disabled = busy;
     };
 
+    const autoDetectMode = (rawText: string) => {
+      const text = String(rawText || "").trim();
+      if (!text) return;
+      const looksLikeUrl = /^https?:\/\//i.test(text) && !text.includes("\n");
+      const hasVless = /vless:\/\//i.test(text);
+      sourceMode = looksLikeUrl && !hasVless ? "url" : "text";
+      if (sourceMode === "url") {
+        sourceUrlInput.value = text;
+      }
+      syncSourceMode();
+    };
+
     tabs.forEach(btn => {
       if (!(btn instanceof HTMLButtonElement)) return;
       btn.addEventListener("click", () => {
@@ -342,7 +354,13 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       if (!file) return;
       const text = await file.text();
       input.value = text;
+      autoDetectMode(text);
       status.textContent = `Imported ${file.name}`;
+    });
+
+    input.addEventListener("paste", e => {
+      const t = e.clipboardData?.getData("text") || "";
+      if (t) autoDetectMode(t);
     });
 
     form.addEventListener("submit", async e => {
@@ -376,14 +394,15 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data?.ok) {
-          status.textContent = data?.error ? `Failed: ${data.error}` : `Failed: HTTP ${res.status}`;
+          const rid = data?.requestId ? ` (Request ID: ${data.requestId})` : "";
+          status.textContent = data?.error ? `Failed: ${data.error}${rid}` : `Failed: HTTP ${res.status}${rid}`;
           return;
         }
 
         latestYaml = String(data.yaml || "");
         resultEl.textContent = latestYaml;
         resultWrap.hidden = false;
-        status.textContent = `Done: ${data.nodes ?? 0} nodes, failed ${data.failed ?? 0}`;
+        status.textContent = `Done: ${data.nodes ?? 0} nodes, failed ${data.failed ?? 0}${data.requestId ? ` (Request ID: ${data.requestId})` : ""}`;
       } catch (err: any) {
         status.textContent = `Failed: ${(err && err.message) || "unknown"}`;
       } finally {
