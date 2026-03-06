@@ -87,6 +87,16 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="efficiency" class="tools-section">
       <h2>Productivity Tools</h2>
       <div class="tools-grid">
+        <article class="tool-card tool-card-placeholder">
+          <h3>Coming soon</h3>
+          <p>More productivity-focused tools will be added here.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="experimental" class="tools-section">
+      <h2>Experimental</h2>
+      <div class="tools-grid">
         <article id="clash-yaml" class="tool-card">
           <h3>Clash YAML Subscription Convert</h3>
           <p>Convert node data into Clash YAML subscription format for easier management.</p>
@@ -175,12 +185,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             </div>
           </div>
         </article>
-      </div>
-    </section>
 
-    <section id="experimental" class="tools-section">
-      <h2>Experimental</h2>
-      <div class="tools-grid">
         <article class="tool-card tool-card-placeholder">
           <h3>Coming soon</h3>
           <p>Experimental releases will be published in this area first.</p>
@@ -802,7 +807,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       romance: "Romance",
       friendship: "Friendship",
       communication: "Communication",
-      conflict: "Conflict",
+      conflict: "Conflict Resilience",
       stability: "Stability",
     };
 
@@ -990,7 +995,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action, locale: "en", typeA, typeB }),
+          body: JSON.stringify({ action, locale: document.documentElement.lang?.toLowerCase().startsWith("en") ? "en" : "zh", typeA, typeB }),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok) {
