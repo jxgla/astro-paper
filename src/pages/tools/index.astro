@@ -1,0 +1,104 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import { SITE } from "@/config";
+---
+
+<Layout title={`Tools | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle="Tools" pageDesc="实用工具集合（持续更新）">
+    <section id="fun" class="tools-section">
+      <h2>趣味小工具</h2>
+      <div class="tools-grid">
+        <article class="tool-card tool-card-placeholder">
+          <h3>Coming soon</h3>
+          <p>即将上线更多趣味小工具。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="efficiency" class="tools-section">
+      <h2>效率工具</h2>
+      <div class="tools-grid">
+        <article id="clash-yaml" class="tool-card">
+          <h3>Clash YAML 订阅转换</h3>
+          <p>将节点信息转换为 Clash YAML 订阅格式，便于统一管理。</p>
+          <span class="tool-badge">Available soon</span>
+        </article>
+
+        <article id="temp-mail" class="tool-card">
+          <h3>临时邮箱</h3>
+          <p>快速生成临时邮箱用于注册验证与一次性收件场景。</p>
+          <span class="tool-badge">Available soon</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="experimental" class="tools-section">
+      <h2>实验工具</h2>
+      <div class="tools-grid">
+        <article class="tool-card tool-card-placeholder">
+          <h3>Coming soon</h3>
+          <p>实验性工具将优先在这里发布。</p>
+        </article>
+      </div>
+    </section>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  .tools-section {
+    margin-top: 1.1rem;
+  }
+
+  .tools-section h2 {
+    margin-bottom: 0.7rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .tools-grid {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .tool-card {
+    border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+    border-radius: 0.9rem;
+    padding: 0.9rem;
+    background: color-mix(in oklab, var(--background) 95%, transparent);
+  }
+
+  .tool-card h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .tool-card p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  }
+
+  .tool-badge {
+    display: inline-block;
+    margin-top: 0.55rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: color-mix(in oklab, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
+
+  .tool-card-placeholder {
+    border-style: dashed;
+    opacity: 0.92;
+  }
+</style>
