@@ -618,9 +618,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const apiBase = (root.dataset.toolsApiBase || "").replace(/\/$/, "");
     const apiUrl = `${apiBase}${TEMP_MAIL_API_PATH}`;
     let currentMailbox = "";
+    const MANUAL_REFRESH_COOLDOWN_MS = 5000;
     let autoRefreshOn = true;
     let autoTimer = 0;
     let latestOtp = "";
+    let lastManualRefreshAt = 0;
 
     const esc = (v: unknown) =>
       String(v ?? "")
@@ -817,6 +819,14 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     });
 
     refreshBtn.addEventListener("click", () => {
+      const now = Date.now();
+      const remainMs = MANUAL_REFRESH_COOLDOWN_MS - (now - lastManualRefreshAt);
+      if (remainMs > 0) {
+        const sec = Math.ceil(remainMs / 1000);
+        status.textContent = `Too frequent. Please wait ${sec}s before refresh.`;
+        return;
+      }
+      lastManualRefreshAt = now;
       fetchInbox().catch(() => undefined);
     });
 
