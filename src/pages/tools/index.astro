@@ -51,10 +51,14 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
                   <div class="mbti-score-label">综合匹配度</div>
                   <div class="mbti-score-value" data-mbti-overall>--</div>
                 </div>
-                <div class="mbti-pair" data-mbti-pair>-- × --</div>
+                <div>
+                  <div class="mbti-pair" data-mbti-pair>-- × --</div>
+                  <div class="mbti-tier" data-mbti-tier hidden></div>
+                </div>
               </div>
 
               <div class="mbti-dimension-grid" data-mbti-dimensions></div>
+              <div class="mbti-share-title" data-mbti-share-title hidden></div>
 
               <div class="tool-result mbti-result-block" data-mbti-result></div>
               <div class="tool-result mbti-result-block" data-mbti-deep-result hidden></div>
@@ -395,6 +399,29 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     font-size: 0.9rem;
     font-weight: 700;
     color: var(--accent);
+  }
+
+  .mbti-tier {
+    margin-top: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    border-radius: 999px;
+    padding: 0.18rem 0.52rem;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .mbti-share-title {
+    border-radius: 0.72rem;
+    border: 1px dashed color-mix(in oklab, var(--accent) 35%, transparent);
+    background: color-mix(in oklab, var(--accent) 12%, var(--background) 88%);
+    padding: 0.65rem 0.75rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-weight: 700;
   }
 
   .mbti-dimension-grid {
@@ -767,8 +794,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const status = form.querySelector("[data-mbti-status]");
     const resultWrap = form.querySelector("[data-mbti-result-wrap]");
     const pairEl = form.querySelector("[data-mbti-pair]");
+    const tierEl = form.querySelector("[data-mbti-tier]");
     const overallEl = form.querySelector("[data-mbti-overall]");
     const dimensionsEl = form.querySelector("[data-mbti-dimensions]");
+    const shareTitleEl = form.querySelector("[data-mbti-share-title]");
     const resultEl = form.querySelector("[data-mbti-result]");
     const deepResultEl = form.querySelector("[data-mbti-deep-result]");
     const posterModal = form.querySelector("[data-mbti-poster-modal]");
@@ -787,8 +816,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(status instanceof HTMLElement)) return;
     if (!(resultWrap instanceof HTMLElement)) return;
     if (!(pairEl instanceof HTMLElement)) return;
+    if (!(tierEl instanceof HTMLElement)) return;
     if (!(overallEl instanceof HTMLElement)) return;
     if (!(dimensionsEl instanceof HTMLElement)) return;
+    if (!(shareTitleEl instanceof HTMLElement)) return;
     if (!(resultEl instanceof HTMLElement)) return;
     if (!(deepResultEl instanceof HTMLElement)) return;
     if (!(posterModal instanceof HTMLElement)) return;
@@ -802,6 +833,8 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     let latestPlainText = "";
     let busy = false;
     let latestPosterDataUrl = "";
+    let lastDeepAt = 0;
+    const DEEP_COOLDOWN_MS = 12000;
 
     const labels = {
       romance: "恋爱",
@@ -888,9 +921,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       ctx.fillText(pairEl.textContent || "", 120, 332);
       ctx.font = "bold 34px Segoe UI, Microsoft YaHei, sans-serif";
       ctx.fillStyle = "#bfdbfe";
-      ctx.fillText(`综合匹配度 ${overallEl.textContent || "--"}`, 120, 388);
+      ctx.fillText(`综合匹配度 ${overallEl.textContent || "--"}${tierEl.textContent ? ` · ${tierEl.textContent}` : ""}`, 120, 388);
 
-      const summaryText = resultEl.querySelector("p")?.textContent || latestPlainText.split("\n")[2] || "";
+      const summaryText = shareTitleEl.textContent || resultEl.querySelector("p")?.textContent || latestPlainText.split("\n")[3] || "";
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 42px Segoe UI, Microsoft YaHei, sans-serif";
       ctx.fillText("一句话总结", 80, 500);
@@ -921,10 +954,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       const noteY = startY + 3 * 130 + 40;
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 38px Segoe UI, Microsoft YaHei, sans-serif";
-      ctx.fillText("适合发朋友圈的一句", 80, noteY);
+      ctx.fillText("适合直接发的标题", 80, noteY);
       ctx.font = "30px Segoe UI, Microsoft YaHei, sans-serif";
       ctx.fillStyle = "rgba(255,255,255,0.92)";
-      wrapText(ctx, `${pairEl.textContent || "这组"}：${summaryText}`, 80, noteY + 54, 920, 40, 6);
+      wrapText(ctx, `${summaryText}`, 80, noteY + 54, 920, 40, 6);
 
       ctx.fillStyle = "rgba(255,255,255,0.66)";
       ctx.font = "24px Segoe UI, Microsoft YaHei, sans-serif";
@@ -941,7 +974,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const buildPlainText = (analysis: any, deepText = "") => {
       return [
         `${analysis.typeA} × ${analysis.typeB}`,
+        `标签：${analysis?.tier?.label || "--"}`,
         `综合匹配度：${analysis.overallScore}`,
+        `分享标题：${analysis.shareTitle || ""}`,
         `总结：${analysis.summary}`,
         `亮点：${analysis.highlights.join("；")}`,
         `风险点：${analysis.risks.join("；")}`,
@@ -955,7 +990,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const renderAnalysis = (analysis: any) => {
       resultWrap.hidden = false;
       pairEl.textContent = `${analysis.typeA} × ${analysis.typeB}`;
+      tierEl.hidden = !analysis?.tier?.label;
+      tierEl.textContent = analysis?.tier?.label ? `${analysis.tier.emoji || ""} ${analysis.tier.label}` : "";
       overallEl.textContent = String(analysis.overallScore || "--");
+      shareTitleEl.hidden = !analysis?.shareTitle;
+      shareTitleEl.textContent = analysis?.shareTitle || "";
       dimensionsEl.innerHTML = Object.entries(analysis.dimensions || {})
         .map(([key, value]) => `<div class="mbti-dimension-card"><strong>${esc(labels[key as keyof typeof labels] || key)}</strong><span>${esc(value)}</span></div>`)
         .join("");
@@ -999,7 +1038,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data?.ok) {
-          status.textContent = data?.error ? `分析失败：${data.error}` : `分析失败：HTTP ${res.status}`;
+          status.textContent = data?.fallbackMessage || (data?.error ? `分析失败：${data.error}` : `分析失败：HTTP ${res.status}`);
           return;
         }
         renderAnalysis(data.data || {});
@@ -1030,6 +1069,13 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       e.preventDefault();
       e.stopPropagation();
       if (busy) return;
+      const now = Date.now();
+      const remainMs = DEEP_COOLDOWN_MS - (now - lastDeepAt);
+      if (remainMs > 0) {
+        status.textContent = `AI 正在冷却中，请 ${Math.ceil(remainMs / 1000)} 秒后再试。`;
+        return;
+      }
+      lastDeepAt = now;
       await requestAnalysis("deep");
     });
 
