@@ -377,7 +377,8 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     display: flex;
     justify-content: space-between;
     gap: 0.8rem;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
     border-radius: 0.75rem;
     padding: 0.75rem 0.8rem;
     border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
@@ -408,10 +409,13 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     gap: 0.28rem;
     border-radius: 999px;
     padding: 0.18rem 0.52rem;
-    background: rgba(255, 255, 255, 0.18);
-    color: #fff;
+    background: color-mix(in oklab, var(--accent) 16%, var(--background) 84%);
+    color: var(--accent);
     font-size: 0.7rem;
     font-weight: 700;
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.35;
   }
 
   .mbti-share-title {
@@ -477,7 +481,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   }
 
   .mbti-poster-preview canvas {
-    width: min(100%, 360px);
+    width: min(100%, 280px);
+    max-height: 70vh;
+    object-fit: contain;
     border-radius: 0.9rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
     box-shadow: 0 12px 40px rgba(15, 23, 42, 0.22);
