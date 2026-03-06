@@ -640,17 +640,32 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     };
 
     const detectOtp = (text: string) => {
+      const src = String(text || "");
       const found: string[] = [];
-      const lower = String(text || "").toLowerCase();
-      const ctx = /(验证码|verification code|otp|passcode|code)/i.test(lower);
-      const reg = /\b\d{4,8}\b/g;
-      let m: RegExpExecArray | null;
-      while ((m = reg.exec(text)) !== null) {
-        const v = m[0];
-        if (!found.includes(v)) found.push(v);
+      const pushUnique = (v: string) => {
+        const token = String(v || "").trim();
+        if (!token || found.includes(token)) return;
+        found.push(token);
+      };
+
+      const numReg = /\b\d{4,8}\b/g;
+      let m1: RegExpExecArray | null;
+      while ((m1 = numReg.exec(src)) !== null) {
+        pushUnique(m1[0]);
       }
-      if (!ctx && found.length > 1) {
-        return found.filter(v => v.length <= 6).slice(0, 1);
+
+      const alphaDashReg = /\b[A-Z0-9]{2,8}(?:-[A-Z0-9]{2,8}){1,3}\b/gi;
+      let m2: RegExpExecArray | null;
+      while ((m2 = alphaDashReg.exec(src)) !== null) {
+        pushUnique(String(m2[0] || "").toUpperCase());
+      }
+
+      const lower = src.toLowerCase();
+      const hasKeyword = /(验证码|verification code|otp|passcode|code|auth code|security code)/i.test(lower);
+
+      if (!hasKeyword) {
+        const prioritized = found.filter(v => /-/.test(v) || /\d/.test(v)).slice(0, 1);
+        return prioritized;
       }
       return found.slice(0, 3);
     };
@@ -755,8 +770,9 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       const subject = detail?.subject || "(无主题)";
       const sender = detail?.sender || detail?.from || "unknown";
       const time = detail?.received_at || detail?.date || "";
-      const textBody = String(detail?.text || detail?.body || detail?.plain || "");
-      const htmlBodyRaw = String(detail?.html || detail?.html_body || detail?.content_html || "");
+      const textBody = String(detail?.text || detail?.body || detail?.plain || detail?.content || "");
+      const htmlBodyRaw = String(detail?.html || detail?.html_body || detail?.content_html || detail?.html_content || "");
+      const explicitCode = String(detail?.verification_code || detail?.verificationCode || "").trim();
       const htmlBody = sanitizeHtml(htmlBodyRaw);
 
       detailSubject.textContent = subject;
@@ -764,10 +780,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       if (htmlBody) {
         detailContent.innerHTML = htmlBody;
       } else {
-        detailContent.textContent = textBody || "（无内容）";
+        detailContent.textContent = textBody || String(detail?.preview || "") || "（无内容）";
       }
 
-      const otpCandidates = detectOtp(`${subject}\n${textBody}\n${htmlBodyRaw}`);
+      const otpCandidates = explicitCode ? [explicitCode] : detectOtp(`${subject}\n${textBody}\n${htmlBodyRaw}\n${detail?.preview || ""}`);
       if (otpCandidates.length > 0) {
         latestOtp = otpCandidates[0];
         otpText.textContent = `验证码：${latestOtp}`;
