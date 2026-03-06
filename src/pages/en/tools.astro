@@ -1,0 +1,104 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import { SITE } from "@/config";
+---
+
+<Layout title={`Tools | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle="Tools" pageDesc="A curated toolbox for practical workflows.">
+    <section id="fun" class="tools-section">
+      <h2>Fun Utilities</h2>
+      <div class="tools-grid">
+        <article class="tool-card tool-card-placeholder">
+          <h3>Coming soon</h3>
+          <p>More fun tools will arrive here.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="efficiency" class="tools-section">
+      <h2>Productivity Tools</h2>
+      <div class="tools-grid">
+        <article id="clash-yaml" class="tool-card">
+          <h3>Clash YAML Subscription Convert</h3>
+          <p>Convert node data into Clash YAML subscription format for easier management.</p>
+          <span class="tool-badge">Available soon</span>
+        </article>
+
+        <article id="temp-mail" class="tool-card">
+          <h3>Temporary Mailbox</h3>
+          <p>Create disposable inboxes quickly for one-time verification and short-lived usage.</p>
+          <span class="tool-badge">Available soon</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="experimental" class="tools-section">
+      <h2>Experimental</h2>
+      <div class="tools-grid">
+        <article class="tool-card tool-card-placeholder">
+          <h3>Coming soon</h3>
+          <p>Experimental releases will be published in this area first.</p>
+        </article>
+      </div>
+    </section>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  .tools-section {
+    margin-top: 1.1rem;
+  }
+
+  .tools-section h2 {
+    margin-bottom: 0.7rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .tools-grid {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .tool-card {
+    border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+    border-radius: 0.9rem;
+    padding: 0.9rem;
+    background: color-mix(in oklab, var(--background) 95%, transparent);
+  }
+
+  .tool-card h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .tool-card p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  }
+
+  .tool-badge {
+    display: inline-block;
+    margin-top: 0.55rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: color-mix(in oklab, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
+
+  .tool-card-placeholder {
+    border-style: dashed;
+    opacity: 0.92;
+  }
+</style>

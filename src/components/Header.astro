@@ -22,7 +22,7 @@ const langSwitchHref = isEn
 const langSwitchLabel = isEn ? "CN" : "EN";
 const chatNavLabel = isEn ? "🤖 Chat" : "🤖 AI Chat";
 
-const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts"]);
+const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts", "/tools"]);
 const brandTitle = isEn ? "VibeWatcher" : SITE.title;
 
 const withLocale = (path: string) => {
@@ -39,6 +39,8 @@ const isActive = (path: string) => {
 
   return currentPath === localizedPath || currentPathArray[0] === pathArray[0];
 };
+
+const isToolsRoute = currentPath === withLocale("/tools");
 ---
 
 <a
@@ -104,10 +106,42 @@ const isActive = (path: string) => {
             {isEn ? "Posts" : "Posts"}
           </a>
         </li>
-        <li class="col-span-2">
-          <a href={withLocale("/tags")} class:list={{ "active-nav": isActive("/tags") }}>
-            {isEn ? "Tags" : "Tags"}
-          </a>
+        <li id="tools-nav-item" class="col-span-2 sm:relative">
+          <button
+            type="button"
+            id="tools-menu-trigger"
+            class:list={[
+              "w-full cursor-pointer rounded px-4 py-3 text-center font-medium whitespace-nowrap hover:text-accent sm:px-2 sm:py-1",
+              { "active-nav": isToolsRoute },
+            ]}
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {isEn ? "Tools" : "Tools"}
+          </button>
+
+          <div
+            id="tools-dropdown"
+            class="tools-dropdown hidden sm:absolute sm:top-full sm:left-1/2 sm:mt-2 sm:w-[30rem] sm:-translate-x-1/2 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:p-3 sm:shadow-lg"
+          >
+            <div class="grid gap-3 sm:grid-cols-3">
+              <section class="rounded-lg border border-border/70 p-3">
+                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Fun" : "趣味小工具"}</h3>
+                <a class="tools-link" href={withLocale("/tools#fun")}>{isEn ? "Coming soon" : "Coming soon"}</a>
+              </section>
+
+              <section class="rounded-lg border border-border/70 p-3">
+                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Productivity" : "效率工具"}</h3>
+                <a class="tools-link" href={withLocale("/tools#clash-yaml")}>{isEn ? "Clash YAML subscription convert" : "Clash YAML 订阅转换"}</a>
+                <a class="tools-link" href={withLocale("/tools#temp-mail")}>{isEn ? "Temporary Mailbox" : "临时邮箱"}</a>
+              </section>
+
+              <section class="rounded-lg border border-border/70 p-3">
+                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Experimental" : "实验工具"}</h3>
+                <a class="tools-link" href={withLocale("/tools#experimental")}>{isEn ? "Coming soon" : "Coming soon"}</a>
+              </section>
+            </div>
+          </div>
         </li>
         <li class="col-span-2">
           <a href={withLocale("/about")} class:list={{ "active-nav": isActive("/about") }}>
@@ -179,14 +213,81 @@ const isActive = (path: string) => {
   </div>
 </header>
 
+<style>
+  .tools-link {
+    display: block;
+    padding: 0.28rem 0;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  }
+
+  .tools-link:hover {
+    color: var(--accent);
+  }
+
+  @media (min-width: 640px) {
+    #tools-nav-item:hover #tools-dropdown {
+      display: block;
+    }
+  }
+
+  @media (max-width: 639px) {
+    #tools-menu-trigger {
+      border: none;
+      background: transparent;
+    }
+
+    #tools-nav-item[data-open="true"] #tools-dropdown {
+      display: block;
+      margin-top: 0.35rem;
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+      background: color-mix(in oklab, var(--background) 92%, transparent);
+      padding: 0.55rem;
+    }
+
+    #tools-dropdown .grid {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    #tools-dropdown section {
+      border-radius: 0.6rem;
+      border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+      padding: 0.55rem;
+      text-align: left;
+    }
+
+    #tools-dropdown h3 {
+      margin-bottom: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .tools-link {
+      padding: 0.32rem 0;
+      font-size: 0.78rem;
+    }
+  }
+</style>
+
 <script>
   function toggleNav() {
     const menuBtn = document.querySelector("#menu-btn");
     const menuItems = document.querySelector("#menu-items");
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
+    const toolsNavItem = document.querySelector("#tools-nav-item");
+    const toolsTrigger = document.querySelector("#tools-menu-trigger");
+    const toolsDropdown = document.querySelector("#tools-dropdown");
 
-    if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
+    if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !toolsNavItem || !toolsTrigger || !toolsDropdown) return;
+
+    const closeToolsMobileMenu = () => {
+      toolsNavItem.setAttribute("data-open", "false");
+      toolsTrigger.setAttribute("aria-expanded", "false");
+    };
 
     menuBtn.addEventListener("click", () => {
       const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
@@ -197,6 +298,29 @@ const isActive = (path: string) => {
       menuItems.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
+
+      if (openMenu) {
+        closeToolsMobileMenu();
+      }
+    });
+
+    toolsTrigger.addEventListener("click", e => {
+      if (window.matchMedia("(min-width: 640px)").matches) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const isOpen = toolsNavItem.getAttribute("data-open") === "true";
+      toolsNavItem.setAttribute("data-open", isOpen ? "false" : "true");
+      toolsTrigger.setAttribute("aria-expanded", isOpen ? "false" : "true");
+    });
+
+    document.addEventListener("click", e => {
+      if (window.matchMedia("(min-width: 640px)").matches) return;
+      const target = e.target;
+      if (!(target instanceof Node)) return;
+      if (!toolsNavItem.contains(target)) {
+        closeToolsMobileMenu();
+      }
     });
   }
 
