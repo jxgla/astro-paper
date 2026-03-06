@@ -79,7 +79,18 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         <article id="temp-mail" class="tool-card">
           <h3>Temporary Mailbox</h3>
           <p>Create disposable inboxes quickly for one-time verification and short-lived usage.</p>
-          <span class="tool-badge">Available soon</span>
+          <span class="tool-badge">Beta</span>
+
+          <div class="tool-form" data-temp-mail data-tools-api-base={toolsApiBase}>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-temp-mail-create>Create mailbox</button>
+              <button type="button" class="tool-btn-secondary" data-temp-mail-refresh>Refresh inbox</button>
+            </div>
+
+            <p class="tool-status" data-temp-mail-status>Generate a mailbox first, then refresh the inbox.</p>
+            <div class="tool-mailbox" data-temp-mail-address>No mailbox yet</div>
+            <div class="tool-result" data-temp-mail-list>No email yet</div>
+          </div>
         </article>
       </div>
     </section>
@@ -245,6 +256,16 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     padding: 0.6rem;
     font-size: 0.71rem;
     line-height: 1.38;
+  }
+
+  .tool-mailbox {
+    border-radius: 0.62rem;
+    border: 1px dashed color-mix(in oklab, var(--foreground) 18%, transparent);
+    padding: 0.55rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--background) 97%, transparent);
   }
 
   .tool-badge {
@@ -447,5 +468,74 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     });
   }
 
+  const TEMP_MAIL_API_PATH = "/api/tools/temp-mail";
+
+  function initTempMailTool() {
+    const root = document.querySelector("[data-temp-mail]");
+    if (!(root instanceof HTMLElement)) return;
+    if (root.dataset.inited === "1") return;
+    root.dataset.inited = "1";
+
+    const createBtn = root.querySelector("[data-temp-mail-create]");
+    const refreshBtn = root.querySelector("[data-temp-mail-refresh]");
+    const status = root.querySelector("[data-temp-mail-status]");
+    const mailboxEl = root.querySelector("[data-temp-mail-address]");
+    const listEl = root.querySelector("[data-temp-mail-list]");
+
+    if (!(createBtn instanceof HTMLButtonElement)) return;
+    if (!(refreshBtn instanceof HTMLButtonElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(mailboxEl instanceof HTMLElement)) return;
+    if (!(listEl instanceof HTMLElement)) return;
+
+    const apiBase = (root.dataset.toolsApiBase || "").replace(/\/$/, "");
+    const apiUrl = `${apiBase}${TEMP_MAIL_API_PATH}`;
+    let currentMailbox = "";
+
+    const renderEmails = (list: any[]) => {
+      if (!Array.isArray(list) || list.length === 0) {
+        listEl.textContent = "No email yet";
+        return;
+      }
+      listEl.textContent = list
+        .slice(0, 10)
+        .map(item => `• ${item.subject || "(No subject)"}\n  ${item.sender || "unknown"} · ${item.received_at || ""}`)
+        .join("\n\n");
+    };
+
+    const fetchInbox = async () => {
+      if (!currentMailbox) {
+        status.textContent = "Generate a mailbox first.";
+        return;
+      }
+      status.textContent = "Refreshing inbox...";
+      const res = await fetch(`${apiUrl}?action=emails&mailbox=${encodeURIComponent(currentMailbox)}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        status.textContent = data?.error ? `Inbox refresh failed: ${data.error}` : `Inbox refresh failed: HTTP ${res.status}`;
+        return;
+      }
+      renderEmails(data.data || []);
+      status.textContent = `Inbox refreshed${data.requestId ? ` (Request ID: ${data.requestId})` : ""}`;
+    };
+
+    createBtn.addEventListener("click", async () => {
+      status.textContent = "Creating mailbox...";
+      const res = await fetch(`${apiUrl}?action=create`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        status.textContent = data?.error ? `Create failed: ${data.error}` : `Create failed: HTTP ${res.status}`;
+        return;
+      }
+      currentMailbox = data?.data?.email || "";
+      mailboxEl.textContent = currentMailbox || "Create failed";
+      status.textContent = `Mailbox created${data.requestId ? ` (Request ID: ${data.requestId})` : ""}`;
+      renderEmails([]);
+    });
+
+    refreshBtn.addEventListener("click", fetchInbox);
+  }
+
   document.addEventListener("astro:page-load", initClashTool);
+  document.addEventListener("astro:page-load", initTempMailTool);
 </script>
