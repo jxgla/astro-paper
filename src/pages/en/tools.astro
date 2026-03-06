@@ -4,6 +4,8 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
+
+const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
 ---
 
 <Layout title={`Tools | ${SITE.title}`}>
@@ -25,7 +27,35 @@ import { SITE } from "@/config";
         <article id="clash-yaml" class="tool-card">
           <h3>Clash YAML Subscription Convert</h3>
           <p>Convert node data into Clash YAML subscription format for easier management.</p>
-          <span class="tool-badge">Available soon</span>
+          <span class="tool-badge">Beta</span>
+
+          <form class="tool-form" data-clash-form data-tools-api-base={toolsApiBase}>
+            <label class="tool-label" for="clash-input-en">Paste node text or subscription content</label>
+            <textarea
+              id="clash-input-en"
+              class="tool-textarea"
+              data-clash-input
+              placeholder="One vless:// link per line"
+            ></textarea>
+
+            <div class="tool-actions">
+              <label class="tool-file-btn">
+                Import .txt
+                <input type="file" accept=".txt,text/plain" data-clash-file />
+              </label>
+              <button type="submit" class="tool-btn-primary" data-clash-convert>Convert</button>
+            </div>
+
+            <p class="tool-status" data-clash-status>Up to 200 lines, supports paste and txt upload.</p>
+
+            <div class="tool-result-wrap" data-clash-result-wrap hidden>
+              <pre class="tool-result" data-clash-result></pre>
+              <div class="tool-actions">
+                <button type="button" class="tool-btn-secondary" data-clash-copy>Copy YAML</button>
+                <button type="button" class="tool-btn-secondary" data-clash-download>Download sub.yml</button>
+              </div>
+            </div>
+          </form>
         </article>
 
         <article id="temp-mail" class="tool-card">
@@ -86,6 +116,84 @@ import { SITE } from "@/config";
     color: color-mix(in oklab, var(--foreground) 80%, transparent);
   }
 
+  .tool-form {
+    margin-top: 0.65rem;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .tool-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .tool-textarea {
+    width: 100%;
+    min-height: 8.5rem;
+    resize: vertical;
+    border-radius: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+    background: color-mix(in oklab, var(--background) 96%, transparent);
+    color: var(--foreground);
+    padding: 0.58rem;
+    font-size: 0.75rem;
+    line-height: 1.42;
+  }
+
+  .tool-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .tool-file-btn,
+  .tool-btn-primary,
+  .tool-btn-secondary {
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+    background: color-mix(in oklab, var(--background) 95%, transparent);
+    color: var(--foreground);
+    border-radius: 0.52rem;
+    padding: 0.35rem 0.62rem;
+    font-size: 0.73rem;
+    cursor: pointer;
+  }
+
+  .tool-btn-primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+  }
+
+  .tool-file-btn input {
+    display: none;
+  }
+
+  .tool-status {
+    margin: 0;
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 70%, transparent);
+  }
+
+  .tool-result-wrap {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .tool-result {
+    margin: 0;
+    max-height: 14rem;
+    overflow: auto;
+    border-radius: 0.62rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, #0f172a 82%, var(--background) 18%);
+    color: #e2e8f0;
+    padding: 0.6rem;
+    font-size: 0.71rem;
+    line-height: 1.38;
+  }
+
   .tool-badge {
     display: inline-block;
     margin-top: 0.55rem;
@@ -102,3 +210,114 @@ import { SITE } from "@/config";
     opacity: 0.92;
   }
 </style>
+
+<script>
+  const CLASH_API_PATH = "/api/tools/clash-yaml-convert";
+
+  function initClashTool() {
+    const form = document.querySelector("[data-clash-form]");
+    if (!(form instanceof HTMLFormElement)) return;
+    if (form.dataset.inited === "1") return;
+    form.dataset.inited = "1";
+
+    const input = form.querySelector("[data-clash-input]");
+    const fileInput = form.querySelector("[data-clash-file]");
+    const status = form.querySelector("[data-clash-status]");
+    const resultWrap = form.querySelector("[data-clash-result-wrap]");
+    const resultEl = form.querySelector("[data-clash-result]");
+    const copyBtn = form.querySelector("[data-clash-copy]");
+    const downloadBtn = form.querySelector("[data-clash-download]");
+    const convertBtn = form.querySelector("[data-clash-convert]");
+
+    if (!(input instanceof HTMLTextAreaElement)) return;
+    if (!(fileInput instanceof HTMLInputElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(resultWrap instanceof HTMLElement)) return;
+    if (!(resultEl instanceof HTMLElement)) return;
+    if (!(copyBtn instanceof HTMLButtonElement)) return;
+    if (!(downloadBtn instanceof HTMLButtonElement)) return;
+    if (!(convertBtn instanceof HTMLButtonElement)) return;
+
+    const apiBase = (form.dataset.toolsApiBase || "").replace(/\/$/, "");
+    const apiUrl = `${apiBase}${CLASH_API_PATH}`;
+    let latestYaml = "";
+    let busy = false;
+
+    const setBusy = (next: boolean) => {
+      busy = next;
+      convertBtn.disabled = busy;
+      input.disabled = busy;
+      fileInput.disabled = busy;
+    };
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      input.value = text;
+      status.textContent = `Imported ${file.name}`;
+    });
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (busy) return;
+      const text = input.value.trim();
+      if (!text) {
+        status.textContent = "Please input node text first.";
+        return;
+      }
+
+      try {
+        setBusy(true);
+        status.textContent = "Converting...";
+
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ inputText: text }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data?.ok) {
+          status.textContent = data?.error ? `Failed: ${data.error}` : `Failed: HTTP ${res.status}`;
+          return;
+        }
+
+        latestYaml = String(data.yaml || "");
+        resultEl.textContent = latestYaml;
+        resultWrap.hidden = false;
+        status.textContent = `Done: ${data.nodes ?? 0} nodes, failed ${data.failed ?? 0}`;
+      } catch (err: any) {
+        status.textContent = `Failed: ${(err && err.message) || "unknown"}`;
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      if (!latestYaml) return;
+      try {
+        await navigator.clipboard.writeText(latestYaml);
+        status.textContent = "YAML copied.";
+      } catch {
+        status.textContent = "Copy failed. Please copy manually.";
+      }
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!latestYaml) return;
+      const blob = new Blob([latestYaml], { type: "application/x-yaml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sub.yml";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  document.addEventListener("astro:page-load", initClashTool);
+</script>
