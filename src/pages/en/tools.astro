@@ -30,6 +30,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           <span class="tool-badge">Beta</span>
 
           <form class="tool-form" data-clash-form data-tools-api-base={toolsApiBase}>
+            <div class="tool-source-tabs" role="tablist" aria-label="Input mode">
+              <button type="button" class="tool-tab is-active" data-source-tab="text">Text Input</button>
+              <button type="button" class="tool-tab" data-source-tab="url">Subscription URL</button>
+            </div>
+
             <label class="tool-label" for="clash-input-en">Paste node text or subscription content</label>
             <textarea
               id="clash-input-en"
@@ -38,21 +43,34 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               placeholder="One vless:// link per line"
             ></textarea>
 
+            <div class="tool-url-wrap" data-url-wrap hidden>
+              <label class="tool-label" for="clash-source-url-en">Subscription URL</label>
+              <input
+                id="clash-source-url-en"
+                class="tool-input"
+                data-clash-source-url
+                type="url"
+                placeholder="https://example.com/subscription.txt"
+              />
+            </div>
+
             <div class="tool-actions">
-              <label class="tool-file-btn">
+              <label class="tool-file-btn" data-file-btn>
                 Import .txt
                 <input type="file" accept=".txt,text/plain" data-clash-file />
               </label>
               <button type="submit" class="tool-btn-primary" data-clash-convert>Convert</button>
+              <button type="button" class="tool-btn-secondary" data-clash-clear-input>Clear input</button>
             </div>
 
-            <p class="tool-status" data-clash-status>Up to 200 lines, supports paste and txt upload.</p>
+            <p class="tool-status" data-clash-status>Up to 200 lines, supports paste, txt upload, and subscription URL.</p>
 
             <div class="tool-result-wrap" data-clash-result-wrap hidden>
               <pre class="tool-result" data-clash-result></pre>
               <div class="tool-actions">
                 <button type="button" class="tool-btn-secondary" data-clash-copy>Copy YAML</button>
                 <button type="button" class="tool-btn-secondary" data-clash-download>Download sub.yml</button>
+                <button type="button" class="tool-btn-secondary" data-clash-clear-output>Clear output</button>
               </div>
             </div>
           </form>
@@ -126,6 +144,41 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     font-size: 0.75rem;
     font-weight: 600;
     color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .tool-source-tabs {
+    display: inline-flex;
+    gap: 0.35rem;
+    padding: 0.2rem;
+    border-radius: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    width: fit-content;
+  }
+
+  .tool-tab {
+    border: 0;
+    background: transparent;
+    color: color-mix(in oklab, var(--foreground) 76%, transparent);
+    border-radius: 0.45rem;
+    padding: 0.28rem 0.52rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+
+  .tool-tab.is-active {
+    background: color-mix(in oklab, var(--accent) 20%, transparent);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .tool-input {
+    width: 100%;
+    border-radius: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+    background: color-mix(in oklab, var(--background) 96%, transparent);
+    color: var(--foreground);
+    padding: 0.55rem 0.58rem;
+    font-size: 0.75rem;
   }
 
   .tool-textarea {
@@ -228,6 +281,12 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     const copyBtn = form.querySelector("[data-clash-copy]");
     const downloadBtn = form.querySelector("[data-clash-download]");
     const convertBtn = form.querySelector("[data-clash-convert]");
+    const clearInputBtn = form.querySelector("[data-clash-clear-input]");
+    const clearOutputBtn = form.querySelector("[data-clash-clear-output]");
+    const sourceUrlInput = form.querySelector("[data-clash-source-url]");
+    const tabs = form.querySelectorAll("[data-source-tab]");
+    const urlWrap = form.querySelector("[data-url-wrap]");
+    const fileBtn = form.querySelector("[data-file-btn]");
 
     if (!(input instanceof HTMLTextAreaElement)) return;
     if (!(fileInput instanceof HTMLInputElement)) return;
@@ -237,18 +296,46 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(copyBtn instanceof HTMLButtonElement)) return;
     if (!(downloadBtn instanceof HTMLButtonElement)) return;
     if (!(convertBtn instanceof HTMLButtonElement)) return;
+    if (!(clearInputBtn instanceof HTMLButtonElement)) return;
+    if (!(clearOutputBtn instanceof HTMLButtonElement)) return;
+    if (!(sourceUrlInput instanceof HTMLInputElement)) return;
+    if (!(urlWrap instanceof HTMLElement)) return;
+    if (!(fileBtn instanceof HTMLElement)) return;
 
     const apiBase = (form.dataset.toolsApiBase || "").replace(/\/$/, "");
     const apiUrl = `${apiBase}${CLASH_API_PATH}`;
     let latestYaml = "";
     let busy = false;
+    let sourceMode = "text";
+
+    const syncSourceMode = () => {
+      const isUrl = sourceMode === "url";
+      urlWrap.hidden = !isUrl;
+      input.hidden = isUrl;
+      fileBtn.hidden = isUrl;
+      tabs.forEach(btn => {
+        if (!(btn instanceof HTMLButtonElement)) return;
+        btn.classList.toggle("is-active", btn.dataset.sourceTab === sourceMode);
+      });
+    };
+
+    syncSourceMode();
 
     const setBusy = (next: boolean) => {
       busy = next;
       convertBtn.disabled = busy;
       input.disabled = busy;
       fileInput.disabled = busy;
+      sourceUrlInput.disabled = busy;
     };
+
+    tabs.forEach(btn => {
+      if (!(btn instanceof HTMLButtonElement)) return;
+      btn.addEventListener("click", () => {
+        sourceMode = btn.dataset.sourceTab === "url" ? "url" : "text";
+        syncSourceMode();
+      });
+    });
 
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files?.[0];
@@ -262,8 +349,13 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       e.preventDefault();
       if (busy) return;
       const text = input.value.trim();
-      if (!text) {
+      const sourceUrl = sourceUrlInput.value.trim();
+      if (sourceMode === "text" && !text) {
         status.textContent = "Please input node text first.";
+        return;
+      }
+      if (sourceMode === "url" && !sourceUrl) {
+        status.textContent = "Please input subscription URL first.";
         return;
       }
 
@@ -274,7 +366,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ inputText: text }),
+          body: JSON.stringify(
+            sourceMode === "url"
+              ? { sourceType: "url", sourceUrl }
+              : { sourceType: "text", inputText: text }
+          ),
         });
 
         const data = await res.json().catch(() => ({}));
@@ -316,6 +412,19 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+    });
+
+    clearInputBtn.addEventListener("click", () => {
+      input.value = "";
+      sourceUrlInput.value = "";
+      status.textContent = "Input cleared.";
+    });
+
+    clearOutputBtn.addEventListener("click", () => {
+      latestYaml = "";
+      resultEl.textContent = "";
+      resultWrap.hidden = true;
+      status.textContent = "Output cleared.";
     });
   }
 
