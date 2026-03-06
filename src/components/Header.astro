@@ -15,7 +15,6 @@ const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
 
 const isEn = currentPath === "/en" || currentPath.startsWith("/en/");
-const basePrefix = isEn ? "/en" : "";
 const langSwitchHref = isEn
   ? (currentPath === "/en" ? "/" : currentPath.replace(/^\/en/, ""))
   : `/en${currentPath === "/" ? "" : currentPath}`;
@@ -23,7 +22,8 @@ const langSwitchLabel = isEn ? "CN" : "EN";
 const chatNavLabel = isEn ? "🤖 Chat" : "🤖 AI Chat";
 
 const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts", "/tools"]);
-const brandTitle = isEn ? "VibeWatcher" : SITE.title;
+const brandTitleDesktop = isEn ? "VibeWatcher" : SITE.title;
+const brandTitleMobile = isEn ? "VibeWatcher" : "观者终端";
 
 const withLocale = (path: string) => {
   if (!path.startsWith("/")) return path;
@@ -60,18 +60,19 @@ const isToolsRoute = currentPath === withLocale("/tools");
       "py-4 sm:py-6",
       "border-b border-border",
       "relative w-full bg-background",
-      "flex items-baseline justify-between sm:items-center",
+      "flex items-center justify-between",
     ]}
   >
     <a
       href={withLocale("/")}
-      class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="max-w-[74vw] truncate py-1 pe-2 text-xl leading-tight font-semibold whitespace-nowrap sm:max-w-none sm:pe-0 sm:text-2xl sm:leading-none"
     >
-      {brandTitle}
+      <span class="sm:hidden">{brandTitleMobile}</span>
+      <span class="hidden sm:inline">{brandTitleDesktop}</span>
     </a>
     <nav
       id="nav-menu"
-      class="flex w-full flex-col items-center sm:ms-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"
+      class="relative flex flex-col items-end sm:ms-2 sm:flex-row sm:items-center sm:justify-end sm:space-x-4 sm:py-0"
     >
       <button
         id="menu-btn"
@@ -122,7 +123,7 @@ const isToolsRoute = currentPath === withLocale("/tools");
 
           <div
             id="tools-dropdown"
-            class="tools-dropdown hidden sm:absolute sm:top-full sm:left-1/2 sm:mt-2 sm:w-[30rem] sm:-translate-x-1/2 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:p-3 sm:shadow-lg"
+            class="tools-dropdown sm:absolute sm:top-full sm:left-1/2 sm:z-40 sm:mt-2 sm:w-[30rem] sm:-translate-x-1/2 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:p-3 sm:shadow-lg"
           >
             <div class="grid gap-3 sm:grid-cols-3">
               <section class="rounded-lg border border-border/70 p-3">
@@ -214,6 +215,14 @@ const isToolsRoute = currentPath === withLocale("/tools");
 </header>
 
 <style>
+  .tools-dropdown {
+    display: none;
+  }
+
+  #tools-nav-item[data-open="true"] #tools-dropdown {
+    display: block;
+  }
+
   .tools-link {
     display: block;
     padding: 0.28rem 0;
@@ -224,12 +233,6 @@ const isToolsRoute = currentPath === withLocale("/tools");
 
   .tools-link:hover {
     color: var(--accent);
-  }
-
-  @media (min-width: 640px) {
-    #tools-nav-item:hover #tools-dropdown {
-      display: block;
-    }
   }
 
   @media (max-width: 639px) {
@@ -274,19 +277,28 @@ const isToolsRoute = currentPath === withLocale("/tools");
 
 <script>
   function toggleNav() {
-    const menuBtn = document.querySelector("#menu-btn");
-    const menuItems = document.querySelector("#menu-items");
-    const menuIcon = document.querySelector("#menu-icon");
-    const closeIcon = document.querySelector("#close-icon");
-    const toolsNavItem = document.querySelector("#tools-nav-item");
-    const toolsTrigger = document.querySelector("#tools-menu-trigger");
-    const toolsDropdown = document.querySelector("#tools-dropdown");
+    const menuBtn = document.querySelector("#menu-btn") as HTMLElement | null;
+    const menuItems = document.querySelector("#menu-items") as HTMLElement | null;
+    const menuIcon = document.querySelector("#menu-icon") as HTMLElement | null;
+    const closeIcon = document.querySelector("#close-icon") as HTMLElement | null;
+    const toolsNavItem = document.querySelector("#tools-nav-item") as HTMLElement | null;
+    const toolsTrigger = document.querySelector("#tools-menu-trigger") as HTMLElement | null;
+    const toolsDropdown = document.querySelector("#tools-dropdown") as HTMLElement | null;
 
     if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !toolsNavItem || !toolsTrigger || !toolsDropdown) return;
+    if (menuBtn.dataset.bound === "1") return;
+    menuBtn.dataset.bound = "1";
 
     const closeToolsMobileMenu = () => {
       toolsNavItem.setAttribute("data-open", "false");
       toolsTrigger.setAttribute("aria-expanded", "false");
+    };
+
+    const toggleToolsMenu = (forceOpen?: boolean) => {
+      const isOpen = toolsNavItem.getAttribute("data-open") === "true";
+      const next = typeof forceOpen === "boolean" ? forceOpen : !isOpen;
+      toolsNavItem.setAttribute("data-open", next ? "true" : "false");
+      toolsTrigger.setAttribute("aria-expanded", next ? "true" : "false");
     };
 
     menuBtn.addEventListener("click", () => {
@@ -305,21 +317,22 @@ const isToolsRoute = currentPath === withLocale("/tools");
     });
 
     toolsTrigger.addEventListener("click", e => {
-      if (window.matchMedia("(min-width: 640px)").matches) return;
       e.preventDefault();
       e.stopPropagation();
+      toggleToolsMenu();
+    });
 
-      const isOpen = toolsNavItem.getAttribute("data-open") === "true";
-      toolsNavItem.setAttribute("data-open", isOpen ? "false" : "true");
-      toolsTrigger.setAttribute("aria-expanded", isOpen ? "false" : "true");
+    toolsDropdown.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        closeToolsMobileMenu();
+      });
     });
 
     document.addEventListener("click", e => {
-      if (window.matchMedia("(min-width: 640px)").matches) return;
       const target = e.target;
       if (!(target instanceof Node)) return;
       if (!toolsNavItem.contains(target)) {
-        closeToolsMobileMenu();
+        toggleToolsMenu(false);
       }
     });
   }

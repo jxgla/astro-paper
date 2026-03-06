@@ -121,7 +121,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     <div
       id="chatbot-reserved-slot"
       aria-hidden="true"
-      class="chatbot-slot-placeholder hidden md:block"
+      class="chatbot-slot-placeholder"
     >
       <HomeChatbotWidget locale="zh" />
     </div>
@@ -184,6 +184,15 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     backdrop-filter: none;
     pointer-events: auto;
     z-index: 35;
+  }
+
+  @media (max-width: 767px) {
+    .chatbot-slot-placeholder {
+      right: 0.7rem;
+      bottom: 0.7rem;
+      width: min(22rem, calc(100vw - 1.1rem));
+      height: min(34rem, calc(100vh - 1.1rem));
+    }
   }
 
   .chatbot-slot-border,
