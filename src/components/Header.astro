@@ -41,6 +41,7 @@ const isActive = (path: string) => {
 };
 
 const isToolsRoute = currentPath === withLocale("/tools");
+const isEnHome = currentPath === "/en";
 ---
 
 <a
@@ -195,7 +196,7 @@ const isToolsRoute = currentPath === withLocale("/tools");
         </li>
         {
           SITE.lightAndDarkMode && (
-            <li class="col-span-1 flex items-center justify-center">
+            <li class="col-span-1 flex items-center justify-center gap-1.5">
               <button
                 id="theme-btn"
                 class="focus-outline relative size-12 p-4 sm:size-8 hover:[&>svg]:stroke-accent"
@@ -206,6 +207,20 @@ const isToolsRoute = currentPath === withLocale("/tools");
                 <IconMoon class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                 <IconSunHigh class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
               </button>
+              {
+                isEnHome && (
+                  <button
+                    type="button"
+                    id="secret-entry-trigger"
+                    class="secret-entry-trigger"
+                    aria-hidden="true"
+                    tabindex="-1"
+                    title=""
+                  >
+                    ·
+                  </button>
+                )
+              }
             </li>
           )
         }
@@ -233,6 +248,23 @@ const isToolsRoute = currentPath === withLocale("/tools");
 
   .tools-link:hover {
     color: var(--accent);
+  }
+
+  .secret-entry-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: none;
+    background: transparent;
+    color: color-mix(in oklab, var(--foreground) 16%, transparent);
+    font-size: 0.72rem;
+    line-height: 1;
+    opacity: 0.35;
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
   }
 
   @media (max-width: 639px) {
@@ -337,8 +369,37 @@ const isToolsRoute = currentPath === withLocale("/tools");
     });
   }
 
+  function initSecretEntry() {
+    const isEnHome = window.location.pathname === "/en";
+    if (!isEnHome) return;
+
+    const themeBtn = document.querySelector("#theme-btn") as HTMLButtonElement | null;
+    if (!themeBtn) return;
+    if (themeBtn.dataset.secretBound === "1") return;
+    themeBtn.dataset.secretBound = "1";
+
+    const recentClicks: number[] = [];
+    const WINDOW_MS = 20_000;
+    const REQUIRED_CLICKS = 10;
+
+    themeBtn.addEventListener("click", () => {
+      const now = Date.now();
+      recentClicks.push(now);
+      while (recentClicks.length && now - recentClicks[0] > WINDOW_MS) {
+        recentClicks.shift();
+      }
+
+      if (recentClicks.length >= REQUIRED_CLICKS) {
+        recentClicks.length = 0;
+        window.dispatchEvent(new CustomEvent("secret-entry:open"));
+      }
+    });
+  }
+
   toggleNav();
+  initSecretEntry();
 
   // Runs on view transitions navigation
   document.addEventListener("astro:after-swap", toggleNav);
+  document.addEventListener("astro:after-swap", initSecretEntry);
 </script>
