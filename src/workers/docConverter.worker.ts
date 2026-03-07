@@ -1,5 +1,5 @@
 import mammoth from "mammoth";
-import { convert } from "pandoc-wasm";
+import { getPandocBrowserInstance } from "@/lib/pandocBrowser";
 
 type Format = "txt" | "md" | "html" | "tex" | "docx";
 type ConversionPayload = string | ArrayBuffer;
@@ -22,7 +22,8 @@ function normalizeOutputFormat(format: Format) {
 }
 
 async function runPandoc(inputType: Format, outputType: Format, payload: string) {
-  const result = await convert({ from: normalizeInputFormat(inputType), to: normalizeOutputFormat(outputType) }, payload, {});
+  const pandoc = await getPandocBrowserInstance();
+  const result = await pandoc.convert({ from: normalizeInputFormat(inputType), to: normalizeOutputFormat(outputType) }, payload, {});
   if (result.stderr?.trim()) {
     throw new Error("转换引擎返回错误，请尝试更简单的输入内容。");
   }
