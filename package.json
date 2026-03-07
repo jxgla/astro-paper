@@ -16,6 +16,7 @@
     "@astrojs/react": "^4.4.1",
     "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.6.0",
+    "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.14",
