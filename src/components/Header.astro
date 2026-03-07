@@ -370,7 +370,10 @@ const isEnHome = currentPath === "/en";
   }
 
   function initSecretEntry() {
-    const isEnHome = window.location.pathname === "/en";
+    const currentPath = window.location.pathname.endsWith("/") && window.location.pathname !== "/"
+      ? window.location.pathname.slice(0, -1)
+      : window.location.pathname;
+    const isEnHome = currentPath === "/en";
     if (!isEnHome) return;
 
     const themeBtn = document.querySelector("#theme-btn") as HTMLButtonElement | null;
