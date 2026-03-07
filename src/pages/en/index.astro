@@ -20,6 +20,7 @@ const enPostsOnly = posts.filter(p => p.id.endsWith("-en"));
 const sortedPosts = getSortedPosts(enPostsOnly);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
 ---
 
 <Layout title={`AI Terminal | English | ${SITE.title}`}>
@@ -125,6 +126,22 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     >
       <HomeChatbotWidget locale="en" />
     </div>
+
+    <div class="secret-entry-modal" data-secret-entry-modal hidden>
+      <div class="secret-entry-backdrop" data-secret-entry-close></div>
+      <div class="secret-entry-panel" role="dialog" aria-modal="true" aria-label="Restricted access">
+        <div class="secret-entry-head">
+          <strong>Restricted access</strong>
+          <button type="button" class="secret-entry-close" data-secret-entry-close aria-label="Close">✕</button>
+        </div>
+        <p class="secret-entry-copy">Enter the PIN to continue.</p>
+        <form class="secret-entry-form" data-secret-entry-form data-tools-api-base={toolsApiBase}>
+          <input class="secret-entry-input" data-secret-entry-input type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="PIN code" />
+          <button type="submit" class="secret-entry-submit">Enter</button>
+        </form>
+        <p class="secret-entry-status" data-secret-entry-status hidden></p>
+      </div>
+    </div>
   </main>
   <Footer />
 </Layout>
@@ -227,6 +244,87 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
   :global(html[data-theme="light"]) .chatbot-slot-placeholder {
     background: transparent;
   }
+
+  .secret-entry-modal[hidden] {
+    display: none;
+  }
+
+  .secret-entry-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+  }
+
+  .secret-entry-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(8px);
+  }
+
+  .secret-entry-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(92vw, 24rem);
+    transform: translate(-50%, -50%);
+    border-radius: 1rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--background) 94%, #020617 6%);
+    padding: 1rem;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.38);
+  }
+
+  .secret-entry-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .secret-entry-copy,
+  .secret-entry-status {
+    margin: 0.8rem 0 0;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .secret-entry-form {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+  }
+
+  .secret-entry-input {
+    width: 100%;
+    border-radius: 0.8rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+    background: color-mix(in oklab, var(--background) 98%, transparent);
+    color: var(--foreground);
+    padding: 0.78rem 0.85rem;
+    font-size: 0.92rem;
+  }
+
+  .secret-entry-submit,
+  .secret-entry-close {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--background) 98%, transparent);
+    color: var(--foreground);
+    cursor: pointer;
+  }
+
+  .secret-entry-submit {
+    padding: 0.72rem 0.95rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  .secret-entry-close {
+    width: 2rem;
+    height: 2rem;
+  }
 </style>
 
 <script>
@@ -236,5 +334,75 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     if (indexLayout) {
       sessionStorage.setItem("backUrl", "/en");
     }
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    const modal = document.querySelector("[data-secret-entry-modal]") as HTMLElement | null;
+    const form = document.querySelector("[data-secret-entry-form]") as HTMLFormElement | null;
+    const input = document.querySelector("[data-secret-entry-input]") as HTMLInputElement | null;
+    const status = document.querySelector("[data-secret-entry-status]") as HTMLElement | null;
+    const closeButtons = document.querySelectorAll("[data-secret-entry-close]");
+    if (!modal || !form || !input || !status) return;
+    if (form.dataset.bound === "1") return;
+    form.dataset.bound = "1";
+
+    const closeModal = () => {
+      modal.hidden = true;
+      input.value = "";
+      status.hidden = true;
+      status.textContent = "";
+    };
+
+    const openModal = () => {
+      modal.hidden = false;
+      status.hidden = true;
+      status.textContent = "";
+      setTimeout(() => input.focus(), 20);
+    };
+
+    closeButtons.forEach(button => {
+      button.addEventListener("click", closeModal);
+    });
+
+    window.addEventListener("secret-entry:open", openModal);
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const toolsApiBase = form.dataset.toolsApiBase || "";
+      if (!toolsApiBase) {
+        status.hidden = false;
+        status.textContent = "Secret entry is unavailable.";
+        return;
+      }
+
+      const pin = input.value.trim();
+      if (!pin) {
+        status.hidden = false;
+        status.textContent = "Enter the PIN first.";
+        return;
+      }
+
+      status.hidden = false;
+      status.textContent = "Checking…";
+
+      try {
+        const response = await fetch(`${toolsApiBase}/api/tools/secret-entry-auth`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ pin }),
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload?.ok || !payload?.token || !payload?.path) {
+          throw new Error(payload?.error || "Access denied");
+        }
+
+        sessionStorage.setItem("secretEntryToken", payload.token);
+        sessionStorage.setItem("secretEntryPath", payload.path);
+        window.location.href = `${payload.path}?token=${encodeURIComponent(payload.token)}`;
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : "Access denied";
+      }
+    });
   });
 </script>

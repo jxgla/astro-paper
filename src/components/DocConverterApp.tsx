@@ -2,7 +2,47 @@ import { useMemo, useState } from "react";
 
 type Format = "txt" | "md" | "html" | "tex" | "docx";
 type SourceMode = "text" | "file";
+type Locale = "zh" | "en";
 type ApiResponse = { ok: boolean; result?: string; error?: string };
+
+type Copy = {
+  badge: string;
+  title: string;
+  intro: string;
+  supportTitle: string;
+  useCasesTitle: string;
+  useCasesBody: string;
+  serviceTitle: string;
+  serviceBody: string;
+  inputTitle: string;
+  inputBody: string;
+  sourceMode: string;
+  textMode: string;
+  fileMode: string;
+  inputFormat: string;
+  outputFormat: string;
+  textInput: string;
+  textPlaceholder: string;
+  fileLabel: string;
+  fileHint: string;
+  fileHintSelected: (name: string) => string;
+  convert: string;
+  converting: string;
+  copy: string;
+  download: string;
+  copied: string;
+  downloaded: string;
+  outputTitle: string;
+  emptyResult: string;
+  emptyInputError: string;
+  missingFileError: string;
+  maxFileError: string;
+  unavailableError: string;
+  fileFailedError: string;
+  copyFailedError: string;
+  genericFailedError: string;
+  sampleText: string;
+};
 
 const TEXT_FORMATS: Format[] = ["md", "html", "tex"];
 const FILE_FORMATS: Format[] = ["docx"];
@@ -17,7 +57,86 @@ const OUTPUT_FORMATS_BY_INPUT: Record<Format, Format[]> = {
 const DOCX_MAX_BYTES = 10 * 1024 * 1024;
 const API_BASE = (import.meta.env.PUBLIC_DOC_CONVERTER_API_BASE || "https://converter.410666.xyz").replace(/\/$/, "");
 
-async function runTextConversion(inputType: Format, outputType: Format, content: string) {
+const COPY: Record<Locale, Copy> = {
+  zh: {
+    badge: "Experimental",
+    title: "文档格式转换",
+    intro: "当前改为独立后端服务驱动，站点只保留轻前端与结果展示。",
+    supportTitle: "当前支持",
+    useCasesTitle: "适合现在使用的场景",
+    useCasesBody: "轻量 Markdown、简单 LaTeX、常规 HTML，以及没有复杂样式的大部分 docx。",
+    serviceTitle: "服务端转换说明",
+    serviceBody: "请求会发送到站内转换服务处理。复杂表格、脚注、富样式 Word 排版仍不保证完全保真。",
+    inputTitle: "输入配置",
+    inputBody: "先选择来源和格式，再决定输出目标。",
+    sourceMode: "输入来源",
+    textMode: "文本粘贴",
+    fileMode: "docx 上传",
+    inputFormat: "输入格式",
+    outputFormat: "输出格式",
+    textInput: "文本输入",
+    textPlaceholder: "在这里粘贴 Markdown / HTML / LaTeX 文本",
+    fileLabel: "docx 文件",
+    fileHint: "限制 10MB。文件会交给站内转换服务处理，不直接暴露后端入口。",
+    fileHintSelected: name => `已选择：${name}`,
+    convert: "开始转换",
+    converting: "转换中…",
+    copy: "复制结果",
+    download: "下载结果",
+    copied: "结果已复制。",
+    downloaded: "结果已下载。",
+    outputTitle: "结果展示",
+    emptyResult: "暂无结果",
+    emptyInputError: "请先输入要转换的内容。",
+    missingFileError: "请先选择 .docx 文件。",
+    maxFileError: "docx 文件过大，当前限制为 10MB。",
+    unavailableError: "转换服务暂时不可用。",
+    fileFailedError: "文件转换失败。",
+    copyFailedError: "复制失败，请手动复制结果。",
+    genericFailedError: "转换失败",
+    sampleText: "# 标题\n\n**加粗** 和 *斜体*",
+  },
+  en: {
+    badge: "Experimental",
+    title: "Document Converter",
+    intro: "This tool now runs through a dedicated backend service while the site keeps a lightweight frontend shell.",
+    supportTitle: "Currently supported",
+    useCasesTitle: "Best for",
+    useCasesBody: "Lightweight Markdown, simple LaTeX, standard HTML, and most docx files without complex styling.",
+    serviceTitle: "Conversion service note",
+    serviceBody: "Requests are processed by an internal conversion service. Complex tables, footnotes, and rich Word layouts are still not guaranteed to be fully preserved.",
+    inputTitle: "Input setup",
+    inputBody: "Choose the source and format first, then decide the target output.",
+    sourceMode: "Source",
+    textMode: "Paste text",
+    fileMode: "Upload docx",
+    inputFormat: "Input format",
+    outputFormat: "Output format",
+    textInput: "Text input",
+    textPlaceholder: "Paste Markdown / HTML / LaTeX content here",
+    fileLabel: "docx file",
+    fileHint: "10MB max. Files are processed by the internal conversion service without exposing the backend endpoint in the UI.",
+    fileHintSelected: name => `Selected: ${name}`,
+    convert: "Convert",
+    converting: "Converting…",
+    copy: "Copy result",
+    download: "Download result",
+    copied: "Result copied.",
+    downloaded: "Result downloaded.",
+    outputTitle: "Result",
+    emptyResult: "No result yet",
+    emptyInputError: "Enter content to convert first.",
+    missingFileError: "Select a .docx file first.",
+    maxFileError: "The docx file is too large. Current limit: 10MB.",
+    unavailableError: "The conversion service is temporarily unavailable.",
+    fileFailedError: "File conversion failed.",
+    copyFailedError: "Copy failed. Please copy the result manually.",
+    genericFailedError: "Conversion failed",
+    sampleText: "# Title\n\n**Bold** and *italic*",
+  },
+};
+
+async function runTextConversion(inputType: Format, outputType: Format, content: string, fallbackError: string) {
   const response = await fetch(`${API_BASE}/api/convert/text`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -26,13 +145,13 @@ async function runTextConversion(inputType: Format, outputType: Format, content:
 
   const payload = (await response.json()) as ApiResponse;
   if (!response.ok || !payload.ok || typeof payload.result !== "string") {
-    throw new Error(payload.error || "转换服务暂时不可用。");
+    throw new Error(payload.error || fallbackError);
   }
 
   return payload.result;
 }
 
-async function runFileConversion(inputType: Format, outputType: Format, file: File) {
+async function runFileConversion(inputType: Format, outputType: Format, file: File, fallbackError: string) {
   const formData = new FormData();
   formData.append("inputType", inputType);
   formData.append("outputType", outputType);
@@ -45,7 +164,7 @@ async function runFileConversion(inputType: Format, outputType: Format, file: Fi
 
   const payload = (await response.json()) as ApiResponse;
   if (!response.ok || !payload.ok || typeof payload.result !== "string") {
-    throw new Error(payload.error || "文件转换失败。");
+    throw new Error(payload.error || fallbackError);
   }
 
   return payload.result;
@@ -55,11 +174,16 @@ function guessFileName(outputType: Format) {
   return `converted.${outputType === "md" ? "md" : outputType}`;
 }
 
-export default function DocConverterApp() {
+interface Props {
+  locale?: Locale;
+}
+
+export default function DocConverterApp({ locale = "zh" }: Props) {
+  const copy = COPY[locale];
   const [sourceMode, setSourceMode] = useState<SourceMode>("text");
   const [inputType, setInputType] = useState<Format>("md");
   const [outputType, setOutputType] = useState<Format>("tex");
-  const [textInput, setTextInput] = useState("# Title\n\n**Bold** and *italic*");
+  const [textInput, setTextInput] = useState(copy.sampleText);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
@@ -79,6 +203,7 @@ export default function DocConverterApp() {
       setInputType("md");
       setOutputType("tex");
       setSelectedFile(null);
+      setTextInput(copy.sampleText);
       return;
     }
     setInputType("docx");
@@ -103,18 +228,18 @@ export default function DocConverterApp() {
     setDownloaded(false);
     try {
       if (sourceMode === "file") {
-        if (!selectedFile) throw new Error("请先选择 .docx 文件。");
-        if (selectedFile.size > DOCX_MAX_BYTES) throw new Error("docx 文件过大，当前限制为 10MB。");
-        const nextResult = await runFileConversion(inputType, outputType, selectedFile);
+        if (!selectedFile) throw new Error(copy.missingFileError);
+        if (selectedFile.size > DOCX_MAX_BYTES) throw new Error(copy.maxFileError);
+        const nextResult = await runFileConversion(inputType, outputType, selectedFile, copy.fileFailedError);
         setResult(nextResult);
         return;
       }
-      if (!textInput.trim()) throw new Error("请先输入要转换的内容。");
-      const nextResult = await runTextConversion(inputType, outputType, textInput);
+      if (!textInput.trim()) throw new Error(copy.emptyInputError);
+      const nextResult = await runTextConversion(inputType, outputType, textInput, copy.unavailableError);
       setResult(nextResult);
     } catch (err) {
       setResult("");
-      setError(err instanceof Error ? err.message : "转换失败");
+      setError(err instanceof Error ? err.message : copy.genericFailedError);
     } finally {
       setIsBusy(false);
     }
@@ -127,7 +252,7 @@ export default function DocConverterApp() {
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      setError("复制失败，请手动复制结果。");
+      setError(copy.copyFailedError);
     }
   };
 
@@ -150,12 +275,12 @@ export default function DocConverterApp() {
     <div className="doc-converter-app">
       <div className="doc-converter-intro">
         <div>
-          <span className="doc-converter-badge">Experimental</span>
-          <h2>文档格式转换</h2>
-          <p>当前改为独立后端服务驱动，站点只保留轻前端，避免浏览器端 wasm 包体过大导致发布失败。</p>
+          <span className="doc-converter-badge">{copy.badge}</span>
+          <h2>{copy.title}</h2>
+          <p>{copy.intro}</p>
         </div>
         <div className="doc-converter-note">
-          <strong>当前支持</strong>
+          <strong>{copy.supportTitle}</strong>
           <ul>
             <li>md → tex / html</li>
             <li>tex → md</li>
@@ -167,12 +292,12 @@ export default function DocConverterApp() {
 
       <div className="doc-top-alerts">
         <div className="doc-alert-card">
-          <strong>适合现在使用的场景</strong>
-          <p>轻量 Markdown、简单 LaTeX、常规 HTML，以及没有复杂样式的大部分 docx。</p>
+          <strong>{copy.useCasesTitle}</strong>
+          <p>{copy.useCasesBody}</p>
         </div>
         <div className="doc-alert-card">
-          <strong>服务端转换说明</strong>
-          <p>请求会发送到 `converter.410666.xyz` 后端服务处理。复杂表格、脚注、富样式 Word 排版仍不保证完全保真。</p>
+          <strong>{copy.serviceTitle}</strong>
+          <p>{copy.serviceBody}</p>
         </div>
       </div>
 
@@ -180,22 +305,22 @@ export default function DocConverterApp() {
         <section className="doc-panel">
           <div className="doc-panel-head">
             <div>
-              <h3>输入配置</h3>
-              <p>先选择来源和格式，再决定输出目标。</p>
+              <h3>{copy.inputTitle}</h3>
+              <p>{copy.inputBody}</p>
             </div>
           </div>
 
           <div className="doc-form-grid">
             <label>
-              <span>输入来源</span>
+              <span>{copy.sourceMode}</span>
               <select value={sourceMode} onChange={(event) => handleSourceModeChange(event.target.value as SourceMode)}>
-                <option value="text">文本粘贴</option>
-                <option value="file">docx 上传</option>
+                <option value="text">{copy.textMode}</option>
+                <option value="file">{copy.fileMode}</option>
               </select>
             </label>
 
             <label>
-              <span>输入格式</span>
+              <span>{copy.inputFormat}</span>
               <select value={inputType} onChange={(event) => handleInputTypeChange(event.target.value as Format)}>
                 {(sourceMode === "text" ? TEXT_FORMATS : FILE_FORMATS).map((format: Format) => (
                   <option key={format} value={format}>{format}</option>
@@ -204,7 +329,7 @@ export default function DocConverterApp() {
             </label>
 
             <label>
-              <span>输出格式</span>
+              <span>{copy.outputFormat}</span>
               <select value={outputType} onChange={(event) => setOutputType(event.target.value as Format)}>
                 {availableOutputFormats.map((format: Format) => (
                   <option key={format} value={format}>{format}</option>
@@ -215,36 +340,36 @@ export default function DocConverterApp() {
 
           {sourceMode === "text" ? (
             <label className="doc-textarea-wrap">
-              <span>文本输入</span>
-              <textarea rows={14} value={textInput} onChange={(event) => setTextInput(event.target.value)} placeholder="在这里粘贴 Markdown / HTML / LaTeX 文本" />
+              <span>{copy.textInput}</span>
+              <textarea rows={14} value={textInput} onChange={(event) => setTextInput(event.target.value)} placeholder={copy.textPlaceholder} />
             </label>
           ) : (
             <label className="doc-file-wrap">
-              <span>docx 文件</span>
+              <span>{copy.fileLabel}</span>
               <input type="file" accept=".docx" onChange={(event) => setSelectedFile(event.target.files?.[0] || null)} />
-              <small>{selectedFile ? `已选择：${selectedFile.name}` : "限制 10MB。文件将通过 tunnel 转到后端服务处理，不直接暴露 VPS 端口。"}</small>
+              <small>{selectedFile ? copy.fileHintSelected(selectedFile.name) : copy.fileHint}</small>
             </label>
           )}
 
           <div className="doc-actions">
             <button type="button" className="doc-primary" onClick={handleConvert} disabled={isBusy}>
-              {isBusy ? "转换中…" : "开始转换"}
+              {isBusy ? copy.converting : copy.convert}
             </button>
-            <button type="button" className="doc-secondary" onClick={handleCopy} disabled={!result}>复制结果</button>
-            <button type="button" className="doc-secondary" onClick={handleDownload} disabled={!result}>下载结果</button>
+            <button type="button" className="doc-secondary" onClick={handleCopy} disabled={!result}>{copy.copy}</button>
+            <button type="button" className="doc-secondary" onClick={handleDownload} disabled={!result}>{copy.download}</button>
           </div>
 
           {error ? <div className="doc-error">{error}</div> : null}
-          {copied ? <div className="doc-success">结果已复制。</div> : null}
-          {downloaded ? <div className="doc-success">结果已下载。</div> : null}
+          {copied ? <div className="doc-success">{copy.copied}</div> : null}
+          {downloaded ? <div className="doc-success">{copy.downloaded}</div> : null}
         </section>
 
         <section className="doc-panel">
           <div className="doc-output-head">
-            <h3>结果展示</h3>
+            <h3>{copy.outputTitle}</h3>
             <span>{outputType.toUpperCase()}</span>
           </div>
-          <pre className="doc-output">{result || "暂无结果"}</pre>
+          <pre className="doc-output">{result || copy.emptyResult}</pre>
         </section>
       </div>
 
