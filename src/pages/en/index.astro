@@ -393,13 +393,12 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         });
 
         const payload = await response.json();
-        if (!response.ok || !payload?.ok || !payload?.token || !payload?.path) {
+        if (!response.ok || !payload?.ok || !payload?.token || !payload?.targetUrl) {
           throw new Error(payload?.error || "Access denied");
         }
 
         sessionStorage.setItem("secretEntryToken", payload.token);
-        sessionStorage.setItem("secretEntryPath", payload.path);
-        window.location.href = `${payload.path}?token=${encodeURIComponent(payload.token)}`;
+        window.location.href = `${payload.targetUrl}${payload.targetUrl.includes("?") ? "&" : "?"}token=${encodeURIComponent(payload.token)}`;
       } catch (error) {
         status.textContent = error instanceof Error ? error.message : "Access denied";
       }
