@@ -1,5 +1,5 @@
 import mammoth from "mammoth";
-import { getPandocBrowserInstance } from "@/lib/pandocBrowser";
+import { getPandocBrowserInstance } from "../lib/pandocBrowser";
 
 type Format = "txt" | "md" | "html" | "tex" | "docx";
 type ConversionPayload = string | ArrayBuffer;
