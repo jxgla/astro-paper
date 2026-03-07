@@ -1,4 +1,5 @@
 import { defineConfig, envField, fontProviders } from "astro/config";
+import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
@@ -16,6 +17,7 @@ export default defineConfig({
   site: SITE.website,
   devToolbar: { enabled: false },
   integrations: [
+    react(),
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
     }),

@@ -91,9 +91,14 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="efficiency" class="tools-section">
       <h2>效率工具</h2>
       <div class="tools-grid">
-        <article class="tool-card tool-card-placeholder">
-          <h3>Coming soon</h3>
-          <p>更偏生产力向的工具会继续补充到这里。</p>
+        <article id="doc-converter" class="tool-card">
+          <h3>文档格式转换</h3>
+          <p>独立子页面版本，支持 md、tex、html、docx 的基础互转。</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/tools/doc-converter">打开转换器</a>
+            <p class="tool-status">当前优先验证独立子页面链路，复杂格式暂不保证完全保真。</p>
+          </div>
         </article>
       </div>
     </section>

@@ -91,9 +91,14 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="efficiency" class="tools-section">
       <h2>Productivity Tools</h2>
       <div class="tools-grid">
-        <article class="tool-card tool-card-placeholder">
-          <h3>Coming soon</h3>
-          <p>More productivity-focused tools will be added here.</p>
+        <article id="doc-converter" class="tool-card">
+          <h3>Document Converter</h3>
+          <p>Standalone subpage version for basic md, tex, html, and docx conversions.</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/en/tools/doc-converter">Open converter</a>
+            <p class="tool-status">This first release validates the subpage workflow. Complex formatting is not guaranteed yet.</p>
+          </div>
         </article>
       </div>
     </section>

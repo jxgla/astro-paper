@@ -1,0 +1,50 @@
+---
+import DocToolPage from "@/layouts/DocToolPage.astro";
+import DocConverterApp from "@/components/DocConverterApp";
+---
+
+<DocToolPage
+  title="Document Converter"
+  desc="Basic conversion between md, tex, html, and docx"
+  heading="Document Converter"
+  subheading="Shipped first as a standalone tool page, with deeper integration deferred to the next phase."
+>
+  <div class="doc-page-note">
+    <div>
+      <strong>Current stage</strong>
+      <p>This first release is intentionally isolated as a standalone subpage to validate the conversion pipeline inside the live site environment.</p>
+    </div>
+    <div>
+      <strong>Best for</strong>
+      <p>Lightweight Markdown, LaTeX, HTML, and simple docx documents. Heavy layout, images, footnotes, and complex tables are not guaranteed.</p>
+    </div>
+  </div>
+
+  <DocConverterApp client:load />
+</DocToolPage>
+
+<style>
+  .doc-page-note {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .doc-page-note > div {
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    border-radius: 0.9rem;
+    padding: 0.9rem;
+    background: color-mix(in oklab, var(--background) 96%, transparent);
+  }
+
+  .doc-page-note strong {
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .doc-page-note p {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+</style>
