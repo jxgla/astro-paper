@@ -2,7 +2,6 @@ import { defineConfig, envField, fontProviders } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import wasm from "vite-plugin-wasm";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import {
@@ -44,7 +43,7 @@ export default defineConfig({
     // @ts-ignore
     // This will be fixed in Astro 6 with Vite 7 support
     // See: https://github.com/withastro/astro/issues/14030
-    plugins: [tailwindcss(), wasm()],
+    plugins: [tailwindcss()],
     optimizeDeps: {
       exclude: ["@resvg/resvg-js"],
     },
@@ -71,6 +70,11 @@ export default defineConfig({
         optional: true,
       }),
       PUBLIC_TOOLS_API_BASE: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
+      PUBLIC_DOC_CONVERTER_API_BASE: envField.string({
         access: "public",
         context: "client",
         optional: true,

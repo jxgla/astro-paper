@@ -16,7 +16,6 @@
     "@astrojs/react": "^4.4.1",
     "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.6.0",
-    "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.14",
@@ -24,8 +23,6 @@
     "astro": "^5.16.6",
     "dayjs": "^1.11.19",
     "lodash.kebabcase": "^4.1.1",
-    "mammoth": "^1.9.1",
-    "pandoc-wasm": "^1.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "remark-collapse": "^0.1.2",
@@ -50,7 +47,6 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.51.0",
-    "vite-plugin-wasm": "^3.4.1"
+    "typescript-eslint": "^8.51.0"
   }
 }

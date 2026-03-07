@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import ConverterWorker from "@/workers/docConverter.worker.ts?worker";
 
 type Format = "txt" | "md" | "html" | "tex" | "docx";
 type SourceMode = "text" | "file";
-type WorkerResponse = { ok: boolean; result?: string; error?: string };
+type ApiResponse = { ok: boolean; result?: string; error?: string };
 
 const TEXT_FORMATS: Format[] = ["md", "html", "tex"];
 const FILE_FORMATS: Format[] = ["docx"];
@@ -16,25 +15,40 @@ const OUTPUT_FORMATS_BY_INPUT: Record<Format, Format[]> = {
 };
 
 const DOCX_MAX_BYTES = 10 * 1024 * 1024;
+const API_BASE = (import.meta.env.PUBLIC_DOC_CONVERTER_API_BASE || "https://converter.410666.xyz").replace(/\/$/, "");
 
-async function runWorkerConversion(inputType: Format, outputType: Format, payload: string | ArrayBuffer) {
-  const worker = new ConverterWorker();
-  try {
-    const result = await new Promise<string>((resolve, reject) => {
-      worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-        if (event.data.ok && typeof event.data.result === "string") {
-          resolve(event.data.result);
-          return;
-        }
-        reject(new Error(event.data.error || "Worker conversion failed"));
-      };
-      worker.onerror = () => reject(new Error("转换线程异常退出。"));
-      worker.postMessage({ inputType, outputType, payload });
-    });
-    return result;
-  } finally {
-    worker.terminate();
+async function runTextConversion(inputType: Format, outputType: Format, content: string) {
+  const response = await fetch(`${API_BASE}/api/convert/text`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ inputType, outputType, content }),
+  });
+
+  const payload = (await response.json()) as ApiResponse;
+  if (!response.ok || !payload.ok || typeof payload.result !== "string") {
+    throw new Error(payload.error || "转换服务暂时不可用。");
   }
+
+  return payload.result;
+}
+
+async function runFileConversion(inputType: Format, outputType: Format, file: File) {
+  const formData = new FormData();
+  formData.append("inputType", inputType);
+  formData.append("outputType", outputType);
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE}/api/convert/file`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const payload = (await response.json()) as ApiResponse;
+  if (!response.ok || !payload.ok || typeof payload.result !== "string") {
+    throw new Error(payload.error || "文件转换失败。");
+  }
+
+  return payload.result;
 }
 
 function guessFileName(outputType: Format) {
@@ -91,13 +105,12 @@ export default function DocConverterApp() {
       if (sourceMode === "file") {
         if (!selectedFile) throw new Error("请先选择 .docx 文件。");
         if (selectedFile.size > DOCX_MAX_BYTES) throw new Error("docx 文件过大，当前限制为 10MB。");
-        const payload = await selectedFile.arrayBuffer();
-        const nextResult = await runWorkerConversion(inputType, outputType, payload);
+        const nextResult = await runFileConversion(inputType, outputType, selectedFile);
         setResult(nextResult);
         return;
       }
       if (!textInput.trim()) throw new Error("请先输入要转换的内容。");
-      const nextResult = await runWorkerConversion(inputType, outputType, textInput);
+      const nextResult = await runTextConversion(inputType, outputType, textInput);
       setResult(nextResult);
     } catch (err) {
       setResult("");
@@ -139,7 +152,7 @@ export default function DocConverterApp() {
         <div>
           <span className="doc-converter-badge">Experimental</span>
           <h2>文档格式转换</h2>
-          <p>先做成独立子页面版本，优先把基础转换链路跑稳，再决定是否并入主 tools 页面交互。</p>
+          <p>当前改为独立后端服务驱动，站点只保留轻前端，避免浏览器端 wasm 包体过大导致发布失败。</p>
         </div>
         <div className="doc-converter-note">
           <strong>当前支持</strong>
@@ -158,8 +171,8 @@ export default function DocConverterApp() {
           <p>轻量 Markdown、简单 LaTeX、常规 HTML，以及没有复杂样式的大部分 docx。</p>
         </div>
         <div className="doc-alert-card">
-          <strong>暂不保证</strong>
-          <p>复杂表格、图片很多的文档、脚注、特殊宏、富样式 Word 排版，当前都可能丢失格式。</p>
+          <strong>服务端转换说明</strong>
+          <p>请求会发送到 `converter.410666.xyz` 后端服务处理。复杂表格、脚注、富样式 Word 排版仍不保证完全保真。</p>
         </div>
       </div>
 
@@ -209,7 +222,7 @@ export default function DocConverterApp() {
             <label className="doc-file-wrap">
               <span>docx 文件</span>
               <input type="file" accept=".docx" onChange={(event) => setSelectedFile(event.target.files?.[0] || null)} />
-              <small>{selectedFile ? `已选择：${selectedFile.name}` : "限制 10MB，复杂格式和图片文档暂不保证完美保真。"}</small>
+              <small>{selectedFile ? `已选择：${selectedFile.name}` : "限制 10MB。文件将通过 tunnel 转到后端服务处理，不直接暴露 VPS 端口。"}</small>
             </label>
           )}
 
