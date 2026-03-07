@@ -1,0 +1,33 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import { SITE } from "@/config";
+
+interface Props {
+  title: string;
+  desc: string;
+  heading: string;
+  subheading: string;
+}
+
+const { title, heading, subheading } = Astro.props;
+---
+
+<Layout title={`${title} | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle={heading} pageDesc={subheading}>
+    <section class="doc-tool-shell">
+      <slot />
+    </section>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  .doc-tool-shell {
+    display: grid;
+    gap: 1rem;
+  }
+</style>
