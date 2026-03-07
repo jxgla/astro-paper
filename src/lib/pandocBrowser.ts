@@ -1,5 +1,5 @@
 import { createPandocInstance } from "./pandocCore";
-import pandocWasmUrl from "pandoc-wasm/src/pandoc.wasm?url";
+import pandocWasmUrl from "./pandoc.wasm?url";
 
 type PandocBrowserInstance = Awaited<ReturnType<typeof createPandocInstance>>;
 
