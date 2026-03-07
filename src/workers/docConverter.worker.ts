@@ -23,6 +23,9 @@ function normalizeOutputFormat(format: Format) {
 
 async function runPandoc(inputType: Format, outputType: Format, payload: string) {
   const pandoc = await getPandocBrowserInstance();
+  if (!pandoc) {
+    throw new Error("Pandoc engine not initialized.");
+  }
   const result = await pandoc.convert({ from: normalizeInputFormat(inputType), to: normalizeOutputFormat(outputType) }, payload, {});
   if (result.stderr?.trim()) {
     throw new Error("转换引擎返回错误，请尝试更简单的输入内容。");

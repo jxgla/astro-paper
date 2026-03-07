@@ -1,9 +1,9 @@
-import { createPandocInstance } from "pandoc-wasm/src/core.js";
+import { createPandocInstance } from "./pandocCore";
 import pandocWasmUrl from "pandoc-wasm/src/pandoc.wasm?url";
 
-let cachedInstancePromise: Promise<{
-  convert: (options: { from: string; to: string }, input: string, extra?: Record<string, unknown>) => Promise<{ stdout: string; stderr?: string }>;
-}> | null = null;
+type PandocBrowserInstance = Awaited<ReturnType<typeof createPandocInstance>>;
+
+let cachedInstancePromise: Promise<PandocBrowserInstance> | null = null;
 
 async function createInstance() {
   const response = await fetch(pandocWasmUrl);
