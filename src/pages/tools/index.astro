@@ -205,10 +205,6 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article class="tool-card tool-card-placeholder">
-          <h3>Coming soon</h3>
-          <p>实验性工具将优先在这里发布。</p>
-        </article>
       </div>
     </section>
   </Main>
@@ -229,7 +225,13 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 900px) {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .tool-card {
@@ -612,10 +614,6 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     color: var(--accent);
   }
 
-  .tool-card-placeholder {
-    border-style: dashed;
-    opacity: 0.92;
-  }
 </style>
 
 <script>
