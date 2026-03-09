@@ -164,10 +164,10 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
   }
 </style>
 
-<script>
+<script lang="ts">
   function initFunImagePage() {
     const root = document.querySelector("[data-fun-imagine]");
-    if (!root || root.dataset.bound === "1") return;
+    if (!(root instanceof HTMLFormElement) || root.dataset.bound === "1") return;
     root.dataset.bound = "1";
 
     const apiBase = (root.getAttribute("data-api-base") || "").replace(/\/$/, "");
@@ -175,16 +175,23 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
     const ratioEl = root.querySelector("[data-ratio]");
     const statusEl = root.querySelector("[data-status]");
     const quotaEl = root.querySelector("[data-quota]");
-    const startBtn = root.querySelector("[data-start]");
     const stopBtn = root.querySelector("[data-stop]");
     const clearBtn = root.querySelector("[data-clear]");
     const waterfall = document.querySelector("[data-waterfall]");
 
+    if (!(promptEl instanceof HTMLTextAreaElement)) return;
+    if (!(ratioEl instanceof HTMLSelectElement)) return;
+    if (!(statusEl instanceof HTMLElement)) return;
+    if (!(quotaEl instanceof HTMLElement)) return;
+    if (!(stopBtn instanceof HTMLButtonElement)) return;
+    if (!(clearBtn instanceof HTMLButtonElement)) return;
+    if (!(waterfall instanceof HTMLElement)) return;
+
     let taskId = "";
-    let eventSource = null;
+    let eventSource: EventSource | null = null;
     let generated = 0;
 
-    const setStatus = text => {
+    const setStatus = (text: string) => {
       statusEl.textContent = text;
     };
 
@@ -200,7 +207,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       }
     };
 
-    const addImage = b64 => {
+    const addImage = (b64: string) => {
       if (!b64) return;
       const item = document.createElement("figure");
       item.className = "fun-item";
@@ -243,7 +250,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       await refreshQuota();
     };
 
-    root.addEventListener("submit", async event => {
+    root.addEventListener("submit", async (event: SubmitEvent) => {
       event.preventDefault();
 
       const prompt = (promptEl.value || "").trim();
@@ -267,8 +274,9 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
         if (!res.ok || !startData?.task_id) {
           throw new Error(startData?.error || startData?.detail || "start failed");
         }
-      } catch (err) {
-        setStatus(`Start failed: ${String(err.message || err)}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        setStatus(`Start failed: ${message}`);
         await refreshQuota();
         return;
       }
@@ -277,7 +285,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       setStatus("Generating...");
 
       eventSource = new EventSource(`${apiBase}/api/fun/imagine/sse?task_id=${encodeURIComponent(taskId)}`);
-      eventSource.onmessage = async e => {
+      eventSource.onmessage = async (e: MessageEvent<string>) => {
         if (!e?.data) return;
         if (e.data === "[DONE]") {
           await stopStream(true);
@@ -285,7 +293,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
           return;
         }
 
-        let payload;
+        let payload: any;
         try {
           payload = JSON.parse(e.data);
         } catch {
