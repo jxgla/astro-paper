@@ -21,7 +21,7 @@ const langSwitchHref = isEn
 const langSwitchLabel = isEn ? "CN" : "EN";
 const chatNavLabel = isEn ? "🤖 Chat" : "🤖 AI Chat";
 
-const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts", "/tools"]);
+const EN_LOCALIZED_PATHS = new Set(["/", "/chat", "/posts", "/tools", "/fun"]);
 const brandTitleDesktop = isEn ? "VibeWatcher" : SITE.title;
 const brandTitleMobile = isEn ? "VibeWatcher" : "观者终端";
 
@@ -41,6 +41,7 @@ const isActive = (path: string) => {
 };
 
 const isToolsRoute = currentPath === withLocale("/tools");
+const isFunRoute = currentPath === withLocale("/fun");
 const isEnHome = currentPath === "/en";
 ---
 
@@ -106,6 +107,11 @@ const isEnHome = currentPath === "/en";
         <li class="col-span-2">
           <a href={withLocale("/posts")} class:list={{ "active-nav": isActive("/posts") }}>
             {isEn ? "Posts" : "Posts"}
+          </a>
+        </li>
+        <li class="col-span-2">
+          <a href={withLocale("/fun")} class:list={{ "active-nav": isFunRoute || isActive("/fun") }}>
+            {isEn ? "Fun" : "Fun"}
           </a>
         </li>
         <li id="tools-nav-item" class="col-span-2 sm:relative">

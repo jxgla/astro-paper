@@ -217,6 +217,17 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             </label>
 
             <label>
+              <span class="tool-label">Currency</span>
+              <select class="tool-input" data-vps-currency>
+                <option value="CNY">CNY (RMB)</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
+                <option value="HKD">HKD</option>
+              </select>
+            </label>
+
+            <label>
               <span class="tool-label">Total Cycle (months)</span>
               <input class="tool-input" data-vps-total-months type="number" min="1" step="1" placeholder="e.g. 12" />
             </label>
@@ -236,8 +247,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <div class="vps-value-panel" data-vps-result hidden>
               <div class="vps-value-main" data-vps-value>--</div>
               <div class="vps-value-meta">
+                <span data-vps-fx-date>FX date: --</span>
+                <span data-vps-fx-rate>FX rate: --</span>
                 <span data-vps-remaining>Remaining days: --</span>
                 <span data-vps-ratio>Remaining ratio: --</span>
+                <span data-vps-original-value>Residual in source currency: --</span>
               </div>
             </div>
           </form>
@@ -1548,34 +1562,110 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
   function initVpsResidualTool() {
     const form = document.querySelector("[data-vps-value-form]");
-    if (!form || form.dataset.bound === "1") return;
+    if (!(form instanceof HTMLFormElement) || form.dataset.bound === "1") return;
     form.dataset.bound = "1";
 
     const paidInput = form.querySelector("[data-vps-paid]");
+    const currencyInput = form.querySelector("[data-vps-currency]");
     const totalMonthsInput = form.querySelector("[data-vps-total-months]");
     const expiryInput = form.querySelector("[data-vps-expiry]");
     const status = form.querySelector("[data-vps-status]");
     const resultPanel = form.querySelector("[data-vps-result]");
     const valueEl = form.querySelector("[data-vps-value]");
+    const fxDateEl = form.querySelector("[data-vps-fx-date]");
+    const fxRateEl = form.querySelector("[data-vps-fx-rate]");
     const remainingEl = form.querySelector("[data-vps-remaining]");
     const ratioEl = form.querySelector("[data-vps-ratio]");
+    const originalValueEl = form.querySelector("[data-vps-original-value]");
     const clearBtn = form.querySelector("[data-vps-clear]");
+
+    if (!(paidInput instanceof HTMLInputElement)) return;
+    if (!(currencyInput instanceof HTMLSelectElement)) return;
+    if (!(totalMonthsInput instanceof HTMLInputElement)) return;
+    if (!(expiryInput instanceof HTMLInputElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(resultPanel instanceof HTMLElement)) return;
+    if (!(valueEl instanceof HTMLElement)) return;
+    if (!(fxDateEl instanceof HTMLElement)) return;
+    if (!(fxRateEl instanceof HTMLElement)) return;
+    if (!(remainingEl instanceof HTMLElement)) return;
+    if (!(ratioEl instanceof HTMLElement)) return;
+    if (!(originalValueEl instanceof HTMLElement)) return;
+    if (!(clearBtn instanceof HTMLButtonElement)) return;
+
+    let fxSnapshot = null;
+
+    const fmt = number =>
+      new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      }).format(number);
+
+    const fetchFx = async () => {
+      if (fxSnapshot) return fxSnapshot;
+      const fallback = {
+        date: new Date().toISOString().slice(0, 10),
+        cnyPerUnit: {
+          CNY: 1,
+          USD: 7.2,
+          GBP: 9.2,
+          EUR: 7.8,
+          HKD: 0.92,
+        },
+      };
+
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/CNY", { cache: "no-store" });
+        const data = await res.json();
+        if (!res.ok || data?.result !== "success" || !data?.rates) {
+          fxSnapshot = fallback;
+          return fxSnapshot;
+        }
+
+        const toCny = code => {
+          if (code === "CNY") return 1;
+          const r = Number(data.rates?.[code]);
+          if (!Number.isFinite(r) || r <= 0) return fallback.cnyPerUnit[code] || 1;
+          return 1 / r;
+        };
+
+        fxSnapshot = {
+          date: String((data.time_last_update_utc || "").slice(0, 16) || data.time_last_update_unix || fallback.date),
+          cnyPerUnit: {
+            CNY: 1,
+            USD: toCny("USD"),
+            GBP: toCny("GBP"),
+            EUR: toCny("EUR"),
+            HKD: toCny("HKD"),
+          },
+        };
+        return fxSnapshot;
+      } catch {
+        fxSnapshot = fallback;
+        return fxSnapshot;
+      }
+    };
 
     const reset = () => {
       paidInput.value = "";
+      currencyInput.value = "CNY";
       totalMonthsInput.value = "";
       expiryInput.value = "";
       status.textContent = "Formula: paid amount × (remaining cycle / total cycle)";
       resultPanel.hidden = true;
       valueEl.textContent = "--";
+      fxDateEl.textContent = "FX date: --";
+      fxRateEl.textContent = "FX rate: --";
       remainingEl.textContent = "Remaining days: --";
       ratioEl.textContent = "Remaining ratio: --";
+      originalValueEl.textContent = "Residual in source currency: --";
     };
 
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
 
       const paid = Number(paidInput.value);
+      const currency = String(currencyInput.value || "CNY");
       const totalMonths = Number(totalMonthsInput.value);
       const expiryRaw = expiryInput.value;
 
@@ -1609,17 +1699,25 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       const remainingDays = Math.max(0, Math.ceil((expiry.getTime() - today.getTime()) / msPerDay));
       const remainingMonthsApprox = remainingDays / 30;
       const ratio = Math.max(0, Math.min(1, remainingMonthsApprox / totalMonths));
-      const value = Math.max(0, Math.min(paid, paid * ratio));
 
-      valueEl.textContent = `Residual value: ${value.toFixed(2)}`;
+      const fx = await fetchFx();
+      const cnyPerUnit = Number(fx.cnyPerUnit?.[currency] || 1);
+      const paidCny = paid * cnyPerUnit;
+      const valueCny = Math.max(0, Math.min(paidCny, paidCny * ratio));
+      const valueOriginal = currency === "CNY" ? valueCny : valueCny / cnyPerUnit;
+
+      valueEl.textContent = `Residual value: ${fmt(valueCny)} CNY`;
+      fxDateEl.textContent = `FX date: ${fx.date}`;
+      fxRateEl.textContent = `FX rate: 1 ${currency} = ${fmt(cnyPerUnit)} CNY`;
       remainingEl.textContent = `Remaining days: ${remainingDays}`;
       ratioEl.textContent = `Remaining ratio: ${(ratio * 100).toFixed(2)}%`;
+      originalValueEl.textContent = `Residual in source currency: ${fmt(valueOriginal)} ${currency}`;
       resultPanel.hidden = false;
 
       if (remainingDays <= 0) {
         status.textContent = "Expired or expires today. Residual value is 0.";
       } else {
-        status.textContent = "Calculated (using 30 days = 1 month).";
+        status.textContent = "Calculated (using 30 days = 1 month, with daily FX refresh).";
       }
     });
 

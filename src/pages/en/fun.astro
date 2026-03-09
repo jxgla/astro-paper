@@ -1,0 +1,335 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Main from "@/layouts/Main.astro";
+import { SITE } from "@/config";
+
+const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.mehjx.workers.dev";
+---
+
+<Layout title={`Fun | ${SITE.title}`}>
+  <Header />
+  <Main pageTitle="Fun" pageDesc="Grok2API-powered fun capabilities (phase 1: image waterfall)">
+    <section class="fun-section">
+      <article class="fun-card">
+        <h2>Image Waterfall</h2>
+        <p>Generate images continuously from prompts. Maximum 50 images per IP per day.</p>
+
+        <form class="fun-form" data-fun-imagine data-api-base={funApiBase}>
+          <label>
+            <span class="fun-label">Prompt</span>
+            <textarea class="fun-input" data-prompt placeholder="e.g. neon cyberpunk alley, rainy night, cinematic light"></textarea>
+          </label>
+
+          <label>
+            <span class="fun-label">Aspect Ratio</span>
+            <select class="fun-select" data-ratio>
+              <option value="2:3">2:3</option>
+              <option value="3:2">3:2</option>
+              <option value="1:1">1:1</option>
+              <option value="16:9">16:9</option>
+              <option value="9:16">9:16</option>
+            </select>
+          </label>
+
+          <div class="fun-actions">
+            <button type="submit" class="fun-btn-primary" data-start>Start</button>
+            <button type="button" class="fun-btn-secondary" data-stop>Stop</button>
+            <button type="button" class="fun-btn-secondary" data-clear>Clear Images</button>
+          </div>
+
+          <p class="fun-status" data-status>Ready</p>
+          <p class="fun-quota" data-quota>Daily quota: -- / 50</p>
+        </form>
+      </article>
+
+      <article class="fun-waterfall-card">
+        <div class="fun-waterfall" data-waterfall></div>
+      </article>
+    </section>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  .fun-section {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .fun-card,
+  .fun-waterfall-card {
+    border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+    border-radius: 0.9rem;
+    padding: 0.9rem;
+    background: color-mix(in oklab, var(--background) 95%, transparent);
+  }
+
+  .fun-card h2 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .fun-card p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .fun-form {
+    margin-top: 0.7rem;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .fun-label {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .fun-input,
+  .fun-select {
+    width: 100%;
+    border-radius: 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+    background: color-mix(in oklab, var(--background) 96%, transparent);
+    color: var(--foreground);
+    padding: 0.55rem 0.58rem;
+    font-size: 0.78rem;
+  }
+
+  .fun-input {
+    min-height: 5.8rem;
+    resize: vertical;
+    line-height: 1.45;
+  }
+
+  .fun-actions {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .fun-btn-primary,
+  .fun-btn-secondary {
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+    background: color-mix(in oklab, var(--background) 95%, transparent);
+    color: var(--foreground);
+    border-radius: 0.52rem;
+    padding: 0.38rem 0.72rem;
+    font-size: 0.74rem;
+    cursor: pointer;
+  }
+
+  .fun-btn-primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+  }
+
+  .fun-status,
+  .fun-quota {
+    margin: 0;
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 70%, transparent);
+  }
+
+  .fun-waterfall {
+    columns: 4 220px;
+    column-gap: 0.7rem;
+  }
+
+  .fun-item {
+    break-inside: avoid;
+    margin-bottom: 0.7rem;
+    border-radius: 0.72rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--background) 97%, transparent);
+  }
+
+  .fun-item img {
+    width: 100%;
+    display: block;
+  }
+
+  .fun-item-meta {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.68rem;
+    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  }
+</style>
+
+<script>
+  function initFunImagePage() {
+    const root = document.querySelector("[data-fun-imagine]");
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+
+    const apiBase = (root.getAttribute("data-api-base") || "").replace(/\/$/, "");
+    const promptEl = root.querySelector("[data-prompt]");
+    const ratioEl = root.querySelector("[data-ratio]");
+    const statusEl = root.querySelector("[data-status]");
+    const quotaEl = root.querySelector("[data-quota]");
+    const startBtn = root.querySelector("[data-start]");
+    const stopBtn = root.querySelector("[data-stop]");
+    const clearBtn = root.querySelector("[data-clear]");
+    const waterfall = document.querySelector("[data-waterfall]");
+
+    let taskId = "";
+    let eventSource = null;
+    let generated = 0;
+
+    const setStatus = text => {
+      statusEl.textContent = text;
+    };
+
+    const refreshQuota = async () => {
+      try {
+        const res = await fetch(`${apiBase}/api/fun/imagine/quota`, { cache: "no-store" });
+        const data = await res.json();
+        if (data?.ok) {
+          quotaEl.textContent = `Daily quota: ${data.used} / ${data.limit} (remaining ${data.remaining})`;
+        }
+      } catch {
+        quotaEl.textContent = "Daily quota: fetch failed";
+      }
+    };
+
+    const addImage = b64 => {
+      if (!b64) return;
+      const item = document.createElement("figure");
+      item.className = "fun-item";
+
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.src = `data:image/jpeg;base64,${b64}`;
+      img.alt = "generated image";
+
+      const meta = document.createElement("figcaption");
+      meta.className = "fun-item-meta";
+      generated += 1;
+      meta.textContent = `#${generated}`;
+
+      item.appendChild(img);
+      item.appendChild(meta);
+      waterfall.prepend(item);
+    };
+
+    const stopStream = async (silent = false) => {
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+
+      if (taskId) {
+        try {
+          await fetch(`${apiBase}/api/fun/imagine/stop`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ task_ids: [taskId] }),
+          });
+        } catch {
+          // ignore
+        }
+      }
+
+      taskId = "";
+      if (!silent) setStatus("Stopped");
+      await refreshQuota();
+    };
+
+    root.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const prompt = (promptEl.value || "").trim();
+      const aspect_ratio = ratioEl.value || "2:3";
+      if (!prompt) {
+        setStatus("Please enter a prompt");
+        return;
+      }
+
+      await stopStream(true);
+
+      setStatus("Creating task...");
+      let startData;
+      try {
+        const res = await fetch(`${apiBase}/api/fun/imagine/start`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, aspect_ratio }),
+        });
+        startData = await res.json();
+        if (!res.ok || !startData?.task_id) {
+          throw new Error(startData?.error || startData?.detail || "start failed");
+        }
+      } catch (err) {
+        setStatus(`Start failed: ${String(err.message || err)}`);
+        await refreshQuota();
+        return;
+      }
+
+      taskId = startData.task_id;
+      setStatus("Generating...");
+
+      eventSource = new EventSource(`${apiBase}/api/fun/imagine/sse?task_id=${encodeURIComponent(taskId)}`);
+      eventSource.onmessage = async e => {
+        if (!e?.data) return;
+        if (e.data === "[DONE]") {
+          await stopStream(true);
+          setStatus("Completed");
+          return;
+        }
+
+        let payload;
+        try {
+          payload = JSON.parse(e.data);
+        } catch {
+          return;
+        }
+
+        if (payload?.type === "image" && payload?.b64_json) {
+          addImage(payload.b64_json);
+          return;
+        }
+
+        if (payload?.type === "quota" && payload?.status === "limit_reached") {
+          setStatus("Daily quota reached (50)");
+          await stopStream(true);
+          return;
+        }
+
+        if (payload?.type === "error") {
+          setStatus(`Error: ${payload.message || "unknown"}`);
+          await stopStream(true);
+          return;
+        }
+      };
+
+      eventSource.onerror = async () => {
+        setStatus("Connection dropped and stopped");
+        await stopStream(true);
+      };
+    });
+
+    stopBtn.addEventListener("click", () => stopStream());
+
+    clearBtn.addEventListener("click", () => {
+      waterfall.innerHTML = "";
+      generated = 0;
+      setStatus("Images cleared");
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (eventSource) eventSource.close();
+    });
+
+    refreshQuota();
+  }
+
+  document.addEventListener("astro:page-load", initFunImagePage);
+</script>
