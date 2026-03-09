@@ -205,6 +205,44 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
+        <article id="vps-residual-value" class="tool-card">
+          <h3>VPS 剩余周期价值</h3>
+          <p>仅按已支付金额、总周期与到期时间计算剩余价值，不引入市场比价或人为系数。</p>
+          <span class="tool-badge">New</span>
+
+          <form class="tool-form" data-vps-value-form>
+            <label>
+              <span class="tool-label">支付金额</span>
+              <input class="tool-input" data-vps-paid type="number" min="0" step="0.01" placeholder="例如 360" />
+            </label>
+
+            <label>
+              <span class="tool-label">总周期（月）</span>
+              <input class="tool-input" data-vps-total-months type="number" min="1" step="1" placeholder="例如 12" />
+            </label>
+
+            <label>
+              <span class="tool-label">到期时间</span>
+              <input class="tool-input" data-vps-expiry type="date" />
+            </label>
+
+            <div class="tool-actions">
+              <button type="submit" class="tool-btn-primary">计算</button>
+              <button type="button" class="tool-btn-secondary" data-vps-clear>清空</button>
+            </div>
+
+            <p class="tool-status" data-vps-status>按公式：支付金额 × (剩余周期 / 总周期)</p>
+
+            <div class="vps-value-panel" data-vps-result hidden>
+              <div class="vps-value-main" data-vps-value>--</div>
+              <div class="vps-value-meta">
+                <span data-vps-remaining>剩余天数：--</span>
+                <span data-vps-ratio>剩余占比：--</span>
+              </div>
+            </div>
+          </form>
+        </article>
+
       </div>
     </section>
   </Main>
@@ -347,6 +385,30 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     margin: 0;
     font-size: 0.72rem;
     color: color-mix(in oklab, var(--foreground) 70%, transparent);
+  }
+
+  .vps-value-panel {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent);
+    background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 18%, var(--background) 82%), color-mix(in oklab, var(--background) 96%, transparent));
+    padding: 0.72rem 0.8rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .vps-value-main {
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--foreground);
+  }
+
+  .vps-value-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    font-size: 0.74rem;
+    color: color-mix(in oklab, var(--foreground) 76%, transparent);
   }
 
   .tool-result-wrap {
@@ -1484,7 +1546,88 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     syncAutoState();
   }
 
+  function initVpsResidualTool() {
+    const form = document.querySelector("[data-vps-value-form]");
+    if (!form || form.dataset.bound === "1") return;
+    form.dataset.bound = "1";
+
+    const paidInput = form.querySelector("[data-vps-paid]");
+    const totalMonthsInput = form.querySelector("[data-vps-total-months]");
+    const expiryInput = form.querySelector("[data-vps-expiry]");
+    const status = form.querySelector("[data-vps-status]");
+    const resultPanel = form.querySelector("[data-vps-result]");
+    const valueEl = form.querySelector("[data-vps-value]");
+    const remainingEl = form.querySelector("[data-vps-remaining]");
+    const ratioEl = form.querySelector("[data-vps-ratio]");
+    const clearBtn = form.querySelector("[data-vps-clear]");
+
+    const reset = () => {
+      paidInput.value = "";
+      totalMonthsInput.value = "";
+      expiryInput.value = "";
+      status.textContent = "按公式：支付金额 × (剩余周期 / 总周期)";
+      resultPanel.hidden = true;
+      valueEl.textContent = "--";
+      remainingEl.textContent = "剩余天数：--";
+      ratioEl.textContent = "剩余占比：--";
+    };
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const paid = Number(paidInput.value);
+      const totalMonths = Number(totalMonthsInput.value);
+      const expiryRaw = expiryInput.value;
+
+      if (!Number.isFinite(paid) || paid < 0) {
+        status.textContent = "请输入有效的支付金额。";
+        resultPanel.hidden = true;
+        return;
+      }
+      if (!Number.isFinite(totalMonths) || totalMonths <= 0) {
+        status.textContent = "总周期（月）必须大于 0。";
+        resultPanel.hidden = true;
+        return;
+      }
+      if (!expiryRaw) {
+        status.textContent = "请选择到期时间。";
+        resultPanel.hidden = true;
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const expiry = new Date(`${expiryRaw}T00:00:00`);
+      if (Number.isNaN(expiry.getTime())) {
+        status.textContent = "到期时间格式无效。";
+        resultPanel.hidden = true;
+        return;
+      }
+
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const remainingDays = Math.max(0, Math.ceil((expiry.getTime() - today.getTime()) / msPerDay));
+      const remainingMonthsApprox = remainingDays / 30;
+      const ratio = Math.max(0, Math.min(1, remainingMonthsApprox / totalMonths));
+      const value = Math.max(0, Math.min(paid, paid * ratio));
+
+      valueEl.textContent = `剩余价值：${value.toFixed(2)}`;
+      remainingEl.textContent = `剩余天数：${remainingDays} 天`;
+      ratioEl.textContent = `剩余占比：${(ratio * 100).toFixed(2)}%`;
+      resultPanel.hidden = false;
+
+      if (remainingDays <= 0) {
+        status.textContent = "已到期或今日到期，剩余价值为 0。";
+      } else {
+        status.textContent = "已完成计算（按 30 天 = 1 个月折算剩余周期）。";
+      }
+    });
+
+    clearBtn.addEventListener("click", reset);
+  }
+
   document.addEventListener("astro:page-load", initClashTool);
   document.addEventListener("astro:page-load", initMbtiTool);
   document.addEventListener("astro:page-load", initTempMailTool);
+  document.addEventListener("astro:page-load", initVpsResidualTool);
 </script>
