@@ -164,7 +164,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
   }
 </style>
 
-<script lang="ts">
+<script>
   function initFunImagePage() {
     const root = document.querySelector("[data-fun-imagine]");
     if (!(root instanceof HTMLFormElement) || root.dataset.bound === "1") return;
@@ -188,10 +188,10 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
     if (!(waterfall instanceof HTMLElement)) return;
 
     let taskId = "";
-    let eventSource: EventSource | null = null;
+    let eventSource = null;
     let generated = 0;
 
-    const setStatus = (text: string) => {
+    const setStatus = text => {
       statusEl.textContent = text;
     };
 
@@ -207,7 +207,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       }
     };
 
-    const addImage = (b64: string) => {
+    const addImage = b64 => {
       if (!b64) return;
       const item = document.createElement("figure");
       item.className = "fun-item";
@@ -250,7 +250,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       await refreshQuota();
     };
 
-    root.addEventListener("submit", async (event: SubmitEvent) => {
+    root.addEventListener("submit", async event => {
       event.preventDefault();
 
       const prompt = (promptEl.value || "").trim();
@@ -274,7 +274,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
         if (!res.ok || !startData?.task_id) {
           throw new Error(startData?.error || startData?.detail || "start failed");
         }
-      } catch (err: unknown) {
+      } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         setStatus(`Start failed: ${message}`);
         await refreshQuota();
@@ -285,7 +285,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       setStatus("Generating...");
 
       eventSource = new EventSource(`${apiBase}/api/fun/imagine/sse?task_id=${encodeURIComponent(taskId)}`);
-      eventSource.onmessage = async (e: MessageEvent<string>) => {
+      eventSource.onmessage = async e => {
         if (!e?.data) return;
         if (e.data === "[DONE]") {
           await stopStream(true);
@@ -293,7 +293,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
           return;
         }
 
-        let payload: any;
+        let payload;
         try {
           payload = JSON.parse(e.data);
         } catch {

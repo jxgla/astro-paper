@@ -1593,8 +1593,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(originalValueEl instanceof HTMLElement)) return;
     if (!(clearBtn instanceof HTMLButtonElement)) return;
 
+    /** @type {{date: string, cnyPerUnit: Record<string, number>} | null} */
     let fxSnapshot = null;
 
+    /** @param {number} number */
     const fmt = number =>
       new Intl.NumberFormat("zh-CN", {
         minimumFractionDigits: 3,
@@ -1622,6 +1624,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           return fxSnapshot;
         }
 
+        /** @param {string} code */
         const toCny = code => {
           if (code === "CNY") return 1;
           const r = Number(data.rates?.[code]);
