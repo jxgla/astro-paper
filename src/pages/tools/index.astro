@@ -1593,47 +1593,52 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     if (!(originalValueEl instanceof HTMLElement)) return;
     if (!(clearBtn instanceof HTMLButtonElement)) return;
 
-    /** @type {{date: string, cnyPerUnit: Record<string, number>} | null} */
-    let fxSnapshot = null;
+    const fallbackFx = {
+      date: new Date().toISOString().slice(0, 10),
+      cnyPerUnit: {
+        CNY: 1,
+        USD: 7.2,
+        GBP: 9.2,
+        EUR: 7.8,
+        HKD: 0.92,
+      },
+    };
+    let fxSnapshot = fallbackFx;
+    let fxLoaded = false;
 
-    /** @param {number} number */
-    const fmt = number =>
-      new Intl.NumberFormat("zh-CN", {
+    /** @param {number} value */
+    function fmt(value) {
+      return new Intl.NumberFormat("zh-CN", {
         minimumFractionDigits: 3,
         maximumFractionDigits: 3,
-      }).format(number);
+      }).format(value);
+    }
 
     const fetchFx = async () => {
-      if (fxSnapshot) return fxSnapshot;
-      const fallback = {
-        date: new Date().toISOString().slice(0, 10),
-        cnyPerUnit: {
-          CNY: 1,
-          USD: 7.2,
-          GBP: 9.2,
-          EUR: 7.8,
-          HKD: 0.92,
-        },
-      };
+      if (fxLoaded) return fxSnapshot;
 
       try {
         const res = await fetch("https://open.er-api.com/v6/latest/CNY", { cache: "no-store" });
         const data = await res.json();
         if (!res.ok || data?.result !== "success" || !data?.rates) {
-          fxSnapshot = fallback;
+          fxSnapshot = fallbackFx;
+          fxLoaded = true;
           return fxSnapshot;
         }
 
-        /** @param {string} code */
-        const toCny = code => {
+        function toCny(code) {
           if (code === "CNY") return 1;
           const r = Number(data.rates?.[code]);
-          if (!Number.isFinite(r) || r <= 0) return fallback.cnyPerUnit[code] || 1;
-          return 1 / r;
-        };
+          if (Number.isFinite(r) && r > 0) return 1 / r;
+          if (code === "USD") return fallbackFx.cnyPerUnit.USD;
+          if (code === "GBP") return fallbackFx.cnyPerUnit.GBP;
+          if (code === "EUR") return fallbackFx.cnyPerUnit.EUR;
+          if (code === "HKD") return fallbackFx.cnyPerUnit.HKD;
+          return 1;
+        }
 
         fxSnapshot = {
-          date: String((data.time_last_update_utc || "").slice(0, 16) || data.time_last_update_unix || fallback.date),
+          date: String((data.time_last_update_utc || "").slice(0, 16) || data.time_last_update_unix || fallbackFx.date),
           cnyPerUnit: {
             CNY: 1,
             USD: toCny("USD"),
@@ -1642,9 +1647,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             HKD: toCny("HKD"),
           },
         };
+        fxLoaded = true;
         return fxSnapshot;
       } catch {
-        fxSnapshot = fallback;
+        fxSnapshot = fallbackFx;
+        fxLoaded = true;
         return fxSnapshot;
       }
     };

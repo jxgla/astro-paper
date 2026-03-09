@@ -188,12 +188,14 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
     if (!(waterfall instanceof HTMLElement)) return;
 
     let taskId = "";
+    /** @type {EventSource | null} */
     let eventSource = null;
     let generated = 0;
 
-    const setStatus = text => {
+    /** @param {string} text */
+    function setStatus(text) {
       statusEl.textContent = text;
-    };
+    }
 
     const refreshQuota = async () => {
       try {
@@ -207,7 +209,8 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       }
     };
 
-    const addImage = b64 => {
+    /** @param {string} b64 */
+    function addImage(b64) {
       if (!b64) return;
       const item = document.createElement("figure");
       item.className = "fun-item";
@@ -225,7 +228,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.me
       item.appendChild(img);
       item.appendChild(meta);
       waterfall.prepend(item);
-    };
+    }
 
     const stopStream = async (silent = false) => {
       if (eventSource) {
