@@ -193,6 +193,8 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     /** @type {EventSource | null} */
     let eventSource = null;
     let generated = 0;
+    /** @type {Map<string, HTMLElement>} */
+    const streamImageMap = new Map();
 
     /** @type {string | null} */
     let statusHold = null;
@@ -229,14 +231,33 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     };
 
     /** @param {string} b64 */
-    function addImage(b64) {
-      if (!b64) return;
+    function inferMimeFromBase64(b64) {
+      if (!b64) return "image/jpeg";
+      if (b64.startsWith("iVBOR")) return "image/png";
+      if (b64.startsWith("/9j/")) return "image/jpeg";
+      if (b64.startsWith("R0lGOD")) return "image/gif";
+      return "image/jpeg";
+    }
+
+    /** @param {string} payload */
+    function payloadToSrc(payload) {
+      if (!payload) return "";
+      if (payload.startsWith("http://") || payload.startsWith("https://")) return payload;
+      if (payload.startsWith("data:")) return payload;
+      const mime = inferMimeFromBase64(payload);
+      return `data:${mime};base64,${payload}`;
+    }
+
+    /** @param {string} payload */
+    function addImage(payload) {
+      if (!payload) return;
       const item = document.createElement("figure");
       item.className = "fun-item";
 
       const img = document.createElement("img");
       img.loading = "lazy";
-      img.src = `data:image/jpeg;base64,${b64}`;
+      img.decoding = "async";
+      img.src = payloadToSrc(payload);
       img.alt = "generated image";
 
       const meta = document.createElement("figcaption");
@@ -247,6 +268,51 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       item.appendChild(img);
       item.appendChild(meta);
       waterfall.prepend(item);
+    }
+
+    /**
+     * Upsert a stream image by imageId so partial images can be replaced by final images.
+     * @param {string} payload
+     * @param {any} meta
+     * @param {string} imageId
+     * @param {boolean} isFinal
+     */
+    function upsertStreamImage(payload, meta, imageId, isFinal) {
+      if (!payload || !imageId) return;
+      const existing = streamImageMap.get(imageId);
+      if (!existing) {
+        const item = document.createElement("figure");
+        item.className = "fun-item";
+        item.dataset.imageId = imageId;
+
+        const img = document.createElement("img");
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.src = payloadToSrc(payload);
+        img.alt = "generated image";
+
+        const metaEl = document.createElement("figcaption");
+        metaEl.className = "fun-item-meta";
+        generated += 1;
+        const ms = meta && meta.elapsed_ms ? ` • ${meta.elapsed_ms}ms` : "";
+        metaEl.textContent = `#${generated}${isFinal ? "" : "（生成中）"}${ms}`;
+
+        item.appendChild(img);
+        item.appendChild(metaEl);
+        waterfall.prepend(item);
+        streamImageMap.set(imageId, item);
+        return;
+      }
+
+      const img = existing.querySelector("img");
+      if (img instanceof HTMLImageElement) {
+        img.src = payloadToSrc(payload);
+      }
+      const metaEl = existing.querySelector(".fun-item-meta");
+      if (metaEl instanceof HTMLElement) {
+        const ms = meta && meta.elapsed_ms ? ` • ${meta.elapsed_ms}ms` : "";
+        metaEl.textContent = `${metaEl.textContent?.replace(/（生成中）/g, "") || ""}${isFinal ? "" : "（生成中）"}${ms}`.trim();
+      }
     }
 
     const stopStream = async (silent = false) => {
@@ -329,8 +395,30 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
           return;
         }
 
+        // Grok2API streaming event types (see grok2api/_public/static/function/js/imagine.js)
+        if (payload?.type === "image_generation.partial_image" || payload?.type === "image_generation.completed") {
+          const imageId = payload.image_id || payload.imageId;
+          const p = payload.b64_json || payload.url || payload.image;
+          const isFinal = payload.type === "image_generation.completed" || payload.stage === "final";
+          if (p && imageId) {
+            upsertStreamImage(p, payload, String(imageId), Boolean(isFinal));
+          }
+          return;
+        }
+
         if (payload?.type === "image" && payload?.b64_json) {
           addImage(payload.b64_json);
+          return;
+        }
+
+        if (payload?.type === "status") {
+          if (payload.status === "running") {
+            setStatus("生成中...");
+          }
+          if (payload.status === "stopped") {
+            await stopStream(true);
+            setStatus("本轮生成结束");
+          }
           return;
         }
 
@@ -340,8 +428,9 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
           return;
         }
 
-        if (payload?.type === "error") {
-          setStatus(`错误：${payload.message || "unknown"}`);
+        if (payload?.type === "error" || payload?.error) {
+          const msg = payload?.message || payload?.error?.message || "unknown";
+          setStatus(`错误：${msg}`);
           await stopStream(true);
           return;
         }
