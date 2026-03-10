@@ -5,7 +5,8 @@ import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
 
-const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun-worker.mehjx.workers.dev";
+// Prefer a configured env var, but default to the production custom domain.
+const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xyz";
 ---
 
 <Layout title={`Fun | ${SITE.title}`}>
