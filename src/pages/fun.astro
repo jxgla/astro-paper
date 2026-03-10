@@ -194,8 +194,18 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     let eventSource = null;
     let generated = 0;
 
+    /** @type {string | null} */
+    let statusHold = null;
+
     /** @param {string} text */
     function setStatus(text) {
+      statusHold = null;
+      statusEl.textContent = text;
+    }
+
+    /** @param {string} text */
+    function holdStatus(text) {
+      statusHold = text;
       statusEl.textContent = text;
     }
 
@@ -203,18 +213,18 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
 
     const refreshQuota = async () => {
       try {
-        setStatus("读取配额中...");
+        if (!statusHold) holdStatus("读取配额中...");
         const res = await fetch(`${apiBase}/api/fun/imagine/quota`, { cache: "no-store" });
         const data = await res.json();
         if (data?.ok) {
           quotaEl.textContent = `今日配额：${data.used} / ${data.limit}（剩余 ${data.remaining}）`;
-          setStatus("准备就绪");
+          if (statusHold === "读取配额中...") setStatus("准备就绪");
         } else {
-          setStatus("配额接口返回异常");
+          if (!statusHold) holdStatus("配额接口返回异常");
         }
       } catch {
         quotaEl.textContent = "今日配额：读取失败";
-        setStatus("配额读取失败（检查域名/CORS/网络）");
+        if (!statusHold) holdStatus("配额读取失败（检查域名/CORS/网络）");
       }
     };
 
@@ -282,14 +292,21 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, aspect_ratio }),
         });
-        startData = await res.json();
+        const rawText = await res.text();
+        try {
+          startData = rawText ? JSON.parse(rawText) : null;
+        } catch {
+          startData = null;
+        }
         if (!res.ok || !startData?.task_id) {
-          throw new Error(startData?.error || startData?.detail || "创建失败");
+          const apiMsg = startData?.error || startData?.detail || rawText;
+          throw new Error(`HTTP ${res.status}：${(apiMsg || "创建失败").toString().slice(0, 200)}`);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         setStatus(`创建失败：${message}`);
-        await refreshQuota();
+        // Don't overwrite the error status with "准备就绪" immediately.
+        refreshQuota();
         return;
       }
 

@@ -194,8 +194,18 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     let eventSource = null;
     let generated = 0;
 
+    /** @type {string | null} */
+    let statusHold = null;
+
     /** @param {string} text */
     function setStatus(text) {
+      statusHold = null;
+      statusEl.textContent = text;
+    }
+
+    /** @param {string} text */
+    function holdStatus(text) {
+      statusHold = text;
       statusEl.textContent = text;
     }
 
@@ -203,18 +213,18 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
 
     const refreshQuota = async () => {
       try {
-        setStatus("Loading quota...");
+        if (!statusHold) holdStatus("Loading quota...");
         const res = await fetch(`${apiBase}/api/fun/imagine/quota`, { cache: "no-store" });
         const data = await res.json();
         if (data?.ok) {
           quotaEl.textContent = `Daily quota: ${data.used} / ${data.limit} (remaining ${data.remaining})`;
-          setStatus("Ready");
+          if (statusHold === "Loading quota...") setStatus("Ready");
         } else {
-          setStatus("Quota API returned unexpected response");
+          if (!statusHold) holdStatus("Quota API returned unexpected response");
         }
       } catch {
         quotaEl.textContent = "Daily quota: fetch failed";
-        setStatus("Quota fetch failed (check domain/CORS/network)");
+        if (!statusHold) holdStatus("Quota fetch failed (check domain/CORS/network)");
       }
     };
 
@@ -282,14 +292,21 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, aspect_ratio }),
         });
-        startData = await res.json();
+        const rawText = await res.text();
+        try {
+          startData = rawText ? JSON.parse(rawText) : null;
+        } catch {
+          startData = null;
+        }
         if (!res.ok || !startData?.task_id) {
-          throw new Error(startData?.error || startData?.detail || "start failed");
+          const apiMsg = startData?.error || startData?.detail || rawText;
+          throw new Error(`HTTP ${res.status}: ${String(apiMsg || "start failed").slice(0, 200)}`);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         setStatus(`Start failed: ${message}`);
-        await refreshQuota();
+        // Don't overwrite the error status with "Ready" immediately.
+        refreshQuota();
         return;
       }
 
