@@ -199,15 +199,22 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       statusEl.textContent = text;
     }
 
+    setStatus("Initialized");
+
     const refreshQuota = async () => {
       try {
+        setStatus("Loading quota...");
         const res = await fetch(`${apiBase}/api/fun/imagine/quota`, { cache: "no-store" });
         const data = await res.json();
         if (data?.ok) {
           quotaEl.textContent = `Daily quota: ${data.used} / ${data.limit} (remaining ${data.remaining})`;
+          setStatus("Ready");
+        } else {
+          setStatus("Quota API returned unexpected response");
         }
       } catch {
         quotaEl.textContent = "Daily quota: fetch failed";
+        setStatus("Quota fetch failed (check domain/CORS/network)");
       }
     };
 

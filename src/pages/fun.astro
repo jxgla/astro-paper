@@ -199,15 +199,22 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       statusEl.textContent = text;
     }
 
+    setStatus("初始化完成");
+
     const refreshQuota = async () => {
       try {
+        setStatus("读取配额中...");
         const res = await fetch(`${apiBase}/api/fun/imagine/quota`, { cache: "no-store" });
         const data = await res.json();
         if (data?.ok) {
           quotaEl.textContent = `今日配额：${data.used} / ${data.limit}（剩余 ${data.remaining}）`;
+          setStatus("准备就绪");
+        } else {
+          setStatus("配额接口返回异常");
         }
       } catch {
         quotaEl.textContent = "今日配额：读取失败";
+        setStatus("配额读取失败（检查域名/CORS/网络）");
       }
     };
 
