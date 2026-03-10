@@ -344,5 +344,14 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     refreshQuota();
   }
 
+  // Ensure the page works whether or not Astro's client router/view-transitions are enabled.
+  // - Initial load: DOMContentLoaded (or immediate if DOM already ready)
+  // - Client-side navigation (if enabled): astro:page-load / astro:after-swap
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFunImagePage, { once: true });
+  } else {
+    initFunImagePage();
+  }
   document.addEventListener("astro:page-load", initFunImagePage);
+  document.addEventListener("astro:after-swap", initFunImagePage);
 </script>

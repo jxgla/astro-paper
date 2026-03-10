@@ -11,7 +11,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
 
 <Layout title={`Fun | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Fun" pageDesc="基于 Grok2API 的趣味能力集合（第一期：Image 瀑布流）">
+  <Main pageTitle="Fun" pageDesc="基于 Grok 的趣味能力集合（第一期：Image 瀑布流）">
     <section class="fun-section">
       <article class="fun-card">
         <h2>Image 瀑布流</h2>
@@ -344,5 +344,14 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     refreshQuota();
   }
 
+  // Ensure the page works whether or not Astro's client router/view-transitions are enabled.
+  // - Initial load: DOMContentLoaded (or immediate if DOM already ready)
+  // - Client-side navigation (if enabled): astro:page-load / astro:after-swap
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFunImagePage, { once: true });
+  } else {
+    initFunImagePage();
+  }
   document.addEventListener("astro:page-load", initFunImagePage);
+  document.addEventListener("astro:after-swap", initFunImagePage);
 </script>
