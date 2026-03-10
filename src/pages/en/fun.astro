@@ -38,6 +38,16 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
             <button type="submit" class="fun-btn-primary" data-start>Start</button>
             <button type="button" class="fun-btn-secondary" data-stop>Stop</button>
             <button type="button" class="fun-btn-secondary" data-clear>Clear Images</button>
+            <button type="button" class="fun-btn-secondary" data-batch>Batch Save</button>
+          </div>
+
+          <div class="fun-save-row">
+            <label class="fun-toggle">
+              <input type="checkbox" data-auto-save />
+              <span>Auto-save</span>
+            </label>
+            <button type="button" class="fun-btn-secondary" data-pick-folder disabled>Select folder</button>
+            <span class="fun-folder" data-folder>Not selected</span>
           </div>
 
           <p class="fun-status" data-status>Ready</p>
@@ -46,6 +56,11 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       </article>
 
       <article class="fun-waterfall-card">
+        <div class="fun-selection" data-selection hidden>
+          <button type="button" class="fun-btn-secondary" data-select-all>Select all / Deselect</button>
+          <button type="button" class="fun-btn-primary" data-download-selected disabled>Download selected (<span data-selected-count>0</span>)</button>
+          <button type="button" class="fun-btn-secondary" data-exit-selection>Exit</button>
+        </div>
         <div class="fun-waterfall" data-waterfall></div>
       </article>
     </section>
@@ -139,6 +154,41 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     color: color-mix(in oklab, var(--foreground) 70%, transparent);
   }
 
+  .fun-save-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .fun-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.74rem;
+    user-select: none;
+  }
+
+  .fun-folder {
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 70%, transparent);
+  }
+
+  .fun-selection {
+    position: sticky;
+    top: 0.6rem;
+    z-index: 5;
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    padding: 0.55rem;
+    border-radius: 0.7rem;
+    margin-bottom: 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
   .fun-waterfall {
     columns: 4 220px;
     column-gap: 0.7rem;
@@ -151,6 +201,24 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     overflow: hidden;
     border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
     background: color-mix(in oklab, var(--background) 97%, transparent);
+    position: relative;
+  }
+
+  .fun-item.selection-mode {
+    cursor: pointer;
+  }
+
+  .fun-item.selection-mode::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+    transition: background 120ms ease;
+  }
+
+  .fun-item.selection-mode.selected::after {
+    background: color-mix(in oklab, #2563eb 20%, transparent);
   }
 
   .fun-item img {
@@ -179,7 +247,16 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     const quotaEl = root.querySelector("[data-quota]");
     const stopBtn = root.querySelector("[data-stop]");
     const clearBtn = root.querySelector("[data-clear]");
+    const batchBtn = root.querySelector("[data-batch]");
+    const autoSaveToggle = root.querySelector("[data-auto-save]");
+    const pickFolderBtn = root.querySelector("[data-pick-folder]");
+    const folderEl = root.querySelector("[data-folder]");
     const waterfall = document.querySelector("[data-waterfall]");
+    const selectionBar = document.querySelector("[data-selection]");
+    const selectAllBtn = document.querySelector("[data-select-all]");
+    const downloadSelectedBtn = document.querySelector("[data-download-selected]");
+    const exitSelectionBtn = document.querySelector("[data-exit-selection]");
+    const selectedCountEl = document.querySelector("[data-selected-count]");
 
     if (!(promptEl instanceof HTMLTextAreaElement)) return;
     if (!(ratioEl instanceof HTMLSelectElement)) return;
@@ -187,7 +264,16 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     if (!(quotaEl instanceof HTMLElement)) return;
     if (!(stopBtn instanceof HTMLButtonElement)) return;
     if (!(clearBtn instanceof HTMLButtonElement)) return;
+    if (!(batchBtn instanceof HTMLButtonElement)) return;
+    if (!(autoSaveToggle instanceof HTMLInputElement)) return;
+    if (!(pickFolderBtn instanceof HTMLButtonElement)) return;
+    if (!(folderEl instanceof HTMLElement)) return;
     if (!(waterfall instanceof HTMLElement)) return;
+    if (!(selectionBar instanceof HTMLElement)) return;
+    if (!(selectAllBtn instanceof HTMLButtonElement)) return;
+    if (!(downloadSelectedBtn instanceof HTMLButtonElement)) return;
+    if (!(exitSelectionBtn instanceof HTMLButtonElement)) return;
+    if (!(selectedCountEl instanceof HTMLElement)) return;
 
     let taskId = "";
     /** @type {EventSource | null} */
@@ -195,6 +281,14 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     let generated = 0;
     /** @type {Map<string, HTMLElement>} */
     const streamImageMap = new Map();
+
+    // Save / batch-save state
+    /** @type {any} */
+    let directoryHandle = null;
+    let useFileSystemAPI = false;
+    const savedImageIds = new Set();
+    let isSelectionMode = false;
+    const selectedItems = new Set();
 
     /** @type {string | null} */
     let statusHold = null;
@@ -269,6 +363,92 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       waterfall.prepend(item);
     }
 
+    function dataUrlToBlob(dataUrl) {
+      const parts = (dataUrl || "").split(",");
+      if (parts.length < 2) return null;
+      const header = parts[0];
+      const b64 = parts.slice(1).join(",");
+      const match = header.match(/data:(.*?);base64/);
+      const mime = match ? match[1] : "application/octet-stream";
+      try {
+        const byteString = atob(b64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mime });
+      } catch {
+        return null;
+      }
+    }
+
+    function sanitizeFilename(raw) {
+      const s = String(raw || "image").trim() || "image";
+      return s
+        .slice(0, 40)
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9\u4e00-\u9fa5_\-]/g, "_");
+    }
+
+    async function saveToFileSystem(dataUrlOrBase64, filenameBase) {
+      if (!directoryHandle) return false;
+      try {
+        let dataUrl = dataUrlOrBase64;
+        if (dataUrlOrBase64 && !String(dataUrlOrBase64).startsWith("data:")) {
+          dataUrl = payloadToSrc(String(dataUrlOrBase64));
+        }
+        const blob = dataUrlToBlob(String(dataUrl));
+        if (!blob) return false;
+        const ext = blob.type === "image/png" ? "png" : "jpg";
+        const filename = `${sanitizeFilename(filenameBase)}.${ext}`;
+        const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function downloadImage(dataUrlOrBase64, filenameBase) {
+      const payload = String(dataUrlOrBase64 || "");
+      const dataUrl = payload.startsWith("data:") ? payload : payloadToSrc(payload);
+      const ext = dataUrl.includes("image/png") ? "png" : "jpg";
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `${sanitizeFilename(filenameBase)}.${ext}`;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    async function maybeAutoSave(item, meta, imageId, payload, isFinal) {
+      if (!autoSaveToggle.checked) return;
+      if (!isFinal) return;
+      if (!payload) return;
+
+      const key = imageId ? String(imageId) : (item && item.dataset && item.dataset.key) || "";
+      if (key && savedImageIds.has(key)) return;
+
+      const prompt = (item && item.dataset && item.dataset.prompt) ? item.dataset.prompt : (meta && meta.prompt) ? String(meta.prompt) : (promptEl.value || "").trim();
+      const ts = Date.now();
+      const baseName = `imagine_${ts}_${prompt ? sanitizeFilename(prompt) : "image"}`;
+
+      if ("showDirectoryPicker" in window && directoryHandle) {
+        const ok = await saveToFileSystem(payload, baseName);
+        if (!ok) {
+          downloadImage(payload, baseName);
+        }
+      } else {
+        downloadImage(payload, baseName);
+      }
+
+      if (key) savedImageIds.add(key);
+    }
+
     /**
      * Upsert a stream image by imageId so partial images can be replaced by final images.
      * @param {string} payload
@@ -296,10 +476,16 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
         const ms = meta && meta.elapsed_ms ? ` • ${meta.elapsed_ms}ms` : "";
         metaEl.textContent = `#${generated}${isFinal ? "" : " (generating)"}${ms}`;
 
+        item.dataset.imageUrl = payloadToSrc(payload);
+        item.dataset.prompt = (meta && meta.prompt) ? String(meta.prompt) : (promptEl.value || "").trim();
+        item.dataset.key = imageId;
+
         item.appendChild(img);
         item.appendChild(metaEl);
         waterfall.prepend(item);
         streamImageMap.set(imageId, item);
+
+        maybeAutoSave(item, meta, imageId, payload, isFinal);
         return;
       }
 
@@ -307,11 +493,121 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       if (img instanceof HTMLImageElement) {
         img.src = payloadToSrc(payload);
       }
+      existing.dataset.imageUrl = payloadToSrc(payload);
       const metaEl = existing.querySelector(".fun-item-meta");
       if (metaEl instanceof HTMLElement) {
         const ms = meta && meta.elapsed_ms ? ` • ${meta.elapsed_ms}ms` : "";
         metaEl.textContent = `${metaEl.textContent?.replace(/\(generating\)/g, "") || ""}${isFinal ? "" : " (generating)"}${ms}`.trim();
       }
+
+      maybeAutoSave(existing, meta, imageId, payload, isFinal);
+    }
+
+    function updateSelectedCount() {
+      selectedCountEl.textContent = String(selectedItems.size);
+      downloadSelectedBtn.disabled = selectedItems.size === 0;
+
+      const items = Array.from(waterfall.querySelectorAll(".fun-item"));
+      const allSelected = items.length > 0 && selectedItems.size === items.length;
+      selectAllBtn.textContent = allSelected ? "Deselect all" : "Select all";
+    }
+
+    function enterSelectionMode() {
+      isSelectionMode = true;
+      selectedItems.clear();
+      selectionBar.hidden = false;
+      Array.from(waterfall.querySelectorAll(".fun-item")).forEach(item => item.classList.add("selection-mode"));
+      updateSelectedCount();
+      setStatus("Selection mode");
+    }
+
+    function exitSelectionMode() {
+      isSelectionMode = false;
+      selectedItems.clear();
+      selectionBar.hidden = true;
+      Array.from(waterfall.querySelectorAll(".fun-item")).forEach(item => item.classList.remove("selection-mode", "selected"));
+      updateSelectedCount();
+      setStatus("Ready");
+    }
+
+    function toggleItemSelection(item) {
+      if (!isSelectionMode) return;
+      if (!(item instanceof HTMLElement)) return;
+      if (item.classList.contains("selected")) {
+        item.classList.remove("selected");
+        selectedItems.delete(item);
+      } else {
+        item.classList.add("selected");
+        selectedItems.add(item);
+      }
+      updateSelectedCount();
+    }
+
+    function toggleSelectAll() {
+      const items = Array.from(waterfall.querySelectorAll(".fun-item"));
+      const allSelected = items.length > 0 && selectedItems.size === items.length;
+      if (allSelected) {
+        items.forEach(item => item.classList.remove("selected"));
+        selectedItems.clear();
+      } else {
+        items.forEach(item => {
+          item.classList.add("selected");
+          selectedItems.add(item);
+        });
+      }
+      updateSelectedCount();
+    }
+
+    async function downloadSelectedAsZip() {
+      if (selectedItems.size === 0) return;
+      if (typeof window.JSZip === "undefined") {
+        setStatus("JSZip not loaded");
+        return;
+      }
+
+      setStatus(`Packing ${selectedItems.size} images...`);
+      downloadSelectedBtn.disabled = true;
+
+      const zip = new window.JSZip();
+      const folder = zip.folder("images");
+      let idx = 0;
+
+      for (const item of selectedItems) {
+        const url = item.dataset.imageUrl || "";
+        const prompt = item.dataset.prompt || "image";
+        let blob = null;
+        try {
+          if (url.startsWith("data:")) {
+            blob = dataUrlToBlob(url);
+          } else if (url) {
+            const res = await fetch(url);
+            blob = await res.blob();
+          }
+        } catch {
+          blob = null;
+        }
+        if (!blob) continue;
+        idx += 1;
+        const ext = blob.type === "image/png" ? "png" : "jpg";
+        const filename = `${sanitizeFilename(prompt)}_${idx}.${ext}`;
+        folder.file(filename, blob);
+      }
+
+      if (idx === 0) {
+        setStatus("No downloadable images");
+        downloadSelectedBtn.disabled = false;
+        return;
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(content);
+      link.download = `imagine_${new Date().toISOString().slice(0, 10)}_${Date.now()}.zip`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      setStatus(`Downloaded ${idx} images`);
+      downloadSelectedBtn.disabled = false;
+      exitSelectionMode();
     }
 
     const stopStream = async (silent = false) => {
@@ -446,7 +742,64 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     clearBtn.addEventListener("click", () => {
       waterfall.innerHTML = "";
       generated = 0;
+      streamImageMap.clear();
+      savedImageIds.clear();
+      selectedItems.clear();
+      exitSelectionMode();
       setStatus("Images cleared");
+    });
+
+    // Auto-save: folder picking
+    if ("showDirectoryPicker" in window) {
+      pickFolderBtn.disabled = false;
+      pickFolderBtn.addEventListener("click", async () => {
+        try {
+          directoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+          useFileSystemAPI = true;
+          folderEl.textContent = directoryHandle?.name || "Selected";
+          setStatus("Folder selected");
+        } catch (e) {
+          if (e && e.name !== "AbortError") {
+            setStatus("Folder selection failed");
+          }
+        }
+      });
+    } else {
+      pickFolderBtn.disabled = true;
+      folderEl.textContent = "Folder save unsupported (will download)";
+    }
+
+    autoSaveToggle.addEventListener("change", () => {
+      if (autoSaveToggle.checked) {
+        if ("showDirectoryPicker" in window) {
+          pickFolderBtn.disabled = false;
+          if (!directoryHandle) {
+            holdStatus("Auto-save enabled: please select a folder");
+          }
+        } else {
+          holdStatus("Auto-save enabled: will use downloads");
+        }
+      } else {
+        setStatus("Auto-save disabled");
+      }
+    });
+
+    // Batch save
+    batchBtn.addEventListener("click", () => {
+      if (isSelectionMode) {
+        exitSelectionMode();
+      } else {
+        enterSelectionMode();
+      }
+    });
+    exitSelectionBtn.addEventListener("click", exitSelectionMode);
+    selectAllBtn.addEventListener("click", toggleSelectAll);
+    downloadSelectedBtn.addEventListener("click", downloadSelectedAsZip);
+
+    waterfall.addEventListener("click", e => {
+      if (!isSelectionMode) return;
+      const item = e.target && e.target.closest ? e.target.closest(".fun-item") : null;
+      if (item) toggleItemSelection(item);
     });
 
     window.addEventListener("beforeunload", () => {
@@ -467,3 +820,5 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
   document.addEventListener("astro:page-load", initFunImagePage);
   document.addEventListener("astro:after-swap", initFunImagePage);
 </script>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
