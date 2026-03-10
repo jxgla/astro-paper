@@ -15,7 +15,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     <section class="fun-section">
       <article class="fun-card">
         <h2>Image 瀑布流</h2>
-        <p>输入提示词并连续生成图片。每个 IP 每天最多 50 张。</p>
+        <p>输入提示词并连续生成图片。每个 IP 每天最多 200 张。</p>
 
         <form class="fun-form" data-fun-imagine data-api-base={funApiBase}>
           <label>
@@ -51,7 +51,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
           </div>
 
           <p class="fun-status" data-status>准备就绪</p>
-          <p class="fun-quota" data-quota>今日配额：-- / 50</p>
+          <p class="fun-quota" data-quota>今日配额：-- / 200</p>
         </form>
       </article>
 
@@ -231,6 +231,39 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     font-size: 0.68rem;
     color: color-mix(in oklab, var(--foreground) 72%, transparent);
   }
+
+  .fun-toast-stack {
+    position: fixed;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    display: grid;
+    gap: 0.45rem;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  .fun-toast {
+    pointer-events: none;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, transparent);
+    backdrop-filter: blur(10px);
+    color: var(--foreground);
+    font-size: 0.74rem;
+    max-width: min(360px, calc(100vw - 2rem));
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  }
+
+  .fun-toast[data-variant="success"] {
+    border-color: color-mix(in oklab, #059669 45%, transparent);
+  }
+  .fun-toast[data-variant="error"] {
+    border-color: color-mix(in oklab, #ef4444 45%, transparent);
+  }
+  .fun-toast[data-variant="info"] {
+    border-color: color-mix(in oklab, #2563eb 45%, transparent);
+  }
 </style>
 
 <script>
@@ -257,6 +290,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
     const downloadSelectedBtn = document.querySelector("[data-download-selected]");
     const exitSelectionBtn = document.querySelector("[data-exit-selection]");
     const selectedCountEl = document.querySelector("[data-selected-count]");
+    const downloadSelectedBtnTemplate = downloadSelectedBtn.innerHTML;
 
     if (!(promptEl instanceof HTMLTextAreaElement)) return;
     if (!(ratioEl instanceof HTMLSelectElement)) return;
@@ -292,6 +326,25 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
 
     /** @type {string | null} */
     let statusHold = null;
+
+    const toastStack = (() => {
+      let el = document.querySelector(".fun-toast-stack");
+      if (el instanceof HTMLElement) return el;
+      el = document.createElement("div");
+      el.className = "fun-toast-stack";
+      document.body.appendChild(el);
+      return el;
+    })();
+
+    /** @param {string} message @param {"success"|"error"|"info"} [variant] */
+    function toast(message, variant = "info") {
+      const node = document.createElement("div");
+      node.className = "fun-toast";
+      node.dataset.variant = variant;
+      node.textContent = message;
+      toastStack.appendChild(node);
+      setTimeout(() => node.remove(), 2600);
+    }
 
     /** @param {string} text */
     function setStatus(text) {
@@ -523,6 +576,7 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       Array.from(waterfall.querySelectorAll(".fun-item")).forEach(item => item.classList.add("selection-mode"));
       updateSelectedCount();
       setStatus("已进入批量选择模式");
+      toast("已进入批量选择模式", "info");
     }
 
     function exitSelectionMode() {
@@ -566,16 +620,20 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       if (selectedItems.size === 0) return;
       if (typeof window.JSZip === "undefined") {
         setStatus("JSZip 未加载，无法打包");
+        toast("JSZip 未加载，无法打包", "error");
         return;
       }
 
       setStatus(`正在打包 ${selectedItems.size} 张图片...`);
       downloadSelectedBtn.disabled = true;
+      const total = selectedItems.size;
+      downloadSelectedBtn.innerHTML = `打包中...（0/${total}）`;
 
       const zip = new window.JSZip();
       const folder = zip.folder("images");
       let idx = 0;
 
+      let done = 0;
       for (const item of selectedItems) {
         const url = item.dataset.imageUrl || "";
         const prompt = item.dataset.prompt || "image";
@@ -592,6 +650,8 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
         }
         if (!blob) continue;
         idx += 1;
+        done += 1;
+        downloadSelectedBtn.innerHTML = `打包中...（${done}/${total}）`;
         const ext = blob.type === "image/png" ? "png" : "jpg";
         const filename = `${sanitizeFilename(prompt)}_${idx}.${ext}`;
         folder.file(filename, blob);
@@ -599,7 +659,9 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
 
       if (idx === 0) {
         setStatus("没有可下载的图片");
+        toast("没有可下载的图片", "error");
         downloadSelectedBtn.disabled = false;
+        downloadSelectedBtn.innerHTML = downloadSelectedBtnTemplate;
         return;
       }
 
@@ -610,7 +672,9 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
       link.click();
       URL.revokeObjectURL(link.href);
       setStatus(`已打包下载 ${idx} 张图片`);
+      toast(`已打包下载 ${idx} 张图片`, "success");
       downloadSelectedBtn.disabled = false;
+      downloadSelectedBtn.innerHTML = downloadSelectedBtnTemplate;
       exitSelectionMode();
     }
 
@@ -722,7 +786,9 @@ const funApiBase = import.meta.env.PUBLIC_FUN_API_BASE || "https://fun.410666.xy
         }
 
         if (payload?.type === "quota" && payload?.status === "limit_reached") {
-          setStatus("今日配额已用完（50 张）");
+          const lim = payload?.limit || 200;
+          setStatus(`今日配额已用完（${lim} 张）`);
+          toast(`今日配额已用完（${lim} 张）`, "error");
           await stopStream(true);
           return;
         }
