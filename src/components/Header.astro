@@ -53,6 +53,27 @@ const isEnHome = currentPath === "/en";
   Skip to content
 </a>
 
+<!-- SEO-only header (visually hidden, indexable) -->
+<header class="sr-only" aria-label={isEn ? "Site quick links" : "站点快捷入口"}>
+  <h1>
+    {isEn
+      ? "Free AI Chat, Tools & Fun — Cloudflare edge gateway"
+      : "免费 AI Chat / Tools / Fun — Cloudflare 边缘网关"}
+  </h1>
+  <p>
+    {isEn
+      ? "No login. Streaming chat. Internal tools and image fun pages."
+      : "免登录 · 流式聊天 · 工具集合 · 趣味页面（含图片瀑布流）"}
+  </p>
+  <nav aria-label={isEn ? "Primary pages" : "主要页面"}>
+    <ul>
+      <li><a href={withLocale("/chat")}>{isEn ? "AI Chat" : "AI Chat"}</a></li>
+      <li><a href={withLocale("/tools")}>{isEn ? "Tools" : "Tools"}</a></li>
+      <li><a href={withLocale("/fun")}>{isEn ? "Fun" : "Fun"}</a></li>
+    </ul>
+  </nav>
+</header>
+
 <header
   class="app-layout flex flex-col items-center justify-between sm:flex-row"
 >
