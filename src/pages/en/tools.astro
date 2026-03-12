@@ -110,6 +110,31 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <p class="tool-status">This tool currently uses a direct external link for a cleaner and more reliable upload workflow.</p>
           </div>
         </article>
+
+        <article id="random-string" class="tool-card">
+          <h3>Random String Generator</h3>
+          <p>Pick a length and generate a random string for passwords. Client-side only — nothing is uploaded.</p>
+          <span class="tool-badge">New</span>
+
+          <form class="tool-form" data-passgen-form>
+            <label>
+              <span class="tool-label">Length</span>
+              <input class="tool-input" data-passgen-length type="number" min="4" max="128" step="1" value="16" />
+            </label>
+
+            <label>
+              <span class="tool-label">Result</span>
+              <input class="tool-input" data-passgen-output type="text" readonly placeholder="Click generate" />
+            </label>
+
+            <div class="tool-actions">
+              <button type="submit" class="tool-btn-primary" data-passgen-generate>Generate</button>
+              <button type="button" class="tool-btn-secondary" data-passgen-copy disabled>Copy</button>
+            </div>
+
+            <p class="tool-status" data-passgen-status aria-live="polite">Tip: use 16+ characters and a password manager for important accounts.</p>
+          </form>
+        </article>
       </div>
     </section>
 
@@ -277,12 +302,12 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   @media (max-width: 900px) {
     .tools-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -1735,8 +1760,96 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     clearBtn.addEventListener("click", reset);
   }
 
+  function initRandomStringTool() {
+    const form = document.querySelector("[data-passgen-form]");
+    if (!(form instanceof HTMLFormElement) || form.dataset.inited === "1") return;
+    form.dataset.inited = "1";
+
+    const lengthInput = form.querySelector("[data-passgen-length]");
+    const outputInput = form.querySelector("[data-passgen-output]");
+    const status = form.querySelector("[data-passgen-status]");
+    const copyBtn = form.querySelector("[data-passgen-copy]");
+
+    if (!(lengthInput instanceof HTMLInputElement)) return;
+    if (!(outputInput instanceof HTMLInputElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(copyBtn instanceof HTMLButtonElement)) return;
+
+    const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.?/";
+
+    const clampLen = (raw) => {
+      const n = Number(raw);
+      if (!Number.isFinite(n)) return 16;
+      return Math.max(4, Math.min(128, Math.floor(n)));
+    };
+
+    const randomString = (len) => {
+      const chars = CHARSET;
+      const n = chars.length;
+      if (len <= 0) return "";
+
+      const cryptoObj = globalThis.crypto;
+      if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
+        let out = "";
+        const buf = new Uint32Array(1);
+        const max = Math.floor(0xffffffff / n) * n;
+        while (out.length < len) {
+          cryptoObj.getRandomValues(buf);
+          const x = buf[0];
+          if (x >= max) continue;
+          out += chars[x % n];
+        }
+        return out;
+      }
+
+      let out = "";
+      for (let i = 0; i < len; i++) {
+        out += chars[Math.floor(Math.random() * n)];
+      }
+      return out;
+    };
+
+    const syncCopyState = () => {
+      copyBtn.disabled = !outputInput.value;
+    };
+
+    const generate = () => {
+      const len = clampLen(lengthInput.value);
+      lengthInput.value = String(len);
+      outputInput.value = randomString(len);
+      status.textContent = `Generated ${len}-character string.`;
+      syncCopyState();
+    };
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      generate();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const text = outputInput.value || "";
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = "Copied to clipboard.";
+      } catch {
+        try {
+          outputInput.focus();
+          outputInput.select();
+          const ok = document.execCommand("copy");
+          status.textContent = ok ? "Copied to clipboard." : "Copy failed. Please copy manually.";
+        } catch {
+          status.textContent = "Copy failed. Please copy manually.";
+        }
+      }
+    });
+
+    syncCopyState();
+  }
+
   document.addEventListener("astro:page-load", initClashTool);
   document.addEventListener("astro:page-load", initMbtiTool);
   document.addEventListener("astro:page-load", initTempMailTool);
   document.addEventListener("astro:page-load", initVpsResidualTool);
+  document.addEventListener("astro:page-load", initRandomStringTool);
 </script>

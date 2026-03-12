@@ -110,6 +110,31 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <p class="tool-status">当前采用独立站直链接入，上传、管理与外链复制体验更稳定。</p>
           </div>
         </article>
+
+        <article id="random-string" class="tool-card">
+          <h3>随机字符串生成器</h3>
+          <p>选择长度，一键生成随机字符串，用作随机密码。纯前端生成，不上传、不走后端。</p>
+          <span class="tool-badge">New</span>
+
+          <form class="tool-form" data-passgen-form>
+            <label>
+              <span class="tool-label">长度</span>
+              <input class="tool-input" data-passgen-length type="number" min="4" max="128" step="1" value="16" />
+            </label>
+
+            <label>
+              <span class="tool-label">生成结果</span>
+              <input class="tool-input" data-passgen-output type="text" readonly placeholder="点击生成" />
+            </label>
+
+            <div class="tool-actions">
+              <button type="submit" class="tool-btn-primary" data-passgen-generate>生成</button>
+              <button type="button" class="tool-btn-secondary" data-passgen-copy disabled>复制</button>
+            </div>
+
+            <p class="tool-status" data-passgen-status aria-live="polite">建议长度 16+，并在重要场景配合密码管理器。</p>
+          </form>
+        </article>
       </div>
     </section>
 
@@ -277,12 +302,12 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   @media (max-width: 900px) {
     .tools-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -1735,8 +1760,98 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     clearBtn.addEventListener("click", reset);
   }
 
+  function initRandomStringTool() {
+    const form = document.querySelector("[data-passgen-form]");
+    if (!(form instanceof HTMLFormElement) || form.dataset.inited === "1") return;
+    form.dataset.inited = "1";
+
+    const lengthInput = form.querySelector("[data-passgen-length]");
+    const outputInput = form.querySelector("[data-passgen-output]");
+    const status = form.querySelector("[data-passgen-status]");
+    const copyBtn = form.querySelector("[data-passgen-copy]");
+
+    if (!(lengthInput instanceof HTMLInputElement)) return;
+    if (!(outputInput instanceof HTMLInputElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+    if (!(copyBtn instanceof HTMLButtonElement)) return;
+
+    const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.?/";
+
+    const clampLen = (raw) => {
+      const n = Number(raw);
+      if (!Number.isFinite(n)) return 16;
+      return Math.max(4, Math.min(128, Math.floor(n)));
+    };
+
+    const randomString = (len) => {
+      const chars = CHARSET;
+      const n = chars.length;
+      if (len <= 0) return "";
+
+      // Prefer Web Crypto for strong randomness.
+      const cryptoObj = globalThis.crypto;
+      if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
+        let out = "";
+        const buf = new Uint32Array(1);
+        const max = Math.floor(0xffffffff / n) * n;
+        while (out.length < len) {
+          cryptoObj.getRandomValues(buf);
+          const x = buf[0];
+          if (x >= max) continue;
+          out += chars[x % n];
+        }
+        return out;
+      }
+
+      // Fallback (weaker): Math.random.
+      let out = "";
+      for (let i = 0; i < len; i++) {
+        out += chars[Math.floor(Math.random() * n)];
+      }
+      return out;
+    };
+
+    const syncCopyState = () => {
+      copyBtn.disabled = !outputInput.value;
+    };
+
+    const generate = () => {
+      const len = clampLen(lengthInput.value);
+      lengthInput.value = String(len);
+      outputInput.value = randomString(len);
+      status.textContent = `已生成 ${len} 位随机字符串。`;
+      syncCopyState();
+    };
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      generate();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const text = outputInput.value || "";
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = "已复制到剪贴板。";
+      } catch {
+        try {
+          outputInput.focus();
+          outputInput.select();
+          const ok = document.execCommand("copy");
+          status.textContent = ok ? "已复制到剪贴板。" : "复制失败，请手动复制。";
+        } catch {
+          status.textContent = "复制失败，请手动复制。";
+        }
+      }
+    });
+
+    syncCopyState();
+  }
+
   document.addEventListener("astro:page-load", initClashTool);
   document.addEventListener("astro:page-load", initMbtiTool);
   document.addEventListener("astro:page-load", initTempMailTool);
   document.addEventListener("astro:page-load", initVpsResidualTool);
+  document.addEventListener("astro:page-load", initRandomStringTool);
 </script>
