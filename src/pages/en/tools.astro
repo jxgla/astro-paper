@@ -10,7 +10,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
 <Layout title={`Tools | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Tools" pageDesc="A curated toolbox for practical workflows.">
+  <Main pageTitle="Tools" pageDesc="A curated toolbox for practical workflows." wide>
     <section id="fun" class="tools-section">
       <h2>Fun Utilities</h2>
       <div class="tools-grid">
@@ -302,12 +302,21 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* Mobile first: keep 2 cards per row */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  @media (max-width: 900px) {
+  /* Medium screens: 3 cards per row */
+  @media (min-width: 900px) {
     .tools-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Wide desktop: 4 cards per row */
+  @media (min-width: 1280px) {
+    .tools-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
