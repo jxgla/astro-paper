@@ -114,14 +114,14 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
         <article id="address-generator" class="tool-card">
           <h3>Address / Mock Identity Generator</h3>
-          <p>Runs as a standalone Cloudflare Pages / Workers app. The blog no longer ships address data or generation logic inside the main site bundle.</p>
+          <p>Standalone static page. Opens directly in a separate site.</p>
           <span class="tool-badge">External</span>
           <div class="tool-form">
-            <a class="tool-btn-primary" href="/en/tools/address-generator">Open tool page</a>
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address-lab.pages.dev"} target="_blank" rel="noreferrer">Open tool</a>
             <p class="tool-status">
               {addressToolUrl
-                ? "The address tool now stays isolated behind its own page so large JSON payloads and heavy scripts do not land in the blog deployment."
-                : "Set `PUBLIC_ADDRESS_TOOL_URL` first, then let the blog shell load the standalone tool via iframe or a new tab."}
+                ? "This now opens the standalone static page directly."
+                : "The default Pages URL is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
             </p>
           </div>
         </article>
