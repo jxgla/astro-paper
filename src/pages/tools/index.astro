@@ -3,9 +3,11 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
+import AddressToolInline from "@/components/AddressToolInline.astro";
 import { SITE } from "@/config";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
+const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 ---
 
 <Layout title={`Tools | ${SITE.title}`}>
@@ -109,6 +111,18 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <a class="tool-btn-primary" href="https://pic.410666.xyz" target="_blank" rel="noreferrer">打开图床</a>
             <p class="tool-status">当前采用独立站直链接入，上传、管理与外链复制体验更稳定。</p>
           </div>
+        </article>
+
+        <article id="address-generator" class="tool-card">
+          <h3>地址 / 虚拟身份生成器</h3>
+          <p>当前直接内嵌在工具页里运行，读取站点已发布的静态 JSON，不跳转、不依赖后端。</p>
+          <span class="tool-badge">Isolated</span>
+          <AddressToolInline locale="zh" />
+          {
+            addressToolUrl && (
+              <p class="tool-status">后续如果把 `address` 单独部署到 Cloudflare Pages，还可以继续复用独立站形态，不影响当前内嵌版。</p>
+            )
+          }
         </article>
 
         <article id="random-string" class="tool-card">

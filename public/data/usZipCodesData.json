@@ -1,0 +1,18 @@
+{
+  "CA": {
+    "state": "CA",
+    "zip_ranges": "90001-96199"
+  },
+  "TX": {
+    "state": "TX",
+    "zip_ranges": "73301-88999"
+  },
+  "NY": {
+    "state": "NY",
+    "zip_ranges": "10001-14999"
+  },
+  "FL": {
+    "state": "FL",
+    "zip_ranges": "32004-34999"
+  }
+}

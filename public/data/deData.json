@@ -1,0 +1,72 @@
+{
+  "DE": {
+    "cities": [
+      "Berlin",
+      "Munich",
+      "Frankfurt",
+      "Cologne"
+    ]
+  },
+  "Bavaria": {
+    "region": "Bavaria",
+    "cities": [
+      "Amberg",
+      "Bautzen",
+      "Eckernförde",
+      "Emmendingen",
+      "Finsterwalde",
+      "Forchheim",
+      "Herzberg",
+      "Hoyerswerda",
+      "Mainburg",
+      "Mettmann",
+      "Schwarzenberg",
+      "Stollberg"
+    ]
+  },
+  "North Rhine-Westphalia": {
+    "region": "North Rhine-Westphalia",
+    "cities": [
+      "Gardelegen",
+      "Gerolzhofen",
+      "Halberstadt",
+      "Havelberg",
+      "Hohenmölsen",
+      "Hohenstein-Ernstthal",
+      "Lüneburg",
+      "Miesbach",
+      "Parchim",
+      "Rathenow"
+    ]
+  },
+  "Baden-Württemberg": {
+    "region": "Baden-Württemberg",
+    "cities": [
+      "Bad",
+      "Grafenau",
+      "Gräfenhainichen",
+      "Höxter",
+      "Kulmbach",
+      "Main-Höchst",
+      "Pritzwalk",
+      "Rathenow",
+      "Sigmaringen",
+      "Stadtroda"
+    ]
+  },
+  "Hesse": {
+    "region": "Hesse",
+    "cities": [
+      "Arnstadt",
+      "Aue",
+      "Bersenbrück",
+      "Eisenhüttenstadt",
+      "Erding",
+      "Füssen",
+      "Lübeck",
+      "Mayen",
+      "München",
+      "Staßfurt"
+    ]
+  }
+}

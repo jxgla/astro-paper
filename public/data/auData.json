@@ -1,0 +1,74 @@
+{
+  "NSW": {
+    "state": "NSW",
+    "cities": [
+      "Sydney",
+      "Newcastle",
+      "Wollongong",
+      "Central Coast",
+      "Canberra"
+    ]
+  },
+  "VIC": {
+    "state": "VIC",
+    "cities": [
+      "Melbourne",
+      "Geelong",
+      "Ballarat",
+      "Bendigo",
+      "Shepparton"
+    ]
+  },
+  "QLD": {
+    "state": "QLD",
+    "cities": [
+      "Brisbane",
+      "Gold Coast",
+      "Sunshine Coast",
+      "Cairns",
+      "Townsville"
+    ]
+  },
+  "WA": {
+    "state": "WA",
+    "cities": [
+      "Perth",
+      "Fremantle",
+      "Mandurah",
+      "Bunbury",
+      "Port Hedland"
+    ]
+  },
+  "SA": {
+    "state": "SA",
+    "cities": [
+      "Adelaide",
+      "Gawler",
+      "Mount Gambier",
+      "Whyalla"
+    ]
+  },
+  "TAS": {
+    "state": "TAS",
+    "cities": [
+      "Hobart",
+      "Launceston",
+      "Devonport"
+    ]
+  },
+  "ACT": {
+    "state": "ACT",
+    "cities": [
+      "Canberra",
+      "Queanbeyan"
+    ]
+  },
+  "NT": {
+    "state": "NT",
+    "cities": [
+      "Darwin",
+      "East Arm",
+      "Palmerston"
+    ]
+  }
+}

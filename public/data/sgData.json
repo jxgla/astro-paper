@@ -1,0 +1,25 @@
+{
+  "SG": {
+    "cities": [
+      "Singapore",
+      "Bukit Merah",
+      "Toa Payoh",
+      "Bedok",
+      "Geylang"
+    ]
+  },
+  "Singapore": {
+    "region": "Singapore",
+    "cities": [
+      "Jamieview",
+      "Longton",
+      "Marthachester",
+      "Moonport",
+      "North",
+      "Rachaelport",
+      "Richardschester",
+      "Vanessachester",
+      "West"
+    ]
+  }
+}

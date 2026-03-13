@@ -1,0 +1,88 @@
+{
+  "Central & Western": {
+    "district": "Central & Western",
+    "cities": [
+      "Central",
+      "Western",
+      "Admiralty"
+    ],
+    "population": 150000
+  },
+  "Wan Chai": {
+    "district": "Wan Chai",
+    "cities": [
+      "Wan Chai",
+      "Causeway Bay"
+    ],
+    "population": 100000
+  },
+  "East": {
+    "district": "East",
+    "cities": [
+      "Quarry Bay",
+      "Tai Koo",
+      "Shau Kei Wan"
+    ],
+    "population": 150000
+  },
+  "South": {
+    "district": "South",
+    "cities": [
+      "Aberdeen",
+      "Repulse Bay",
+      "Stanley"
+    ],
+    "population": 150000
+  },
+  "Yau Tsim Mong": {
+    "district": "Yau Tsim Mong",
+    "cities": [
+      "Mong Kok",
+      "Tsim Sha Tsui",
+      "Yau Ma Tei"
+    ],
+    "population": 150000
+  },
+  "Sham Shui Po": {
+    "district": "Sham Shui Po",
+    "cities": [
+      "Sham Shui Po",
+      "Cheung Sha Wan"
+    ],
+    "population": 100000
+  },
+  "Kowloon City": {
+    "district": "Kowloon City",
+    "cities": [
+      "Hung Hom",
+      "To Kwa Wan"
+    ],
+    "population": 100000
+  },
+  "Wong Tai Sin": {
+    "district": "Wong Tai Sin",
+    "cities": [
+      "Wong Tai Sin",
+      "Tseung Kwan O"
+    ],
+    "population": 100000
+  },
+  "Kwun Tong": {
+    "district": "Kwun Tong",
+    "cities": [
+      "Kwun Tong",
+      "Lam Tin"
+    ],
+    "population": 100000
+  },
+  "New Territories": {
+    "district": "New Territories",
+    "cities": [
+      "Shatin",
+      "Tai Po",
+      "Tuen Mun",
+      "Yuen Long"
+    ],
+    "population": 200000
+  }
+}

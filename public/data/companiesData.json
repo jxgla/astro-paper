@@ -1,0 +1,50 @@
+{
+  "tech": [
+    "Google",
+    "Microsoft",
+    "Apple",
+    "Amazon",
+    "Meta",
+    "Tesla",
+    "Intel",
+    "Nvidia",
+    "Oracle",
+    "Adobe",
+    "Alibaba",
+    "Tencent",
+    "Baidu",
+    "ByteDance",
+    "Xiaomi"
+  ],
+  "finance": [
+    "Goldman Sachs",
+    "JP Morgan",
+    "Bank of America",
+    "Wells Fargo",
+    "ICBC",
+    "Agricultural Bank",
+    "Bank of China",
+    "China Construction Bank"
+  ],
+  "energy": [
+    "ExxonMobil",
+    "Shell",
+    "Chevron",
+    "BP",
+    "PetroChina",
+    "Sinopec",
+    "State Grid",
+    "Saudi Aramco"
+  ],
+  "manufacturing": [
+    "Boeing",
+    "Airbus",
+    "Toyota",
+    "Volkswagen",
+    "BMW",
+    "Shanghai Auto",
+    "Geely",
+    "BYD",
+    "SAIC"
+  ]
+}

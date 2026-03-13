@@ -79,6 +79,11 @@ export default defineConfig({
         context: "client",
         optional: true,
       }),
+      PUBLIC_ADDRESS_TOOL_URL: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
     },
   },
   experimental: {

@@ -1,0 +1,70 @@
+{
+  "CA": {
+    "cities": [
+      "Toronto",
+      "Vancouver",
+      "Montreal",
+      "Calgary"
+    ]
+  },
+  "Ontario": {
+    "region": "Ontario",
+    "cities": [
+      "Gonzalezhaven",
+      "Johnstad",
+      "Kristenburgh",
+      "Lake",
+      "Lewistown",
+      "Michaelmouth",
+      "New",
+      "North",
+      "Port",
+      "South",
+      "West"
+    ]
+  },
+  "Quebec": {
+    "region": "Quebec",
+    "cities": [
+      "Conniechester",
+      "East",
+      "Kaneton",
+      "Lake",
+      "Martinezview",
+      "New",
+      "Nobleport",
+      "Robertbury",
+      "Ronaldborough",
+      "South",
+      "Watkinsfort",
+      "West"
+    ]
+  },
+  "British Columbia": {
+    "region": "British Columbia",
+    "cities": [
+      "Dawnshire",
+      "East",
+      "Gardnerville",
+      "Kaneview",
+      "Kimberlyberg",
+      "Lake",
+      "Port",
+      "South",
+      "West"
+    ]
+  },
+  "Alberta": {
+    "region": "Alberta",
+    "cities": [
+      "Brittanyville",
+      "East",
+      "Gallowaybury",
+      "Matthewstad",
+      "New",
+      "North",
+      "Port",
+      "South"
+    ]
+  }
+}

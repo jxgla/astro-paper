@@ -1,0 +1,198 @@
+[
+  {
+    "oui": "00:00:0C",
+    "vendor": "Cisco"
+  },
+  {
+    "oui": "00:01:42",
+    "vendor": "Digital Equipment"
+  },
+  {
+    "oui": "00:01:43",
+    "vendor": "Cisco"
+  },
+  {
+    "oui": "00:1A:A0",
+    "vendor": "Cisco"
+  },
+  {
+    "oui": "00:26:86",
+    "vendor": "Apple"
+  },
+  {
+    "oui": "08:00:27",
+    "vendor": "PCS Systemtechnik"
+  },
+  {
+    "oui": "08:02:86",
+    "vendor": "Microsystems"
+  },
+  {
+    "oui": "52:54:00",
+    "vendor": "QEMU"
+  },
+  {
+    "oui": "AA:BB:CC",
+    "vendor": "Test"
+  },
+  {
+    "oui": "A0:E0:FF",
+    "vendor": "Astro"
+  },
+  {
+    "oui": "00:11:22",
+    "vendor": "Intel"
+  },
+  {
+    "oui": "08:94:EF",
+    "vendor": "Apple"
+  },
+  {
+    "oui": "00:50:F2",
+    "vendor": "Microsoft"
+  },
+  {
+    "oui": "00:13:10",
+    "vendor": "Linksys"
+  },
+  {
+    "oui": "00:1E:58",
+    "vendor": "Nintendo"
+  },
+  {
+    "oui": "00:ec:85",
+    "vendor": "Broadcom"
+  },
+  {
+    "oui": "01:93:4d",
+    "vendor": "Realtek"
+  },
+  {
+    "oui": "02:11:d1",
+    "vendor": "Qualcomm"
+  },
+  {
+    "oui": "03:30:8b",
+    "vendor": "MediaTek"
+  },
+  {
+    "oui": "04:12:53",
+    "vendor": "Marvell"
+  },
+  {
+    "oui": "05:61:ea",
+    "vendor": "Atheros"
+  },
+  {
+    "oui": "06:dc:9f",
+    "vendor": "Intel"
+  },
+  {
+    "oui": "07:80:4e",
+    "vendor": "AMD"
+  },
+  {
+    "oui": "08:f2:66",
+    "vendor": "NVIDIA"
+  },
+  {
+    "oui": "09:31:e3",
+    "vendor": "Samsung"
+  },
+  {
+    "oui": "0a:9e:f1",
+    "vendor": "Sony"
+  },
+  {
+    "oui": "0b:98:73",
+    "vendor": "LG"
+  },
+  {
+    "oui": "0c:b6:bc",
+    "vendor": "Philips"
+  },
+  {
+    "oui": "0d:20:9e",
+    "vendor": "Sharp"
+  },
+  {
+    "oui": "0e:43:0e",
+    "vendor": "Panasonic"
+  },
+  {
+    "oui": "0f:e6:e8",
+    "vendor": "Toshiba"
+  },
+  {
+    "oui": "10:5d:2f",
+    "vendor": "Hitachi"
+  },
+  {
+    "oui": "11:f9:12",
+    "vendor": "NEC"
+  },
+  {
+    "oui": "12:9d:ae",
+    "vendor": "Fujitsu"
+  },
+  {
+    "oui": "13:03:03",
+    "vendor": "Siemens"
+  },
+  {
+    "oui": "14:30:cf",
+    "vendor": "Ericsson"
+  },
+  {
+    "oui": "15:14:22",
+    "vendor": "Nokia"
+  },
+  {
+    "oui": "16:fe:61",
+    "vendor": "Motorola"
+  },
+  {
+    "oui": "17:25:92",
+    "vendor": "Huawei"
+  },
+  {
+    "oui": "18:8d:5e",
+    "vendor": "ZTE"
+  },
+  {
+    "oui": "19:46:6b",
+    "vendor": "Xiaomi"
+  },
+  {
+    "oui": "1a:3b:61",
+    "vendor": "OPPO"
+  },
+  {
+    "oui": "1b:be:60",
+    "vendor": "Vivo"
+  },
+  {
+    "oui": "1c:c9:ca",
+    "vendor": "OnePlus"
+  },
+  {
+    "oui": "1d:0f:8d",
+    "vendor": "Google"
+  },
+  {
+    "oui": "1e:0b:03",
+    "vendor": "Amazon"
+  },
+  {
+    "oui": "1f:c6:ba",
+    "vendor": "Meta"
+  },
+  {
+    "oui": "20:d1:b2",
+    "vendor": "Apple"
+  },
+  {
+    "oui": "21:e4:03",
+    "vendor": "Microsoft"
+  }
+]

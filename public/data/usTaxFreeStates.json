@@ -1,0 +1,135 @@
+{
+  "taxFreeStates": {
+    "description": "US States with no sales tax",
+    "count": 5,
+    "states": [
+      {
+        "code": "MT",
+        "name": "Montana",
+        "salesTax": 0.0,
+        "cities": [
+          "Billings",
+          "Missoula",
+          "Great Falls",
+          "Butte",
+          "Bozeman",
+          "Helena",
+          "Kalispell",
+          "Havre",
+          "Miles City",
+          "Anaconda"
+        ]
+      },
+      {
+        "code": "NH",
+        "name": "New Hampshire",
+        "salesTax": 0.0,
+        "cities": [
+          "Manchester",
+          "Nashua",
+          "Concord",
+          "Rochester",
+          "Dover",
+          "Durham",
+          "Keene",
+          "Newington",
+          "Laconia",
+          "Lebanon"
+        ]
+      },
+      {
+        "code": "OR",
+        "name": "Oregon",
+        "salesTax": 0.0,
+        "cities": [
+          "Portland",
+          "Eugene",
+          "Salem",
+          "Gresham",
+          "Hillsboro",
+          "Beaverton",
+          "Bend",
+          "Medford",
+          "Springfield",
+          "Corvallis"
+        ]
+      },
+      {
+        "code": "DE",
+        "name": "Delaware",
+        "salesTax": 0.0,
+        "cities": [
+          "Wilmington",
+          "Dover",
+          "Newark",
+          "Smyrna",
+          "Elsmere",
+          "New Castle",
+          "Middletown",
+          "Milford",
+          "Seaford",
+          "Georgetown"
+        ]
+      },
+      {
+        "code": "AK",
+        "name": "Alaska",
+        "salesTax": 0.0,
+        "cities": [
+          "Anchorage",
+          "Juneau",
+          "Fairbanks",
+          "Ketchikan",
+          "Sitka",
+          "Kodiak",
+          "Palmer",
+          "Kenai",
+          "Bethel",
+          "Wasilla"
+        ]
+      }
+    ]
+  },
+  "lowTaxStates": {
+    "description": "US States with lowest sales taxes (under 5%)",
+    "count": 3,
+    "states": [
+      {
+        "code": "CO",
+        "name": "Colorado",
+        "salesTax": 4.63,
+        "cities": [
+          "Denver",
+          "Colorado Springs",
+          "Aurora",
+          "Fort Collins",
+          "Lakewood"
+        ]
+      },
+      {
+        "code": "GA",
+        "name": "Georgia",
+        "salesTax": 4.0,
+        "cities": [
+          "Atlanta",
+          "Augusta",
+          "Columbus",
+          "Savannah",
+          "Athens"
+        ]
+      },
+      {
+        "code": "LA",
+        "name": "Louisiana",
+        "salesTax": 4.45,
+        "cities": [
+          "New Orleans",
+          "Baton Rouge",
+          "Shreveport",
+          "Lafayette",
+          "Lake Charles"
+        ]
+      }
+    ]
+  }
+}

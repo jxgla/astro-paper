@@ -1,0 +1,75 @@
+{
+  "IN": {
+    "cities": [
+      "Mumbai",
+      "Delhi",
+      "Bangalore",
+      "Hyderabad"
+    ]
+  },
+  "Maharashtra": {
+    "region": "Maharashtra",
+    "cities": [
+      "Ballia",
+      "Belgaum",
+      "Bijapur",
+      "Burhanpur",
+      "Durgapur",
+      "Karimnagar",
+      "Kolkata",
+      "Mysore",
+      "Pali",
+      "Patiala",
+      "Sultan"
+    ]
+  },
+  "Uttar Pradesh": {
+    "region": "Uttar Pradesh",
+    "cities": [
+      "Allahabad",
+      "Dharmavaram",
+      "Gangtok",
+      "Jaipur",
+      "Jalgaon",
+      "Junagadh",
+      "Morbi",
+      "Nagercoil",
+      "Nellore",
+      "Rohtak",
+      "Saharsa",
+      "Tezpur",
+      "Vijayawada"
+    ]
+  },
+  "West Bengal": {
+    "region": "West Bengal",
+    "cities": [
+      "Ambarnath",
+      "Begusarai",
+      "Farrukhabad",
+      "Guntakal",
+      "Ozhukarai",
+      "Salem",
+      "Siwan",
+      "Srikakulam",
+      "Vellore"
+    ]
+  },
+  "Karnataka": {
+    "region": "Karnataka",
+    "cities": [
+      "Aizawl",
+      "Bhimavaram",
+      "Jalandhar",
+      "Jehanabad",
+      "Malegaon",
+      "Mango",
+      "Panchkula",
+      "Phusro",
+      "Rajpur",
+      "Ratlam",
+      "Sagar",
+      "Tiruvottiyur"
+    ]
+  }
+}

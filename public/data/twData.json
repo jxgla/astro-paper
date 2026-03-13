@@ -1,0 +1,130 @@
+{
+  "台北": {
+    "city": "台北",
+    "districts": [
+      "大安",
+      "信义",
+      "松山",
+      "中山"
+    ],
+    "population": 400000
+  },
+  "新北": {
+    "city": "新北",
+    "districts": [
+      "板桥",
+      "中和",
+      "永和",
+      "新庄"
+    ],
+    "population": 400000
+  },
+  "台中": {
+    "city": "台中",
+    "districts": [
+      "西屯",
+      "南屯",
+      "北屯",
+      "东区"
+    ],
+    "population": 400000
+  },
+  "台南": {
+    "city": "台南",
+    "districts": [
+      "中西区",
+      "东区",
+      "南区"
+    ],
+    "population": 300000
+  },
+  "高雄": {
+    "city": "高雄",
+    "districts": [
+      "前金",
+      "苓雅",
+      "新兴",
+      "鼓山"
+    ],
+    "population": 400000
+  },
+  "桃园": {
+    "city": "桃园",
+    "districts": [
+      "中坜",
+      "平镇",
+      "龙潭"
+    ],
+    "population": 300000
+  },
+  "新竹": {
+    "city": "新竹",
+    "districts": [
+      "东区",
+      "北区",
+      "香山"
+    ],
+    "population": 300000
+  },
+  "苗栗": {
+    "city": "苗栗",
+    "districts": [
+      "竹南",
+      "头份"
+    ],
+    "population": 200000
+  },
+  "彰化": {
+    "city": "彰化",
+    "districts": [
+      "彰化",
+      "員林"
+    ],
+    "population": 200000
+  },
+  "南投": {
+    "city": "南投",
+    "districts": [
+      "南投",
+      "埔里"
+    ],
+    "population": 200000
+  },
+  "云林": {
+    "city": "云林",
+    "districts": [
+      "斗六",
+      "虎尾"
+    ],
+    "population": 200000
+  },
+  "嘉义": {
+    "city": "嘉义",
+    "districts": [
+      "嘉义",
+      "太保"
+    ],
+    "population": 200000
+  },
+  "花莲": {
+    "city": "花莲",
+    "districts": [
+      "花莲"
+    ],
+    "population": 100000
+  },
+  "台东": {
+    "city": "台东",
+    "districts": [
+      "台东"
+    ],
+    "population": 100000
+  },
+  "宜兰": {
+    "city": "宜兰",
+    "districts": [
+      "宜兰"
+    ],
+    "population": 100000
+  }
+}
