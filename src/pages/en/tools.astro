@@ -3,7 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
-import AddressToolInline from "@/components/AddressToolInline.astro";
 import { SITE } from "@/config";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
@@ -115,14 +114,16 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
         <article id="address-generator" class="tool-card">
           <h3>Address / Mock Identity Generator</h3>
-          <p>Now embedded directly in the tools page. It reads bundled static JSON from this Astro site with no backend and no redirect.</p>
-          <span class="tool-badge">Isolated</span>
-          <AddressToolInline locale="en" />
-          {
-            addressToolUrl && (
-              <p class="tool-status">If you later deploy `address` as a standalone Cloudflare Pages app, you can still keep that isolated version without changing this embedded mode.</p>
-            )
-          }
+          <p>Runs as a standalone Cloudflare Pages / Workers app. The blog no longer ships address data or generation logic inside the main site bundle.</p>
+          <span class="tool-badge">External</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/en/tools/address-generator">Open tool page</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "The address tool now stays isolated behind its own page so large JSON payloads and heavy scripts do not land in the blog deployment."
+                : "Set `PUBLIC_ADDRESS_TOOL_URL` first, then let the blog shell load the standalone tool via iframe or a new tab."}
+            </p>
+          </div>
         </article>
 
         <article id="random-string" class="tool-card">

@@ -3,7 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
-import AddressToolInline from "@/components/AddressToolInline.astro";
 import { SITE } from "@/config";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
@@ -115,14 +114,16 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
         <article id="address-generator" class="tool-card">
           <h3>地址 / 虚拟身份生成器</h3>
-          <p>当前直接内嵌在工具页里运行，读取站点已发布的静态 JSON，不跳转、不依赖后端。</p>
-          <span class="tool-badge">Isolated</span>
-          <AddressToolInline locale="zh" />
-          {
-            addressToolUrl && (
-              <p class="tool-status">后续如果把 `address` 单独部署到 Cloudflare Pages，还可以继续复用独立站形态，不影响当前内嵌版。</p>
-            )
-          }
+          <p>独立部署在 Cloudflare Pages / Workers，博客不再打包地址数据与生成逻辑，只保留轻量入口。</p>
+          <span class="tool-badge">External</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/tools/address-generator">打开工具页</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "当前将通过独立页面承载地址工具，避免再次把大体积 JSON 和复杂脚本塞进博客主站。"
+                : "先配置 `PUBLIC_ADDRESS_TOOL_URL`，再由博客页通过 iframe 或新窗口接入独立地址工具。"}
+            </p>
+          </div>
         </article>
 
         <article id="random-string" class="tool-card">
