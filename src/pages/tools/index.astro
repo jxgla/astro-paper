@@ -112,20 +112,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>地址 / 虚拟身份生成器</h3>
-          <p>独立静态页面，直接打开使用。</p>
-          <span class="tool-badge">External</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address-lab.pages.dev"} target="_blank" rel="noreferrer">打开工具</a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "当前已直接跳转到独立静态页面。"
-                : "未配置环境变量时将使用默认 Pages 地址。"}
-            </p>
-          </div>
-        </article>
-
         <article id="random-string" class="tool-card">
           <h3>随机字符串生成器</h3>
           <p>选择长度，一键生成随机字符串，用作随机密码。纯前端生成，不上传、不走后端。</p>
@@ -206,6 +192,20 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               </div>
             </div>
           </form>
+        </article>
+
+        <article id="address-generator" class="tool-card">
+          <h3>地址生成器</h3>
+          <p>独立静态页面，适合快速生成测试用地址资料。</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.gemnwong.dpdns.org"} target="_blank" rel="noreferrer">打开工具</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "当前直接跳转到独立地址生成器。"
+                : "未配置环境变量时将使用默认独立域名。"}
+            </p>
+          </div>
         </article>
 
         <article id="temp-mail" class="tool-card">

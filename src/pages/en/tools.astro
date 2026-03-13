@@ -112,20 +112,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>Address / Mock Identity Generator</h3>
-          <p>Standalone static page. Opens directly in a separate site.</p>
-          <span class="tool-badge">External</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address-lab.pages.dev"} target="_blank" rel="noreferrer">Open tool</a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "This now opens the standalone static page directly."
-                : "The default Pages URL is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
-            </p>
-          </div>
-        </article>
-
         <article id="random-string" class="tool-card">
           <h3>Random String Generator</h3>
           <p>Pick a length and generate a random string for passwords. Client-side only — nothing is uploaded.</p>
@@ -206,6 +192,20 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               </div>
             </div>
           </form>
+        </article>
+
+        <article id="address-generator" class="tool-card">
+          <h3>Address Generator</h3>
+          <p>Standalone static page for quickly generating test address profiles.</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.gemnwong.dpdns.org"} target="_blank" rel="noreferrer">Open tool</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "This now opens the standalone address generator directly."
+                : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
+            </p>
+          </div>
         </article>
 
         <article id="temp-mail" class="tool-card">
