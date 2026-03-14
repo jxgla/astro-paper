@@ -144,7 +144,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
       <div class="tools-grid">
         <article id="clash-yaml" class="tool-card">
           <h3>Clash YAML 订阅转换</h3>
-          <p>将节点信息转换为 Clash YAML 订阅格式，便于统一管理。</p>
+          <p>将节点/订阅内容转换为 Clash YAML 订阅格式，支持 vless/vmess/trojan/ss 以及 Base64 通用订阅。</p>
           <span class="tool-badge">Beta</span>
 
           <form class="tool-form" data-clash-form data-tools-api-base={toolsApiBase}>
@@ -158,7 +158,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               id="clash-input-zh"
               class="tool-textarea"
               data-clash-input
-              placeholder="每行一条 vless://..."
+              placeholder="每行一条 vless/vmess/trojan/ss://...\n或直接粘贴 Base64 通用订阅"
             ></textarea>
 
             <div class="tool-url-wrap" data-url-wrap hidden>
@@ -181,7 +181,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               <button type="button" class="tool-btn-secondary" data-clash-clear-input>清除输入</button>
             </div>
 
-            <p class="tool-status" data-clash-status>最多 200 行，支持粘贴、txt 上传或订阅链接。</p>
+            <p class="tool-status" data-clash-status>支持粘贴、txt 上传或订阅链接；可直接粘贴 Base64 通用订阅（自动识别解码）。</p>
 
             <div class="tool-result-wrap" data-clash-result-wrap hidden>
               <pre class="tool-result" data-clash-result></pre>
@@ -199,7 +199,9 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           <p>独立静态页面，适合快速生成测试用地址资料。</p>
           <span class="tool-badge">Experimental</span>
           <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.gemnwong.dpdns.org"} target="_blank" rel="noreferrer">打开工具</a>
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
+              打开工具
+            </a>
             <p class="tool-status">
               {addressToolUrl
                 ? "当前直接跳转到独立地址生成器。"
@@ -258,7 +260,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
             <label>
               <span class="tool-label">支付币种</span>
-              <select class="tool-input" data-vps-currency>
+              <select class="tool-input" data-vps-currency">
                 <option value="CNY">人民币 CNY</option>
                 <option value="USD">美元 USD</option>
                 <option value="GBP">英镑 GBP</option>

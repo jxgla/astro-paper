@@ -144,7 +144,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
       <div class="tools-grid">
         <article id="clash-yaml" class="tool-card">
           <h3>Clash YAML Subscription Convert</h3>
-          <p>Convert node data into Clash YAML subscription format for easier management.</p>
+          <p>Convert node/subscription content into Clash YAML. Supports vless/vmess/trojan/ss and Base64 generic subscriptions.</p>
           <span class="tool-badge">Beta</span>
 
           <form class="tool-form" data-clash-form data-tools-api-base={toolsApiBase}>
@@ -158,7 +158,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               id="clash-input-en"
               class="tool-textarea"
               data-clash-input
-              placeholder="One vless:// link per line"
+              placeholder="One vless/vmess/trojan/ss:// link per line, or paste Base64 subscription"
             ></textarea>
 
             <div class="tool-url-wrap" data-url-wrap hidden>
@@ -181,7 +181,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               <button type="button" class="tool-btn-secondary" data-clash-clear-input>Clear input</button>
             </div>
 
-            <p class="tool-status" data-clash-status>Up to 200 lines, supports paste, txt upload, and subscription URL.</p>
+            <p class="tool-status" data-clash-status>Supports paste, txt upload, and subscription URL. Base64 subscriptions are auto-detected and decoded.</p>
 
             <div class="tool-result-wrap" data-clash-result-wrap hidden>
               <pre class="tool-result" data-clash-result></pre>
@@ -199,7 +199,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           <p>Standalone static page for quickly generating test address profiles.</p>
           <span class="tool-badge">Experimental</span>
           <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.gemnwong.dpdns.org"} target="_blank" rel="noreferrer">Open tool</a>
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
             <p class="tool-status">
               {addressToolUrl
                 ? "This now opens the standalone address generator directly."
@@ -258,7 +258,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
             <label>
               <span class="tool-label">Currency</span>
-              <select class="tool-input" data-vps-currency>
+              <select class="tool-input" data-vps-currency">
                 <option value="CNY">CNY (RMB)</option>
                 <option value="USD">USD</option>
                 <option value="GBP">GBP</option>
