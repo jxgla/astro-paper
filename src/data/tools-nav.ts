@@ -57,6 +57,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
           zh: "随机字符串生成器",
         },
       },
+      {
+        href: "/tools#image-to-svg",
+        label: {
+          en: "Image to SVG",
+          zh: "图片转 SVG",
+        },
+      },
     ],
   },
   {

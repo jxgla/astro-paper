@@ -4,6 +4,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
+import imageToSvgScriptUrl from "@/scripts/tools/image-to-svg.ts?url";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
 const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
@@ -135,6 +136,49 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
             <p class="tool-status" data-passgen-status aria-live="polite">建议长度 16+，并在重要场景配合密码管理器。</p>
           </form>
+        </article>
+
+        <article id="image-to-svg" class="tool-card">
+          <h3>图片转 SVG</h3>
+          <p>在浏览器本地把 PNG/JPG 矢量化为 SVG。更适合 Logo / 插画，照片类可能会更“碎”。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-image-to-svg data-locale="zh">
+            <label class="tool-file-btn">
+              选择图片
+              <input type="file" accept="image/*" data-image-to-svg-file />
+            </label>
+
+            <label>
+              <span class="tool-label">预设</span>
+              <select class="tool-input" data-image-to-svg-preset>
+                <option value="default">default</option>
+                <option value="posterized1">posterized1</option>
+                <option value="posterized2" selected>posterized2</option>
+                <option value="detailed">detailed</option>
+                <option value="smoothed">smoothed</option>
+                <option value="grayscale">grayscale</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="tool-label">最长边（px）</span>
+              <input class="tool-input" data-image-to-svg-max type="number" min="256" max="4096" step="64" value="2048" />
+            </label>
+
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-image-to-svg-convert>转换</button>
+              <button type="button" class="tool-btn-secondary" data-image-to-svg-copy disabled>复制 SVG</button>
+              <button type="button" class="tool-btn-secondary" data-image-to-svg-download disabled>下载 SVG</button>
+            </div>
+
+            <p class="tool-status" data-image-to-svg-status aria-live="polite">提示：Logo/插画效果最好；照片类可能会比较“碎”。</p>
+
+            <div class="tool-result-wrap" data-image-to-svg-wrap>
+              <div class="tool-result image-to-svg-preview" data-image-to-svg-preview></div>
+              <pre class="tool-result" data-image-to-svg-code></pre>
+            </div>
+          </div>
         </article>
       </div>
     </section>
