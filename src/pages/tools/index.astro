@@ -884,7 +884,12 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
         resultWrap.hidden = false;
         status.textContent = `转换成功：${data.nodes ?? 0} 条，失败 ${data.failed ?? 0} 条${data.requestId ? `（请求ID: ${data.requestId}）` : ""}`;
       } catch (err: any) {
-        status.textContent = `转换失败：${(err && err.message) || "unknown"}`;
+        const msg = String((err && err.message) || "unknown");
+        if (/Failed to fetch/i.test(msg)) {
+          status.textContent = "转换失败：请求未到达接口（可能是 CORS 或接口地址不可达）。请检查 PUBLIC_TOOLS_API_BASE 与 tools-worker 的 CORS_ALLOWED_ORIGINS。";
+        } else {
+          status.textContent = `转换失败：${msg}`;
+        }
       } finally {
         setBusy(false);
       }

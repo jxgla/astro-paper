@@ -7,6 +7,7 @@ import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
+import { TOOL_NAV_SECTIONS } from "@/data/tools-nav";
 
 const { pathname } = Astro.url;
 
@@ -154,22 +155,14 @@ const isEnHome = currentPath === "/en";
             class="tools-dropdown sm:absolute sm:top-full sm:left-1/2 sm:z-40 sm:mt-2 sm:w-[30rem] sm:-translate-x-1/2 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:p-3 sm:shadow-lg"
           >
             <div class="grid gap-3 sm:grid-cols-3">
-              <section class="rounded-lg border border-border/70 p-3">
-                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Fun" : "趣味小工具"}</h3>
-                <a class="tools-link" href={withLocale("/tools#mbti-match")}>{isEn ? "MBTI Match Test" : "MBTI 匹配测试"}</a>
-              </section>
-
-              <section class="rounded-lg border border-border/70 p-3">
-                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Productivity" : "效率工具"}</h3>
-                <a class="tools-link" href={withLocale("/tools/doc-converter")}>{isEn ? "Document Converter" : "文档格式转换"}</a>
-              </section>
-
-              <section class="rounded-lg border border-border/70 p-3">
-                <h3 class="mb-2 text-sm font-semibold">{isEn ? "Experimental" : "实验工具"}</h3>
-                <a class="tools-link" href={withLocale("/tools#clash-yaml")}>{isEn ? "Clash YAML subscription convert" : "Clash YAML 订阅转换"}</a>
-                <a class="tools-link" href={withLocale("/tools#temp-mail")}>{isEn ? "Temporary Mailbox" : "临时邮箱"}</a>
-                <a class="tools-link" href={withLocale("/tools#vps-residual-value")}>{isEn ? "VPS residual cycle value" : "VPS 剩余周期价值"}</a>
-              </section>
+              {TOOL_NAV_SECTIONS.map(section => (
+                <section class="rounded-lg border border-border/70 p-3">
+                  <h3 class="mb-2 text-sm font-semibold">{isEn ? section.title.en : section.title.zh}</h3>
+                  {section.items.map(item => (
+                    <a class="tools-link" href={withLocale(item.href)}>{isEn ? item.label.en : item.label.zh}</a>
+                  ))}
+                </section>
+              ))}
             </div>
           </div>
         </li>
