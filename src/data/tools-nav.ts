@@ -28,6 +28,41 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
           zh: "MBTI 匹配测试",
         },
       },
+      {
+        href: "/tools#emoji-dna",
+        label: {
+          en: "Emoji DNA",
+          zh: "Emoji DNA",
+        },
+      },
+      {
+        href: "/tools#nickname-gen",
+        label: {
+          en: "Nickname Generator",
+          zh: "网名生成器",
+        },
+      },
+      {
+        href: "/tools#astro-roast",
+        label: {
+          en: "Astro Roast",
+          zh: "星座嘴替",
+        },
+      },
+      {
+        href: "/tools#pixel-avatar",
+        label: {
+          en: "Pixel Avatar",
+          zh: "像素头像",
+        },
+      },
+      {
+        href: "/tools#image-to-svg",
+        label: {
+          en: "Image to SVG",
+          zh: "图片转 SVG",
+        },
+      },
     ],
   },
   {
@@ -55,13 +90,6 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         label: {
           en: "Random String Generator",
           zh: "随机字符串生成器",
-        },
-      },
-      {
-        href: "/tools#image-to-svg",
-        label: {
-          en: "Image to SVG",
-          zh: "图片转 SVG",
         },
       },
     ],

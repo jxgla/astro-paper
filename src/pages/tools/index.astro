@@ -5,6 +5,10 @@ import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
 import imageToSvgScriptUrl from "@/scripts/tools/image-to-svg.ts?url";
+import emojiDnaScriptUrl from "@/scripts/tools/emoji-dna.ts?url";
+import nicknameGenScriptUrl from "@/scripts/tools/nickname-gen.ts?url";
+import astroRoastScriptUrl from "@/scripts/tools/astro-roast.ts?url";
+import pixelAvatarScriptUrl from "@/scripts/tools/pixel-avatar.ts?url";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
 const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
@@ -83,10 +87,179 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
-        <article class="tool-card tool-card-placeholder">
-          <h3>Coming soon</h3>
-          <p>即将上线更多趣味小工具。</p>
+        <article id="emoji-dna" class="tool-card">
+          <h3>Emoji DNA</h3>
+          <p>粘贴聊天片段，看看你的表情气质与四维“浓度”。纯本地分析。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-emoji-dna data-locale="zh">
+            <label>
+              <span class="tool-label">聊天片段</span>
+              <textarea class="tool-textarea" data-emoji-dna-input placeholder="把文本粘贴到这里…" style="min-height: 7rem"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-emoji-dna-analyze>开始分析</button>
+              <button type="button" class="tool-btn-secondary" data-emoji-dna-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-emoji-dna-share disabled>分享</button>
+            </div>
+            <p class="tool-status" data-emoji-dna-status aria-live="polite">提示：纯本地分析，不上传任何内容。</p>
+            <div class="tool-result emoji-dna-top" data-emoji-dna-top></div>
+            <div class="emoji-dna-bars">
+              <div class="emoji-dna-row"><span>甜度</span><div class="emoji-dna-bar" data-emoji-dna-sweet></div></div>
+              <div class="emoji-dna-row"><span>攻击性</span><div class="emoji-dna-bar" data-emoji-dna-spicy></div></div>
+              <div class="emoji-dna-row"><span>抽象度</span><div class="emoji-dna-bar" data-emoji-dna-chaos></div></div>
+              <div class="emoji-dna-row"><span>社交能量</span><div class="emoji-dna-bar" data-emoji-dna-energy></div></div>
+            </div>
+            <div class="tool-status">气质：<strong data-emoji-dna-vibe>--</strong></div>
+          </div>
         </article>
+
+        <article id="nickname-gen" class="tool-card">
+          <h3>网名生成器</h3>
+          <p>选择风格，一键生成一批可用又有梗的网名。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-nickname-gen data-locale="zh">
+            <label>
+              <span class="tool-label">关键词（可选）</span>
+              <input class="tool-input" data-nickname-key type="text" placeholder="例如：观者 / vibe" />
+            </label>
+            <label>
+              <span class="tool-label">风格</span>
+              <select class="tool-input" data-nickname-style>
+                <option value="cyber">赛博</option>
+                <option value="xianxia">仙侠</option>
+                <option value="minimal">极简</option>
+                <option value="japan">日系</option>
+                <option value="abstract">抽象</option>
+                <option value="emo">emo</option>
+                <option value="biz">商务</option>
+              </select>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-nickname-generate>生成</button>
+              <button type="button" class="tool-btn-secondary" data-nickname-more>再来一批</button>
+              <button type="button" class="tool-btn-secondary" data-nickname-copyall disabled>复制全部</button>
+            </div>
+            <p class="tool-status" data-nickname-status aria-live="polite">纯本地生成，不联网。</p>
+            <div class="tool-result" data-nickname-list></div>
+          </div>
+        </article>
+
+        <article id="astro-roast" class="tool-card">
+          <h3>星座嘴替</h3>
+          <p>玄学嘴替 vs 理工嘴硬：都很欠，但你会觉得很准。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-astro-roast data-locale="zh">
+            <label>
+              <span class="tool-label">生日（可选）</span>
+              <input class="tool-input" data-astro-date type="date" />
+            </label>
+            <label>
+              <span class="tool-label">星座（可选）</span>
+              <select class="tool-input" data-astro-sign>
+                <option value="">请选择</option>
+              </select>
+            </label>
+            <label>
+              <span class="tool-label">模式</span>
+              <select class="tool-input" data-astro-mode>
+                <option value="mystic">玄学嘴替</option>
+                <option value="skeptic">理工嘴硬</option>
+              </select>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-astro-generate>生成</button>
+              <button type="button" class="tool-btn-secondary" data-astro-copy disabled>复制</button>
+            </div>
+            <p class="tool-status" data-astro-status aria-live="polite">仅供娱乐，纯本地生成。</p>
+            <pre class="tool-result" data-astro-output></pre>
+          </div>
+        </article>
+
+        <article id="pixel-avatar" class="tool-card">
+          <h3>像素头像</h3>
+          <p>生成一个小像素头像，支持下载 PNG / SVG。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-pixel-avatar data-locale="zh">
+            <label>
+              <span class="tool-label">种子</span>
+              <input class="tool-input" data-pixel-seed type="text" value="vibewatcher" />
+            </label>
+            <div class="tool-actions">
+              <label class="tool-label" style="margin-right:0.25rem">网格</label>
+              <select class="tool-input" data-pixel-grid style="width:auto">
+                <option value="12">12</option>
+                <option value="16" selected>16</option>
+                <option value="24">24</option>
+              </select>
+              <label class="tool-label" style="margin-left:0.25rem">对称</label>
+              <input data-pixel-sym type="checkbox" checked />
+              <label class="tool-label" style="margin-left:0.25rem">配色</label>
+              <select class="tool-input" data-pixel-pal style="width:auto">
+                <option value="neon">neon</option>
+                <option value="pastel">pastel</option>
+                <option value="mono">mono</option>
+                <option value="sunset">sunset</option>
+              </select>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-pixel-random>随机生成</button>
+              <button type="button" class="tool-btn-secondary" data-pixel-png>下载 PNG</button>
+              <button type="button" class="tool-btn-secondary" data-pixel-svg>下载 SVG</button>
+            </div>
+            <p class="tool-status" data-pixel-status aria-live="polite">纯本地生成像素头像。</p>
+            <div class="pixel-avatar-preview">
+              <canvas data-pixel-canvas width="192" height="192"></canvas>
+            </div>
+          </div>
+        </article>
+
+        <article id="image-to-svg" class="tool-card">
+          <h3>图片转 SVG</h3>
+          <p>在浏览器本地把 PNG/JPG 矢量化为 SVG。更适合 Logo / 插画，照片类可能会更“碎”。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-image-to-svg data-locale="zh">
+            <label class="tool-file-btn">
+              选择图片
+              <input type="file" accept="image/*" data-image-to-svg-file />
+            </label>
+
+            <label>
+              <span class="tool-label">预设</span>
+              <select class="tool-input" data-image-to-svg-preset>
+                <option value="default">default</option>
+                <option value="posterized1">posterized1</option>
+                <option value="posterized2" selected>posterized2</option>
+                <option value="detailed">detailed</option>
+                <option value="smoothed">smoothed</option>
+                <option value="grayscale">grayscale</option>
+              </select>
+            </label>
+
+            <label>
+              <span class="tool-label">最长边（px）</span>
+              <input class="tool-input" data-image-to-svg-max type="number" min="256" max="4096" step="64" value="2048" />
+            </label>
+
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-image-to-svg-convert>转换</button>
+              <button type="button" class="tool-btn-secondary" data-image-to-svg-copy disabled>复制 SVG</button>
+              <button type="button" class="tool-btn-secondary" data-image-to-svg-download disabled>下载 SVG</button>
+            </div>
+
+            <p class="tool-status" data-image-to-svg-status aria-live="polite">提示：Logo/插画效果最好；照片类可能会比较“碎”。</p>
+
+            <div class="tool-result-wrap" data-image-to-svg-wrap>
+              <div class="tool-result image-to-svg-preview" data-image-to-svg-preview></div>
+              <pre class="tool-result" data-image-to-svg-code></pre>
+            </div>
+          </div>
+        </article>
+
       </div>
     </section>
 
@@ -138,48 +311,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
-        <article id="image-to-svg" class="tool-card">
-          <h3>图片转 SVG</h3>
-          <p>在浏览器本地把 PNG/JPG 矢量化为 SVG。更适合 Logo / 插画，照片类可能会更“碎”。</p>
-          <span class="tool-badge">New</span>
-
-          <div class="tool-form" data-image-to-svg data-locale="zh">
-            <label class="tool-file-btn">
-              选择图片
-              <input type="file" accept="image/*" data-image-to-svg-file />
-            </label>
-
-            <label>
-              <span class="tool-label">预设</span>
-              <select class="tool-input" data-image-to-svg-preset>
-                <option value="default">default</option>
-                <option value="posterized1">posterized1</option>
-                <option value="posterized2" selected>posterized2</option>
-                <option value="detailed">detailed</option>
-                <option value="smoothed">smoothed</option>
-                <option value="grayscale">grayscale</option>
-              </select>
-            </label>
-
-            <label>
-              <span class="tool-label">最长边（px）</span>
-              <input class="tool-input" data-image-to-svg-max type="number" min="256" max="4096" step="64" value="2048" />
-            </label>
-
-            <div class="tool-actions">
-              <button type="button" class="tool-btn-primary" data-image-to-svg-convert>转换</button>
-              <button type="button" class="tool-btn-secondary" data-image-to-svg-copy disabled>复制 SVG</button>
-              <button type="button" class="tool-btn-secondary" data-image-to-svg-download disabled>下载 SVG</button>
-            </div>
-
-            <p class="tool-status" data-image-to-svg-status aria-live="polite">提示：Logo/插画效果最好；照片类可能会比较“碎”。</p>
-
-            <div class="tool-result-wrap" data-image-to-svg-wrap>
-              <div class="tool-result image-to-svg-preview" data-image-to-svg-preview></div>
-              <pre class="tool-result" data-image-to-svg-code></pre>
-            </div>
-          </div>
-        </article>
+        <!-- 图片转 SVG 归类为趣味小工具，见上方 Fun 区域。 -->
       </div>
     </section>
 
@@ -367,15 +499,8 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Medium screens: 3 cards per row */
+  /* Desktop: 4 cards per row */
   @media (min-width: 900px) {
-    .tools-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  /* Wide desktop: 4 cards per row */
-  @media (min-width: 1280px) {
     .tools-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
@@ -785,7 +910,78 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     color: var(--accent);
   }
 
+  .emoji-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.22rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, #0f172a 8%);
+    font-size: 0.78rem;
+    line-height: 1;
+  }
+
+  .emoji-pill small {
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  .emoji-dna-bars {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .emoji-dna-row {
+    display: grid;
+    grid-template-columns: 4.6rem 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 74%, transparent);
+  }
+
+  .emoji-dna-bar {
+    height: 0.55rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .emoji-dna-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: var(--bar, 0%);
+    background: linear-gradient(90deg, #22c55e, #60a5fa, #a855f7);
+  }
+
+  .pixel-avatar-preview {
+    display: grid;
+    place-items: center;
+    padding: 0.65rem;
+    border-radius: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, #0f172a 8%);
+    overflow: hidden;
+  }
+
+  .pixel-avatar-preview canvas {
+    width: min(100%, 220px);
+    height: auto;
+    image-rendering: pixelated;
+    border-radius: 0.75rem;
+  }
+
 </style>
+
+<script is:inline type="module" src={imageToSvgScriptUrl}></script>
+<script is:inline type="module" src={emojiDnaScriptUrl}></script>
+<script is:inline type="module" src={nicknameGenScriptUrl}></script>
+<script is:inline type="module" src={astroRoastScriptUrl}></script>
+<script is:inline type="module" src={pixelAvatarScriptUrl}></script>
 
 <script>
   // @ts-nocheck
@@ -1929,4 +2125,5 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   document.addEventListener("astro:page-load", initTempMailTool);
   document.addEventListener("astro:page-load", initVpsResidualTool);
   document.addEventListener("astro:page-load", initRandomStringTool);
+  // New fun tools are initialized by their own module scripts.
 </script>
