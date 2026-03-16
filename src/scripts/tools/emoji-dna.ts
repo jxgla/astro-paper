@@ -18,6 +18,7 @@ const LABELS = {
     spicy: "Spiciness",
     chaos: "Chaos",
     energy: "Energy",
+    summary: "Summary",
   },
   zh: {
     placeholder: "把聊天片段粘贴到这里（本地分析，不上传）。",
@@ -34,6 +35,7 @@ const LABELS = {
     spicy: "攻击性",
     chaos: "抽象度",
     energy: "社交能量",
+    summary: "总结",
   },
 } as const;
 
@@ -144,6 +146,18 @@ function buildReport(locale: Locale, top: Array<[string, number]>, s: any, sampl
     : `[Emoji DNA]\nTop emojis: ${topLine}\nVibe: ${vibe}\nSweetness: ${s.sweet}/100\nSpiciness: ${s.spicy}/100\nChaos: ${s.chaos}/100\nEnergy: ${s.energy}/100\nSample length: ${sampleLen} chars\n\n(Local only)`;
 }
 
+function buildSummary(locale: Locale, s: { sweet: number; spicy: number; chaos: number; energy: number }, vibe: string) {
+  const isZh = locale === "zh";
+  const sweetTag = s.sweet >= 70 ? (isZh ? "甜到犯规" : "Sweet overload") : s.sweet >= 40 ? (isZh ? "带点可爱" : "Warm") : (isZh ? "偏克制" : "Reserved");
+  const spicyTag = s.spicy >= 70 ? (isZh ? "火力全开" : "Full spice") : s.spicy >= 40 ? (isZh ? "会阴阳怪气" : "Sassy") : (isZh ? "很文明" : "Polite");
+  const chaosTag = s.chaos >= 70 ? (isZh ? "抽象之神" : "Chaotic") : s.chaos >= 40 ? (isZh ? "有点发疯" : "Unhinged") : (isZh ? "很正常" : "Normal");
+  const energyTag = s.energy >= 70 ? (isZh ? "高能量" : "High energy") : s.energy >= 40 ? (isZh ? "在线" : "Present") : (isZh ? "低电量" : "Low battery");
+
+  return isZh
+    ? `气质：${vibe}\n标签：${sweetTag} / ${spicyTag} / ${chaosTag} / ${energyTag}\n建议：\n- 甜度太高就别再“哈哈”了，容易暴露在乎\n- 抽象太高就少用省略号，容易被误判为冷淡`
+    : `Vibe: ${vibe}\nTags: ${sweetTag} / ${spicyTag} / ${chaosTag} / ${energyTag}\nTips:\n- If you're too sweet, stop overusing "lol" — it leaks feelings\n- If chaos is high, reduce ellipses — people read it as cold`;
+}
+
 async function copyText(text: string) {
   await navigator.clipboard.writeText(text);
 }
@@ -165,6 +179,7 @@ function initEmojiDnaTool() {
     const status = root.querySelector("[data-emoji-dna-status]");
     const topEl = root.querySelector("[data-emoji-dna-top]");
     const vibeEl = root.querySelector("[data-emoji-dna-vibe]");
+    const summaryEl = root.querySelector("[data-emoji-dna-summary]");
     const bars = {
       sweet: root.querySelector("[data-emoji-dna-sweet]") as HTMLElement | null,
       spicy: root.querySelector("[data-emoji-dna-spicy]") as HTMLElement | null,
@@ -179,6 +194,7 @@ function initEmojiDnaTool() {
     if (!(status instanceof HTMLElement)) continue;
     if (!(topEl instanceof HTMLElement)) continue;
     if (!(vibeEl instanceof HTMLElement)) continue;
+    if (!(summaryEl instanceof HTMLElement)) continue;
 
     let lastReport = "";
 
@@ -204,6 +220,7 @@ function initEmojiDnaTool() {
           : "(no emojis detected)";
 
       vibeEl.textContent = vibe;
+      summaryEl.textContent = buildSummary(locale, s, vibe);
       setBar(bars.sweet, s.sweet);
       setBar(bars.spicy, s.spicy);
       setBar(bars.chaos, s.chaos);

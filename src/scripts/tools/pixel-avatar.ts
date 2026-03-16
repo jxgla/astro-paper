@@ -11,7 +11,7 @@ const LABELS = {
     palette: "Palette",
     downloadPng: "Download PNG",
     downloadSvg: "Download SVG",
-    statusReady: "Generate a tiny avatar locally.",
+    statusReady: "Upload an image or randomize. Everything runs locally.",
   },
   zh: {
     randomize: "随机生成",
@@ -21,7 +21,7 @@ const LABELS = {
     palette: "配色",
     downloadPng: "下载 PNG",
     downloadSvg: "下载 SVG",
-    statusReady: "纯本地生成像素头像。",
+    statusReady: "可上传图片或随机生成，全部本地处理。",
   },
 } as const;
 
@@ -40,6 +40,130 @@ function safeLocale(raw: unknown): Locale {
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
+}
+
+async function fileToImageBitmap(file: File): Promise<ImageBitmap> {
+  if (typeof createImageBitmap === "function") {
+    return await createImageBitmap(file);
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("image_load_failed"));
+    });
+    // @ts-ignore
+    if (typeof createImageBitmap === "function") return await createImageBitmap(img);
+
+    // Fallback: draw to canvas and treat it as bitmap source.
+    const c = document.createElement("canvas");
+    c.width = img.naturalWidth || img.width;
+    c.height = img.naturalHeight || img.height;
+    const ctx = c.getContext("2d");
+    if (!ctx) throw new Error("no_canvas_context");
+    ctx.drawImage(img, 0, 0);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (c as any) as ImageBitmap;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function bitmapToPixelMatrix(bitmap: ImageBitmap, grid: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = grid;
+  canvas.height = grid;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) throw new Error("no_canvas_context");
+
+  // Cover-fit crop to square then downscale to grid.
+  const sw = bitmap.width;
+  const sh = bitmap.height;
+  const size = Math.min(sw, sh);
+  const sx = Math.floor((sw - size) / 2);
+  const sy = Math.floor((sh - size) / 2);
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.clearRect(0, 0, grid, grid);
+  ctx.drawImage(bitmap, sx, sy, size, size, 0, 0, grid, grid);
+
+  const imgd = ctx.getImageData(0, 0, grid, grid);
+  const data = imgd.data;
+
+  // Build a palette by quantizing colors (very lightweight):
+  // store rgb buckets and pick most frequent.
+  const freq = new Map<number, number>();
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+    if (a < 32) continue;
+    const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+    freq.set(key, (freq.get(key) || 0) + 1);
+  }
+  const top = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k]) => k);
+
+  // Map each pixel to nearest palette entry.
+  const palette = top.length
+    ? top.map(k => ({
+        r: ((k >> 8) & 0xf) * 17,
+        g: ((k >> 4) & 0xf) * 17,
+        b: (k & 0xf) * 17,
+      }))
+    : [{ r: 30, g: 41, b: 59 }, { r: 248, g: 250, b: 252 }];
+
+  const idx: number[] = [];
+  for (let y = 0; y < grid; y++) {
+    for (let x = 0; x < grid; x++) {
+      const p = (y * grid + x) * 4;
+      const r = data[p];
+      const g = data[p + 1];
+      const b = data[p + 2];
+      const a = data[p + 3];
+      if (a < 32) {
+        idx.push(-1);
+        continue;
+      }
+      let best = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < palette.length; i++) {
+        const pr = palette[i].r;
+        const pg = palette[i].g;
+        const pb = palette[i].b;
+        const d = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      idx.push(best);
+    }
+  }
+
+  const paletteHex = palette.map(c => `#${c.r.toString(16).padStart(2, "0")}${c.g.toString(16).padStart(2, "0")}${c.b.toString(16).padStart(2, "0")}`);
+  return { grid, idx, paletteHex };
+}
+
+function pixelMatrixToSvg(matrix: { grid: number; idx: number[]; paletteHex: string[] }, scale = 16) {
+  const n = matrix.grid;
+  const w = n * scale;
+  const h = n * scale;
+  const rects: string[] = [];
+  rects.push(`<rect width="${w}" height="${h}" fill="#ffffff"/>`);
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const i = matrix.idx[y * n + x];
+      if (i < 0) continue;
+      const fill = matrix.paletteHex[i] || "#000000";
+      rects.push(`<rect x="${x * scale}" y="${y * scale}" width="${scale}" height="${scale}" fill="${fill}"/>`);
+    }
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" shape-rendering="crispEdges">\n${rects.join("\n")}\n</svg>`;
 }
 
 function hashSeed(str: string) {
@@ -146,20 +270,16 @@ function initPixelAvatar() {
     const locale = safeLocale(root.dataset.locale);
     const L = LABELS[locale];
 
-    const seedInput = root.querySelector("[data-pixel-seed]");
     const gridSelect = root.querySelector("[data-pixel-grid]");
-    const symToggle = root.querySelector("[data-pixel-sym]");
-    const palSelect = root.querySelector("[data-pixel-pal]");
+    const fileInput = root.querySelector("[data-pixel-file]");
     const randomBtn = root.querySelector("[data-pixel-random]");
     const dlPngBtn = root.querySelector("[data-pixel-png]");
     const dlSvgBtn = root.querySelector("[data-pixel-svg]");
     const status = root.querySelector("[data-pixel-status]");
     const canvas = root.querySelector("[data-pixel-canvas]");
 
-    if (!(seedInput instanceof HTMLInputElement)) continue;
     if (!(gridSelect instanceof HTMLSelectElement)) continue;
-    if (!(symToggle instanceof HTMLInputElement)) continue;
-    if (!(palSelect instanceof HTMLSelectElement)) continue;
+    if (!(fileInput instanceof HTMLInputElement)) continue;
     if (!(randomBtn instanceof HTMLButtonElement)) continue;
     if (!(dlPngBtn instanceof HTMLButtonElement)) continue;
     if (!(dlSvgBtn instanceof HTMLButtonElement)) continue;
@@ -168,43 +288,68 @@ function initPixelAvatar() {
 
     status.textContent = L.statusReady;
 
-    const draw = () => {
-      const seed = String(seedInput.value || "seed");
-      const grid = clamp(Number(gridSelect.value || 16), 8, 32);
-      const symmetry = Boolean(symToggle.checked);
-      const palKey = (String(palSelect.value || "neon") as PaletteKey) || "neon";
-      const pal = PALETTES[palKey] || PALETTES.neon;
-
-      const rnd = mulberry32(hashSeed(`${seed}|${grid}|${symmetry}|${palKey}`));
-      const matrix = genMatrix(rnd, grid, symmetry);
-
-      const bg = pal[pal.length - 1] || "#f8fafc";
-      const fg = pal[Math.floor(rnd() * Math.min(5, pal.length))] || "#0ea5e9";
-
-      // render canvas
-      const px = 12;
+    const renderPixels = (matrix: { grid: number; idx: number[]; paletteHex: string[] }) => {
+      const grid = matrix.grid;
+      const px = 8;
       canvas.width = grid * px;
       canvas.height = grid * px;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = bg;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // white background
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = fg;
+
       for (let y = 0; y < grid; y++) {
         for (let x = 0; x < grid; x++) {
-          if (!matrix[y][x]) continue;
+          const i = matrix.idx[y * grid + x];
+          if (i < 0) continue;
+          ctx.fillStyle = matrix.paletteHex[i] || "#000";
           ctx.fillRect(x * px, y * px, px, px);
         }
       }
 
-      // attach svg string to dataset for download
-      (root as any)._pixelSvg = matrixToSvg(matrix, { bg, fg }, 16);
+      (root as any)._pixelSvg = pixelMatrixToSvg(matrix, 16);
+    };
+
+    const randomize = () => {
+      const grid = clamp(Number(gridSelect.value || 32), 8, 48);
+      const palKey = ("neon" as PaletteKey);
+      const pal = PALETTES[palKey] || PALETTES.neon;
+      const seed = Math.random().toString(16).slice(2, 10);
+      const rnd = mulberry32(hashSeed(`${seed}|${grid}`));
+      const matrix = genMatrix(rnd, grid, true);
+      const bg = "#ffffff";
+      const fg = pal[Math.floor(rnd() * Math.min(5, pal.length))] || "#0ea5e9";
+
+      // Convert 0/1 matrix to indexed palette of two colors.
+      const idx: number[] = [];
+      for (let y = 0; y < grid; y++) {
+        for (let x = 0; x < grid; x++) {
+          idx.push(matrix[y][x] ? 1 : -1);
+        }
+      }
+      renderPixels({ grid, idx, paletteHex: [bg, fg] });
     };
 
     randomBtn.addEventListener("click", () => {
-      seedInput.value = Math.random().toString(16).slice(2, 10);
-      draw();
+      randomize();
+    });
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      try {
+        const grid = clamp(Number(gridSelect.value || 32), 8, 48);
+        const bitmap = await fileToImageBitmap(file);
+        const matrix = bitmapToPixelMatrix(bitmap, grid);
+        renderPixels(matrix);
+        status.textContent = locale === "zh" ? `已像素化：${file.name}` : `Pixelized: ${file.name}`;
+      } catch (err: any) {
+        status.textContent = locale === "zh" ? `处理失败：${String(err?.message || err)}` : `Failed: ${String(err?.message || err)}`;
+      }
     });
 
     dlPngBtn.addEventListener("click", () => {
@@ -217,17 +362,8 @@ function initPixelAvatar() {
       downloadText("pixel-avatar.svg", svg, "image/svg+xml;charset=utf-8");
     });
 
-    // init palette options
-    if (palSelect.querySelectorAll("option").length <= 1) {
-      (Object.keys(PALETTES) as PaletteKey[]).forEach(k => {
-        const opt = document.createElement("option");
-        opt.value = k;
-        opt.textContent = k;
-        palSelect.appendChild(opt);
-      });
-    }
-
-    draw();
+    // initial preview
+    randomize();
   }
 }
 

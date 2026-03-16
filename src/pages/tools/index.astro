@@ -106,6 +106,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               <div class="emoji-dna-row"><span>社交能量</span><div class="emoji-dna-bar" data-emoji-dna-energy></div></div>
             </div>
             <div class="tool-status">气质：<strong data-emoji-dna-vibe>--</strong></div>
+            <pre class="tool-result" data-emoji-dna-summary></pre>
           </div>
         </article>
 
@@ -137,7 +138,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               <button type="button" class="tool-btn-secondary" data-nickname-copyall disabled>复制全部</button>
             </div>
             <p class="tool-status" data-nickname-status aria-live="polite">纯本地生成，不联网。</p>
-            <div class="tool-result" data-nickname-list></div>
+            <div class="nickname-tiles" data-nickname-list></div>
           </div>
         </article>
 
@@ -175,29 +176,21 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
         <article id="pixel-avatar" class="tool-card">
           <h3>像素头像</h3>
-          <p>生成一个小像素头像，支持下载 PNG / SVG。</p>
+          <p>本地上传图片，一键转成 32×32 像素头像，支持下载 PNG / SVG。</p>
           <span class="tool-badge">New</span>
 
           <div class="tool-form" data-pixel-avatar data-locale="zh">
-            <label>
-              <span class="tool-label">种子</span>
-              <input class="tool-input" data-pixel-seed type="text" value="vibewatcher" />
+            <label class="tool-file-btn">
+              上传图片
+              <input type="file" accept="image/*" data-pixel-file />
             </label>
             <div class="tool-actions">
               <label class="tool-label" style="margin-right:0.25rem">网格</label>
               <select class="tool-input" data-pixel-grid style="width:auto">
-                <option value="12">12</option>
-                <option value="16" selected>16</option>
+                <option value="16">16</option>
                 <option value="24">24</option>
-              </select>
-              <label class="tool-label" style="margin-left:0.25rem">对称</label>
-              <input data-pixel-sym type="checkbox" checked />
-              <label class="tool-label" style="margin-left:0.25rem">配色</label>
-              <select class="tool-input" data-pixel-pal style="width:auto">
-                <option value="neon">neon</option>
-                <option value="pastel">pastel</option>
-                <option value="mono">mono</option>
-                <option value="sunset">sunset</option>
+                <option value="32" selected>32</option>
+                <option value="48">48</option>
               </select>
             </div>
             <div class="tool-actions">
@@ -219,7 +212,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
           <div class="tool-form" data-image-to-svg data-locale="zh">
             <label class="tool-file-btn">
-              选择图片
+              <span data-image-to-svg-file-label>选择图片</span>
               <input type="file" accept="image/*" data-image-to-svg-file />
             </label>
 
@@ -968,6 +961,35 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     height: auto;
     image-rendering: pixelated;
     border-radius: 0.75rem;
+  }
+
+  .nickname-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.45rem;
+    max-height: 13rem;
+    overflow: auto;
+    padding: 0.2rem;
+  }
+
+  .nickname-tile {
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, #0f172a 8%);
+    border-radius: 0.75rem;
+    padding: 0.55rem 0.6rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .nickname-tile small {
+    font-weight: 600;
+    font-size: 0.7rem;
+    opacity: 0.75;
   }
 
 </style>

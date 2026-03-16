@@ -176,18 +176,19 @@ function initNicknameTool() {
     let lastNames: string[] = [];
 
     const renderList = (names: string[]) => {
+      const hint = locale === "zh" ? "点击复制" : "Click to copy";
       list.innerHTML = names
         .map(
           (n, idx) => `
-          <div class="nickname-row">
-            <div class="nickname-text" title="${n}">${n}</div>
-            <button class="tool-btn-secondary" type="button" data-nickname-copy data-i="${idx}">${locale === "zh" ? "复制" : "Copy"}</button>
-          </div>
+          <button class="nickname-tile" type="button" data-nickname-tile data-i="${idx}" title="${n}">
+            <span>${n}</span>
+            <small>${hint}</small>
+          </button>
         `
         )
         .join("");
 
-      list.querySelectorAll("[data-nickname-copy]").forEach(btn => {
+      list.querySelectorAll("[data-nickname-tile]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const i = Number((btn as HTMLElement).getAttribute("data-i") || 0);
           const text = names[i] || "";
@@ -195,6 +196,11 @@ function initNicknameTool() {
           try {
             await copyText(text);
             status.textContent = L.copied;
+            const old = (btn as HTMLElement).innerHTML;
+            (btn as HTMLElement).innerHTML = `<span>${text}</span><small>${locale === "zh" ? "已复制" : "Copied"}</small>`;
+            setTimeout(() => {
+              (btn as HTMLElement).innerHTML = old;
+            }, 900);
           } catch {
             status.textContent = L.copyFail;
           }

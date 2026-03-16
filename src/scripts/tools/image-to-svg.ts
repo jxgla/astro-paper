@@ -143,6 +143,7 @@ function initImageToSvgTool() {
     const t = MESSAGES[locale];
 
     const fileInput = root.querySelector("[data-image-to-svg-file]");
+    const fileLabel = root.querySelector("[data-image-to-svg-file-label]");
     const presetSelect = root.querySelector("[data-image-to-svg-preset]");
     const maxSideInput = root.querySelector("[data-image-to-svg-max]");
     const convertBtn = root.querySelector("[data-image-to-svg-convert]");
@@ -153,6 +154,7 @@ function initImageToSvgTool() {
     const codeEl = root.querySelector("[data-image-to-svg-code]");
 
     if (!(fileInput instanceof HTMLInputElement)) continue;
+    if (fileLabel && !(fileLabel instanceof HTMLElement)) continue;
     if (!(presetSelect instanceof HTMLSelectElement)) continue;
     if (!(maxSideInput instanceof HTMLInputElement)) continue;
     if (!(convertBtn instanceof HTMLButtonElement)) continue;
@@ -201,6 +203,12 @@ function initImageToSvgTool() {
     setBusy(false);
 
     fileInput.addEventListener("change", () => {
+      const file = fileInput.files?.[0];
+      if (fileLabel instanceof HTMLElement) {
+        const base = locale === "zh" ? "已选择" : "Selected";
+        const sizeKb = file ? Math.round(file.size / 1024) : 0;
+        fileLabel.textContent = file ? `${base}: ${file.name} (${sizeKb} KB)` : (locale === "zh" ? "选择图片" : "Choose image");
+      }
       latestSvg = "";
       previewEl.innerHTML = "";
       codeEl.textContent = "";
