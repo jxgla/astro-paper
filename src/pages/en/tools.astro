@@ -4,11 +4,6 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
-import imageToSvgScriptUrl from "@/scripts/tools/image-to-svg.ts?url";
-import emojiDnaScriptUrl from "@/scripts/tools/emoji-dna.ts?url";
-import nicknameGenScriptUrl from "@/scripts/tools/nickname-gen.ts?url";
-import astroRoastScriptUrl from "@/scripts/tools/astro-roast.ts?url";
-import pixelAvatarScriptUrl from "@/scripts/tools/pixel-avatar.ts?url";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
 const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
@@ -993,11 +988,14 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
 </style>
 
-<script is:inline type="module" src={imageToSvgScriptUrl}></script>
-<script is:inline type="module" src={emojiDnaScriptUrl}></script>
-<script is:inline type="module" src={nicknameGenScriptUrl}></script>
-<script is:inline type="module" src={astroRoastScriptUrl}></script>
-<script is:inline type="module" src={pixelAvatarScriptUrl}></script>
+<script type="module">
+  // NOTE: Import tool modules (bundled by Astro/Vite) so production emits .js (not .ts).
+  import "@/scripts/tools/image-to-svg";
+  import "@/scripts/tools/emoji-dna";
+  import "@/scripts/tools/nickname-gen";
+  import "@/scripts/tools/astro-roast";
+  import "@/scripts/tools/pixel-avatar";
+</script>
 
 <script>
   // @ts-nocheck
