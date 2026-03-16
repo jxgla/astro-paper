@@ -245,21 +245,6 @@ function genMatrix(rnd: () => number, n: number, symmetry: boolean) {
   return m;
 }
 
-function matrixToSvg(matrix: number[][], colors: { bg: string; fg: string }, scale = 16) {
-  const n = matrix.length;
-  const w = n * scale;
-  const h = n * scale;
-  const rects: string[] = [];
-  rects.push(`<rect width="${w}" height="${h}" fill="${colors.bg}"/>`);
-  for (let y = 0; y < n; y++) {
-    for (let x = 0; x < n; x++) {
-      if (!matrix[y][x]) continue;
-      rects.push(`<rect x="${x * scale}" y="${y * scale}" width="${scale}" height="${scale}" fill="${colors.fg}"/>`);
-    }
-  }
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" shape-rendering="crispEdges">\n${rects.join("\n")}\n</svg>`;
-}
-
 function initPixelAvatar() {
   const roots = Array.from(document.querySelectorAll("[data-pixel-avatar]"));
   for (const root of roots) {

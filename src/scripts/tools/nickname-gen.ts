@@ -175,14 +175,35 @@ function initNicknameTool() {
     let seedBase = Date.now();
     let lastNames: string[] = [];
 
+    const getToast = () => {
+      let el = document.getElementById("tools-toast");
+      if (el instanceof HTMLElement) return el;
+      el = document.createElement("div");
+      el.id = "tools-toast";
+      el.className = "tools-toast";
+      el.setAttribute("role", "status");
+      el.setAttribute("aria-live", "polite");
+      document.body.appendChild(el);
+      return el;
+    };
+
+    let toastTimer: number | null = null;
+    const showToast = (message: string) => {
+      const el = getToast();
+      el.textContent = message;
+      el.classList.add("is-open");
+      if (toastTimer) window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => {
+        el.classList.remove("is-open");
+      }, 1100);
+    };
+
     const renderList = (names: string[]) => {
-      const hint = locale === "zh" ? "点击复制" : "Click to copy";
       list.innerHTML = names
         .map(
           (n, idx) => `
           <button class="nickname-tile" type="button" data-nickname-tile data-i="${idx}" title="${n}">
             <span>${n}</span>
-            <small>${hint}</small>
           </button>
         `
         )
@@ -196,13 +217,12 @@ function initNicknameTool() {
           try {
             await copyText(text);
             status.textContent = L.copied;
-            const old = (btn as HTMLElement).innerHTML;
-            (btn as HTMLElement).innerHTML = `<span>${text}</span><small>${locale === "zh" ? "已复制" : "Copied"}</small>`;
-            setTimeout(() => {
-              (btn as HTMLElement).innerHTML = old;
-            }, 900);
+            showToast(locale === "zh" ? "已复制" : "Copied");
+            (btn as HTMLElement).classList.add("is-copied");
+            setTimeout(() => (btn as HTMLElement).classList.remove("is-copied"), 650);
           } catch {
             status.textContent = L.copyFail;
+            showToast(locale === "zh" ? "复制失败" : "Copy failed");
           }
         });
       });

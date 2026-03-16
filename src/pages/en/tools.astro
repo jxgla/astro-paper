@@ -984,10 +984,38 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     gap: 0.25rem;
   }
 
-  .nickname-tile small {
-    font-weight: 600;
-    font-size: 0.7rem;
-    opacity: 0.75;
+  .nickname-tile.is-copied {
+    border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.18);
+    transform: translateY(-1px);
+  }
+
+  .tools-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%) translateY(12px);
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, #0f172a 8%);
+    color: var(--foreground);
+    font-size: 0.78rem;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease;
+    z-index: 80;
+    max-width: min(calc(100vw - 2rem), 520px);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tools-toast.is-open {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   .image-to-svg-preview {
