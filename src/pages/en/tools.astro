@@ -988,8 +988,9 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
 </style>
 
-<script type="module">
-  // NOTE: Import tool modules (bundled by Astro/Vite) so production emits .js (not .ts).
+<script>
+  // NOTE: No attributes on this <script> so Astro will process & bundle it.
+  // This ensures `@/` imports are resolved at build time and the browser gets .js.
   import "@/scripts/tools/image-to-svg";
   import "@/scripts/tools/emoji-dna";
   import "@/scripts/tools/nickname-gen";
