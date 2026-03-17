@@ -50,6 +50,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#poem-generator",
+        label: {
+          en: "Chinese Hidden Poem",
+          zh: "藏头 / 藏尾诗",
+        },
+      },
+      {
         href: "/tools#pixel-avatar",
         label: {
           en: "Pixel Avatar",

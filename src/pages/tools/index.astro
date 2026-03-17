@@ -174,6 +174,40 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
+        <article id="poem-generator" class="tool-card">
+          <h3>藏头 / 藏尾诗</h3>
+          <p>输入 2-8 个中文关键词，生成一首可直接分享的藏头或藏尾诗。奇数字数只会在首尾补成双数句。</p>
+          <span class="tool-badge">AI</span>
+
+          <div class="tool-form" data-poem-gen data-locale="zh">
+            <label>
+              <span class="tool-label">关键词</span>
+              <input class="tool-input" data-poem-keyword type="text" inputmode="text" maxlength="8" placeholder="仅支持中文，例如：春江花月" />
+            </label>
+            <label>
+              <span class="tool-label">意境（可选）</span>
+              <input class="tool-input" data-poem-theme type="text" inputmode="text" maxlength="10" placeholder="仅支持中文，例如：夜雨" />
+            </label>
+            <div class="tool-actions">
+              <select class="tool-input" data-poem-mode style="width:auto">
+                <option value="head">藏头</option>
+                <option value="tail">藏尾</option>
+              </select>
+              <select class="tool-input" data-poem-line-length style="width:auto">
+                <option value="5">五言</option>
+                <option value="7" selected>七言</option>
+              </select>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-poem-generate>生成</button>
+              <button type="button" class="tool-btn-secondary" data-poem-copy disabled>复制</button>
+            </div>
+            <p class="tool-status" data-poem-status aria-live="polite">只支持纯中文输入，调用 grok-4.1-thinking 生成。</p>
+            <div class="poem-meta" data-poem-meta></div>
+            <pre class="tool-result poem-output" data-poem-output></pre>
+          </div>
+        </article>
+
         <article id="pixel-avatar" class="tool-card">
           <h3>像素头像</h3>
           <p>本地上传图片，一键转成 32×32 像素头像，支持下载 PNG / SVG。</p>
@@ -1020,6 +1054,30 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     transform: translateX(-50%) translateY(0);
   }
 
+  .poem-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.15rem;
+  }
+
+  .poem-chip {
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1;
+    background: rgba(15, 23, 42, 0.06);
+    color: var(--body-color);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+  }
+
+  .poem-output {
+    min-height: 12rem;
+    white-space: pre-wrap;
+    line-height: 1.9;
+    letter-spacing: 0.08em;
+  }
+
 </style>
 
 <script>
@@ -1029,6 +1087,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   import "@/scripts/tools/emoji-dna";
   import "@/scripts/tools/nickname-gen";
   import "@/scripts/tools/astro-roast";
+  import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
 </script>
 
