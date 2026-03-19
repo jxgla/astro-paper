@@ -3,35 +3,43 @@ layout: ../layouts/AboutLayout.astro
 title: "About"
 ---
 
-AstroPaper is a minimal, accessible and SEO-friendly blog theme built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
+观者终端是我的个人站点，围绕 **AI 对话、博客记录和轻量工具** 这三部分展开。
 
-![Astro Paper](public/astropaper-og.jpg)
+这个站点目前包含：
 
-AstroPaper provides a solid foundation for blogs, or even portfolios\_ with full markdown support, built-in dark mode, and a clean layout that works out-of-the-box.
+- **主站博客**：记录我在 AI、Cloudflare Worker、产品尝试和日常折腾里的真实实践
+- **聊天镜像**：提供免登录的 Grok / GPT 在线对话入口，方便快速试用不同模型
+- **工具页**：放一些我自己会反复用到的小工具，例如文档转换、地址查询、趣味实验等
 
-The blog posts in this theme also serve as guides, docs or example articles\_ making AstroPaper a flexible starting point for your next content-driven site.
+## 这个站点在做什么
 
-## Features
+我希望把它做成一个长期更新的个人节点：
 
-AstroPaper comes with a set of useful features that make content publishing easy and effective:
+- 一边沉淀真实可复用的经验
+- 一边保留一些好玩、顺手、能直接用的在线功能
+- 同时把 AI 对话、内容输出和工具能力放在同一个入口里
 
-- SEO-friendly
-- Fast performance
-- Light & dark mode
-- Highly customizable
-- Organizable blog posts
-- Responsive & accessible
-- Static search with [PageFind](https://pagefind.app/)
-- Automatic social image generation
+如果你是因为博客文章来到这里，可以从文章页继续浏览；
+如果你只是想直接使用功能，也可以去聊天页或工具页。
 
-and so much more.
+## 内容方向
 
-## Show your support
+这里主要会更新这些内容：
 
-If you like [AstroPaper](https://github.com/satnaing/astro-paper), consider giving it a star ⭐️.
+- AI 镜像站与模型体验
+- Cloudflare / Worker / 边缘部署实践
+- 个人项目开发记录
+- 一些能直接在线使用的小工具
 
-Found a bug 🐛 or have an improvement ✨ in mind? Feel free to open an [issue](https://github.com/satnaing/astro-paper/issues), submit a [pull request](https://github.com/satnaing/astro-paper/pulls) or start a [discussion](https://github.com/satnaing/astro-paper/discussions).
+## 关于收录与更新
 
-If you find this theme helpful, you can also [sponsor me on GitHub](https://github.com/sponsors/satnaing) or [buy me a coffee](https://buymeacoffee.com/satnaing) to show your support — every penny counts.
+这个站点会持续更新页面、文章和工具功能。部分页面是功能入口，部分页面是内容页，因此搜索引擎收录节奏可能会不同，但主站内容会长期维护。
 
-Kyay zuu! 🙏🏼
+## 相关入口
+
+- 首页：[/](/)
+- 聊天页：[/chat/](/chat/)
+- 工具页：[/tools/](/tools/)
+- 博客文章：[/posts/](/posts/)
+
+如果你想了解我最近在做什么，博客通常会比静态简介页更新得更快。
