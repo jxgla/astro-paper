@@ -308,6 +308,206 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
+        <article id="timestamp-converter" class="tool-card">
+          <h3>Timestamp Converter</h3>
+          <p>Convert Unix seconds, Unix milliseconds, and ISO strings into local time, UTC, and common timezone outputs.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-timestamp-tool data-locale="en">
+            <label>
+              <span class="tool-label">Input</span>
+              <textarea class="tool-textarea" data-timestamp-input placeholder="Enter Unix seconds / milliseconds / ISO time"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-timestamp-convert>Convert</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-now>Now</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-timestamp-status>Supports Unix seconds, milliseconds, and ISO-8601.</p>
+            <label>
+              <span class="tool-label">Output</span>
+              <textarea class="tool-textarea" data-timestamp-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="text-processor" class="tool-card">
+          <h3>Batch Text Processor</h3>
+          <p>Clean lines, dedupe items, add prefixes or suffixes, batch replace text, and normalize case in one place.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-text-processor data-locale="en">
+            <label>
+              <span class="tool-label">Input text</span>
+              <textarea class="tool-textarea" data-text-processor-input placeholder="One item per line, or paste a full block of text"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label><input type="checkbox" data-text-dedupe /> Remove duplicate lines</label>
+              <label><input type="checkbox" data-text-remove-blank /> Remove blank lines</label>
+              <label><input type="checkbox" data-text-trim /> Trim each line</label>
+              <label><input type="checkbox" data-text-line-numbers /> Add line numbers</label>
+            </div>
+            <div class="tool-grid-2">
+              <label><span class="tool-label">Prefix</span><input class="tool-input" data-text-prefix type="text" /></label>
+              <label><span class="tool-label">Suffix</span><input class="tool-input" data-text-suffix type="text" /></label>
+              <label><span class="tool-label">Find</span><input class="tool-input" data-text-find type="text" /></label>
+              <label><span class="tool-label">Replace with</span><input class="tool-input" data-text-replace type="text" /></label>
+            </div>
+            <label>
+              <span class="tool-label">Case</span>
+              <select class="tool-input" data-text-case>
+                <option value="none">No change</option>
+                <option value="upper">UPPERCASE</option>
+                <option value="lower">lowercase</option>
+                <option value="title">Title Case</option>
+              </select>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-text-run>Process</button>
+              <button type="button" class="tool-btn-secondary" data-text-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-text-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-text-processor-status>Useful for cleaning lists, line-based text, and quick copy editing.</p>
+            <label>
+              <span class="tool-label">Output</span>
+              <textarea class="tool-textarea" data-text-processor-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="json-toolbox" class="tool-card">
+          <h3>JSON / YAML / TOML Toolbox</h3>
+          <p>Format, validate, minify JSON, and do lightweight JSON / YAML / TOML conversions.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-json-toolbox data-locale="en">
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Input format</span>
+                <select class="tool-input" data-json-format>
+                  <option value="json">JSON</option>
+                  <option value="yaml">YAML</option>
+                  <option value="toml">TOML</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">Convert target</span>
+                <select class="tool-input" data-json-convert-target>
+                  <option value="json">JSON</option>
+                  <option value="yaml">YAML</option>
+                  <option value="toml">TOML</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span class="tool-label">Input</span>
+              <textarea class="tool-textarea" data-json-input placeholder="Paste JSON / YAML / TOML here"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-json-format-btn>Format</button>
+              <button type="button" class="tool-btn-secondary" data-json-minify-btn>Minify JSON</button>
+              <button type="button" class="tool-btn-secondary" data-json-validate-btn>Validate</button>
+              <button type="button" class="tool-btn-secondary" data-json-convert-btn>Convert</button>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-json-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-json-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-json-status>Useful for config snippets and API payload inspection.</p>
+            <label>
+              <span class="tool-label">Output</span>
+              <textarea class="tool-textarea" data-json-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="url-toolbox" class="tool-card">
+          <h3>URL Toolbox</h3>
+          <p>Handle URL encode/decode, query parsing, Base64 decoding, JWT decoding, and URL breakdowns.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-url-toolbox data-locale="en">
+            <label>
+              <span class="tool-label">Action</span>
+              <select class="tool-input" data-url-action>
+                <option value="encode">URL Encode</option>
+                <option value="decode">URL Decode</option>
+                <option value="query">Parse Query</option>
+                <option value="breakdown">Break down URL</option>
+                <option value="base64">Base64 Decode</option>
+                <option value="jwt">JWT Decode</option>
+              </select>
+            </label>
+            <label>
+              <span class="tool-label">Input</span>
+              <textarea class="tool-textarea" data-url-input placeholder="Enter a URL, query string, Base64 value, or JWT"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-url-run>Run</button>
+              <button type="button" class="tool-btn-secondary" data-url-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-url-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-url-status>Useful for debugging links, params, and token payloads.</p>
+            <label>
+              <span class="tool-label">Output</span>
+              <textarea class="tool-textarea" data-url-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="regex-tester" class="tool-card">
+          <h3>Regex Tester</h3>
+          <p>Enter a pattern, flags, and sample text to inspect matches, capture groups, and a highlighted preview.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-regex-tester data-locale="en">
+            <div class="tool-grid-2">
+              <label><span class="tool-label">Pattern</span><input class="tool-input" data-regex-pattern type="text" placeholder="e.g. \\b\\w+@\\w+\\.\\w+\\b" /></label>
+              <label><span class="tool-label">Flags</span><input class="tool-input" data-regex-flags type="text" value="g" /></label>
+            </div>
+            <label>
+              <span class="tool-label">Sample text</span>
+              <textarea class="tool-textarea" data-regex-input placeholder="Enter text to test against"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-regex-run>Test</button>
+              <button type="button" class="tool-btn-secondary" data-regex-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-regex-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-regex-status>Quickly validate patterns and inspect groups.</p>
+            <label>
+              <span class="tool-label">Matches</span>
+              <textarea class="tool-textarea" data-regex-output readonly></textarea>
+            </label>
+            <div class="tool-result tool-highlight" data-regex-highlight></div>
+          </div>
+        </article>
+
+        <article id="text-redactor" class="tool-card">
+          <h3>Sensitive Data Redactor</h3>
+          <p>Mask email addresses, phone numbers, tokens, cookies, and long IDs before sharing logs or support text.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-text-redactor data-locale="en">
+            <label>
+              <span class="tool-label">Input text</span>
+              <textarea class="tool-textarea" data-redactor-input placeholder="Paste raw text to redact locally"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label><input type="checkbox" data-redactor-email checked /> Email</label>
+              <label><input type="checkbox" data-redactor-phone checked /> Phone</label>
+              <label><input type="checkbox" data-redactor-token checked /> Token / key</label>
+              <label><input type="checkbox" data-redactor-cookie checked /> Cookie</label>
+              <label><input type="checkbox" data-redactor-ids checked /> Long IDs</label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-redactor-run>Redact</button>
+              <button type="button" class="tool-btn-secondary" data-redactor-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-redactor-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-redactor-status>Runs locally in the browser. Nothing is uploaded.</p>
+            <label>
+              <span class="tool-label">Redacted output</span>
+              <textarea class="tool-textarea" data-redactor-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="random-string" class="tool-card">
           <h3>Random String Generator</h3>
           <p>Pick a length and generate a random string for passwords. Client-side only — nothing is uploaded.</p>
@@ -333,15 +533,37 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="language-detector" class="tool-card">
+          <h3>Language Detector</h3>
+          <p>Estimate the dominant language, script distribution, and likely translation direction before translating.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-language-detector data-locale="en">
+            <label>
+              <span class="tool-label">Input text</span>
+              <textarea class="tool-textarea" data-language-input placeholder="Enter any multilingual text..."></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-language-run>Detect</button>
+              <button type="button" class="tool-btn-secondary" data-language-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-language-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-language-status>Runs locally and only analyzes character/script distribution.</p>
+            <label>
+              <span class="tool-label">Result</span>
+              <textarea class="tool-textarea" data-language-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="text-translator" class="tool-card">
           <h3>Multilingual Translator</h3>
-          <p>Auto-detect source language and translate into multiple target languages.</p>
+          <p>Auto-detect the source language, translate into multiple targets, and generate bilingual output for easier review.</p>
           <span class="tool-badge">New</span>
 
           <form class="tool-form" data-translate-form data-locale="en" data-tools-api-base={toolsApiBase}>
             <label>
               <span class="tool-label">Source text</span>
-              <textarea class="tool-textarea" data-translate-input placeholder="Enter text to translate..."></textarea>
+              <textarea class="tool-textarea" data-translate-input placeholder="Enter text to translate..." data-translate-preserve></textarea>
             </label>
 
             <div class="tool-actions">
@@ -358,15 +580,21 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
             <div class="tool-actions">
               <button type="submit" class="tool-btn-primary" data-translate-submit>Translate</button>
               <button type="button" class="tool-btn-secondary" data-translate-swap>Swap</button>
-              <button type="button" class="tool-btn-secondary" data-translate-copy disabled>Copy output</button>
+              <button type="button" class="tool-btn-secondary" data-translate-copy disabled>Copy translation</button>
+              <button type="button" class="tool-btn-secondary" data-translate-copy-bilingual disabled>Copy bilingual</button>
               <button type="button" class="tool-btn-secondary" data-translate-clear>Clear</button>
             </div>
 
             <p class="tool-status" data-translate-status aria-live="polite">Calls translator service through a secure tools-worker proxy.</p>
+            <div class="tool-status" data-translate-detected></div>
 
             <label>
               <span class="tool-label">Translated text</span>
               <textarea class="tool-textarea" data-translate-output readonly placeholder="Translation will appear here"></textarea>
+            </label>
+            <label>
+              <span class="tool-label">Bilingual output</span>
+              <textarea class="tool-textarea" data-translate-bilingual readonly placeholder="Source + translation will appear here"></textarea>
             </label>
           </form>
         </article>
@@ -553,8 +781,13 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    /* Mobile first: keep 2 cards per row */
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .tools-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   /* Desktop: 4 cards per row */
@@ -623,44 +856,47 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
   .tool-input {
     width: 100%;
-    border-radius: 0.6rem;
+    min-height: 2.75rem;
+    border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 96%, transparent);
     color: var(--foreground);
-    padding: 0.55rem 0.58rem;
-    font-size: 0.75rem;
+    padding: 0.72rem 0.75rem;
+    font-size: 0.92rem;
   }
 
   .tool-textarea {
     width: 100%;
     min-height: 8.5rem;
     resize: vertical;
-    border-radius: 0.6rem;
+    border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 96%, transparent);
     color: var(--foreground);
-    padding: 0.58rem;
-    font-size: 0.75rem;
-    line-height: 1.42;
+    padding: 0.78rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
   .tool-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.6rem;
     align-items: center;
   }
 
   .tool-file-btn,
   .tool-btn-primary,
   .tool-btn-secondary {
+    min-height: 2.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 95%, transparent);
     color: var(--foreground);
-    border-radius: 0.52rem;
-    padding: 0.35rem 0.62rem;
-    font-size: 0.73rem;
+    border-radius: 0.72rem;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.84rem;
     cursor: pointer;
+    touch-action: manipulation;
   }
 
   .tool-btn-primary {
@@ -671,6 +907,14 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
   .tool-file-btn input {
     display: none;
+  }
+
+  .tool-btn-primary:disabled,
+  .tool-btn-secondary:disabled,
+  .tool-input:disabled,
+  .tool-textarea:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .tool-status {
@@ -1114,6 +1358,26 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     letter-spacing: 0.08em;
   }
 
+  .tool-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .tool-grid-2 label {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .tool-highlight mark {
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
+    color: inherit;
+    border-radius: 0.2rem;
+    padding: 0 0.1rem;
+  }
+
   .image-to-svg-preview {
     display: grid;
     place-items: center;
@@ -1144,6 +1408,9 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
   import "@/scripts/tools/translator";
+  import "@/scripts/tools/data-toolset";
+  import "@/scripts/tools/text-toolset";
+  import "@/scripts/tools/regex-tester";
 </script>
 
 <script>

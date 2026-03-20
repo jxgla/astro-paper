@@ -111,10 +111,10 @@ const isEnHome = currentPath === "/en";
       <ul
         id="menu-items"
         class:list={[
-          "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-          "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent [&>li>a]:whitespace-nowrap sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
+          "mt-4 flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 self-stretch rounded-2xl border border-border bg-background/98 p-2 shadow-lg",
+          "[&>li>a]:block [&>li>a]:rounded-xl [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent [&>li>a]:whitespace-nowrap sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
           "hidden",
-          "sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
+          "sm:mt-0 sm:flex sm:w-auto sm:flex-row sm:gap-x-5 sm:gap-y-0 sm:self-auto sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none",
         ]}
       >
         <li class="col-span-2">
@@ -141,7 +141,7 @@ const isEnHome = currentPath === "/en";
             type="button"
             id="tools-menu-trigger"
             class:list={[
-              "w-full cursor-pointer rounded px-4 py-3 text-center font-medium whitespace-nowrap hover:text-accent sm:px-2 sm:py-1",
+              "w-full cursor-pointer rounded-xl border border-border bg-background/90 px-4 py-3 text-center font-medium whitespace-nowrap hover:text-accent sm:border-0 sm:bg-transparent sm:px-2 sm:py-1",
               { "active-nav": isToolsRoute },
             ]}
             aria-haspopup="true"
@@ -261,9 +261,9 @@ const isEnHome = currentPath === "/en";
 
   .tools-link {
     display: block;
-    padding: 0.28rem 0;
-    font-size: 0.8rem;
-    line-height: 1.3;
+    padding: 0.42rem 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
     color: color-mix(in oklab, var(--foreground) 88%, transparent);
   }
 
@@ -290,40 +290,42 @@ const isEnHome = currentPath === "/en";
 
   @media (max-width: 639px) {
     #tools-menu-trigger {
-      border: none;
-      background: transparent;
+      min-height: 44px;
     }
 
     #tools-nav-item[data-open="true"] #tools-dropdown {
       display: block;
-      margin-top: 0.35rem;
-      border-radius: 0.75rem;
+      margin-top: 0.45rem;
+      border-radius: 1rem;
       border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
-      background: color-mix(in oklab, var(--background) 92%, transparent);
-      padding: 0.55rem;
+      background: color-mix(in oklab, var(--background) 96%, transparent);
+      padding: 0.7rem;
     }
 
     #tools-dropdown .grid {
       display: grid;
-      gap: 0.5rem;
+      gap: 0.65rem;
     }
 
     #tools-dropdown section {
-      border-radius: 0.6rem;
+      border-radius: 0.8rem;
       border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
-      padding: 0.55rem;
+      padding: 0.7rem;
       text-align: left;
     }
 
     #tools-dropdown h3 {
-      margin-bottom: 0.35rem;
-      font-size: 0.78rem;
+      margin-bottom: 0.45rem;
+      font-size: 0.84rem;
       font-weight: 700;
     }
 
     .tools-link {
-      padding: 0.32rem 0;
-      font-size: 0.78rem;
+      min-height: 44px;
+      padding: 0.55rem 0;
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
     }
   }
 </style>

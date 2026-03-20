@@ -31,10 +31,11 @@
     position: fixed;
     bottom: 24px;
     left: 24px;
-    z-index: 9999;
+    z-index: 40;
     display: flex;
     align-items: center;
     font-family: system-ui, -apple-system, sans-serif;
+    pointer-events: none;
   }
 
   .bgm-player {
@@ -59,6 +60,7 @@
     z-index: 2;
     position: relative;
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: auto;
   }
   
   .disk:hover {
@@ -119,12 +121,14 @@
     opacity: 0;
     visibility: hidden;
     z-index: 1;
+    pointer-events: none;
   }
 
   .controls.open {
     transform: translateX(0) scaleX(1);
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
   }
 
   html[data-theme="dark"] .controls {
@@ -192,6 +196,27 @@
   }
   html[data-theme="dark"] #bgm-volume::-webkit-slider-thumb {
     background: #8b80f9;
+  }
+
+  @media (max-width: 640px) {
+    #bgm-player-container {
+      left: 12px;
+      bottom: 12px;
+    }
+
+    .disk {
+      width: 42px;
+      height: 42px;
+    }
+
+    .controls {
+      padding: 6px 12px 6px 28px;
+      gap: 10px;
+    }
+
+    #bgm-volume {
+      width: 52px;
+    }
   }
 </style>
 

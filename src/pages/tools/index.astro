@@ -308,6 +308,206 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
+        <article id="timestamp-converter" class="tool-card">
+          <h3>时间戳转换器</h3>
+          <p>支持 Unix 秒、毫秒和 ISO 时间互转，并输出本地时间、UTC 与常用时区结果。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-timestamp-tool data-locale="zh">
+            <label>
+              <span class="tool-label">输入</span>
+              <textarea class="tool-textarea" data-timestamp-input placeholder="输入 Unix 秒 / Unix 毫秒 / ISO 时间"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-timestamp-convert>转换</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-now>现在</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-timestamp-clear>清空</button>
+            </div>
+            <p class="tool-status" data-timestamp-status>支持秒、毫秒和 ISO8601。</p>
+            <label>
+              <span class="tool-label">结果</span>
+              <textarea class="tool-textarea" data-timestamp-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="text-processor" class="tool-card">
+          <h3>批量文本处理器</h3>
+          <p>适合去重、去空行、加前后缀、批量替换、大小写转换和行号整理。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-text-processor data-locale="zh">
+            <label>
+              <span class="tool-label">输入文本</span>
+              <textarea class="tool-textarea" data-text-processor-input placeholder="每行一项，或粘贴整段文本"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label><input type="checkbox" data-text-dedupe /> 去重行</label>
+              <label><input type="checkbox" data-text-remove-blank /> 去空行</label>
+              <label><input type="checkbox" data-text-trim /> trim 每行</label>
+              <label><input type="checkbox" data-text-line-numbers /> 添加行号</label>
+            </div>
+            <div class="tool-grid-2">
+              <label><span class="tool-label">前缀</span><input class="tool-input" data-text-prefix type="text" /></label>
+              <label><span class="tool-label">后缀</span><input class="tool-input" data-text-suffix type="text" /></label>
+              <label><span class="tool-label">查找</span><input class="tool-input" data-text-find type="text" /></label>
+              <label><span class="tool-label">替换为</span><input class="tool-input" data-text-replace type="text" /></label>
+            </div>
+            <label>
+              <span class="tool-label">大小写</span>
+              <select class="tool-input" data-text-case>
+                <option value="none">不转换</option>
+                <option value="upper">UPPERCASE</option>
+                <option value="lower">lowercase</option>
+                <option value="title">Title Case</option>
+              </select>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-text-run>处理</button>
+              <button type="button" class="tool-btn-secondary" data-text-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-text-clear>清空</button>
+            </div>
+            <p class="tool-status" data-text-processor-status>适合清理列表、文案和批量行文本。</p>
+            <label>
+              <span class="tool-label">结果</span>
+              <textarea class="tool-textarea" data-text-processor-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="json-toolbox" class="tool-card">
+          <h3>JSON / YAML / TOML 工具箱</h3>
+          <p>格式化、校验、JSON 压缩，并支持 JSON / YAML / TOML 之间的基础转换。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-json-toolbox data-locale="zh">
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">输入格式</span>
+                <select class="tool-input" data-json-format>
+                  <option value="json">JSON</option>
+                  <option value="yaml">YAML</option>
+                  <option value="toml">TOML</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">转换目标</span>
+                <select class="tool-input" data-json-convert-target>
+                  <option value="json">JSON</option>
+                  <option value="yaml">YAML</option>
+                  <option value="toml">TOML</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span class="tool-label">输入</span>
+              <textarea class="tool-textarea" data-json-input placeholder="粘贴 JSON / YAML / TOML"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-json-format-btn>格式化</button>
+              <button type="button" class="tool-btn-secondary" data-json-minify-btn>压缩 JSON</button>
+              <button type="button" class="tool-btn-secondary" data-json-validate-btn>校验</button>
+              <button type="button" class="tool-btn-secondary" data-json-convert-btn>转换</button>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-json-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-json-clear>清空</button>
+            </div>
+            <p class="tool-status" data-json-status>适合结构化配置和接口返回调试。</p>
+            <label>
+              <span class="tool-label">结果</span>
+              <textarea class="tool-textarea" data-json-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="url-toolbox" class="tool-card">
+          <h3>URL 工具箱</h3>
+          <p>支持 URL 编解码、Query 解析、Base64 解码、JWT 解码和 URL 结构拆解。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-url-toolbox data-locale="zh">
+            <label>
+              <span class="tool-label">操作</span>
+              <select class="tool-input" data-url-action>
+                <option value="encode">URL Encode</option>
+                <option value="decode">URL Decode</option>
+                <option value="query">解析 Query</option>
+                <option value="breakdown">拆解 URL</option>
+                <option value="base64">Base64 Decode</option>
+                <option value="jwt">JWT Decode</option>
+              </select>
+            </label>
+            <label>
+              <span class="tool-label">输入</span>
+              <textarea class="tool-textarea" data-url-input placeholder="输入 URL / Query / Base64 / JWT"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-url-run>处理</button>
+              <button type="button" class="tool-btn-secondary" data-url-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-url-clear>清空</button>
+            </div>
+            <p class="tool-status" data-url-status>适合调试链接、参数和 token。</p>
+            <label>
+              <span class="tool-label">结果</span>
+              <textarea class="tool-textarea" data-url-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
+        <article id="regex-tester" class="tool-card">
+          <h3>正则测试器</h3>
+          <p>输入 pattern、flags 和测试文本，即时查看匹配结果、捕获组和高亮预览。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-regex-tester data-locale="zh">
+            <div class="tool-grid-2">
+              <label><span class="tool-label">Pattern</span><input class="tool-input" data-regex-pattern type="text" placeholder="例如 \\b\\w+@\\w+\\.\\w+\\b" /></label>
+              <label><span class="tool-label">Flags</span><input class="tool-input" data-regex-flags type="text" value="g" /></label>
+            </div>
+            <label>
+              <span class="tool-label">测试文本</span>
+              <textarea class="tool-textarea" data-regex-input placeholder="输入要匹配的文本"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-regex-run>测试</button>
+              <button type="button" class="tool-btn-secondary" data-regex-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-regex-clear>清空</button>
+            </div>
+            <p class="tool-status" data-regex-status>适合快速验证表达式和提取逻辑。</p>
+            <label>
+              <span class="tool-label">匹配结果</span>
+              <textarea class="tool-textarea" data-regex-output readonly></textarea>
+            </label>
+            <div class="tool-result tool-highlight" data-regex-highlight></div>
+          </div>
+        </article>
+
+        <article id="text-redactor" class="tool-card">
+          <h3>敏感信息脱敏器</h3>
+          <p>自动脱敏邮箱、手机号、token、cookie 和长 ID 串，生成适合贴工单或发群聊的文本。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-text-redactor data-locale="zh">
+            <label>
+              <span class="tool-label">输入文本</span>
+              <textarea class="tool-textarea" data-redactor-input placeholder="粘贴原始文本，工具会在本地脱敏"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label><input type="checkbox" data-redactor-email checked /> 邮箱</label>
+              <label><input type="checkbox" data-redactor-phone checked /> 手机号</label>
+              <label><input type="checkbox" data-redactor-token checked /> token / key</label>
+              <label><input type="checkbox" data-redactor-cookie checked /> cookie</label>
+              <label><input type="checkbox" data-redactor-ids checked /> 长 ID 串</label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-redactor-run>脱敏</button>
+              <button type="button" class="tool-btn-secondary" data-redactor-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-redactor-clear>清空</button>
+            </div>
+            <p class="tool-status" data-redactor-status>纯前端处理，不上传任何文本。</p>
+            <label>
+              <span class="tool-label">脱敏结果</span>
+              <textarea class="tool-textarea" data-redactor-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="random-string" class="tool-card">
           <h3>随机字符串生成器</h3>
           <p>选择长度，一键生成随机字符串，用作随机密码。纯前端生成，不上传、不走后端。</p>
@@ -333,15 +533,37 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="language-detector" class="tool-card">
+          <h3>语言检测器</h3>
+          <p>快速判断文本主要语言、脚本占比和推荐翻译方向，适合作为翻译前置判断。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-language-detector data-locale="zh">
+            <label>
+              <span class="tool-label">输入文本</span>
+              <textarea class="tool-textarea" data-language-input placeholder="输入任意多语言文本..."></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-language-run>检测</button>
+              <button type="button" class="tool-btn-secondary" data-language-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-language-clear>清空</button>
+            </div>
+            <p class="tool-status" data-language-status>本地分析字符分布，不上传文本。</p>
+            <label>
+              <span class="tool-label">检测结果</span>
+              <textarea class="tool-textarea" data-language-output readonly></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="text-translator" class="tool-card">
           <h3>多语言翻译</h3>
-          <p>支持自动检测源语言，选择目标语言后快速翻译文本。</p>
+          <p>支持自动检测源语言、多目标语言翻译，并可输出对照文本方便复制和比对。</p>
           <span class="tool-badge">New</span>
 
           <form class="tool-form" data-translate-form data-locale="zh" data-tools-api-base={toolsApiBase}>
             <label>
               <span class="tool-label">原文</span>
-              <textarea class="tool-textarea" data-translate-input placeholder="输入要翻译的内容..."></textarea>
+              <textarea class="tool-textarea" data-translate-input placeholder="输入要翻译的内容..." data-translate-preserve></textarea>
             </label>
 
             <div class="tool-actions">
@@ -359,14 +581,20 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
               <button type="submit" class="tool-btn-primary" data-translate-submit>翻译</button>
               <button type="button" class="tool-btn-secondary" data-translate-swap>交换</button>
               <button type="button" class="tool-btn-secondary" data-translate-copy disabled>复制译文</button>
+              <button type="button" class="tool-btn-secondary" data-translate-copy-bilingual disabled>复制双语</button>
               <button type="button" class="tool-btn-secondary" data-translate-clear>清空</button>
             </div>
 
             <p class="tool-status" data-translate-status aria-live="polite">通过 tools-worker 安全代理调用翻译服务。</p>
+            <div class="tool-status" data-translate-detected></div>
 
             <label>
               <span class="tool-label">译文</span>
               <textarea class="tool-textarea" data-translate-output readonly placeholder="翻译结果会显示在这里"></textarea>
+            </label>
+            <label>
+              <span class="tool-label">双语对照</span>
+              <textarea class="tool-textarea" data-translate-bilingual readonly placeholder="原文与译文对照会显示在这里"></textarea>
             </label>
           </form>
         </article>
@@ -555,8 +783,13 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   .tools-grid {
     display: grid;
     gap: 0.8rem;
-    /* Mobile first: keep 2 cards per row */
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .tools-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   /* Desktop: 4 cards per row */
@@ -625,44 +858,47 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
   .tool-input {
     width: 100%;
-    border-radius: 0.6rem;
+    min-height: 2.75rem;
+    border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 96%, transparent);
     color: var(--foreground);
-    padding: 0.55rem 0.58rem;
-    font-size: 0.75rem;
+    padding: 0.72rem 0.75rem;
+    font-size: 0.92rem;
   }
 
   .tool-textarea {
     width: 100%;
     min-height: 8.5rem;
     resize: vertical;
-    border-radius: 0.6rem;
+    border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 96%, transparent);
     color: var(--foreground);
-    padding: 0.58rem;
-    font-size: 0.75rem;
-    line-height: 1.42;
+    padding: 0.78rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
   .tool-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.6rem;
     align-items: center;
   }
 
   .tool-file-btn,
   .tool-btn-primary,
   .tool-btn-secondary {
+    min-height: 2.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
     background: color-mix(in oklab, var(--background) 95%, transparent);
     color: var(--foreground);
-    border-radius: 0.52rem;
-    padding: 0.35rem 0.62rem;
-    font-size: 0.73rem;
+    border-radius: 0.72rem;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.84rem;
     cursor: pointer;
+    touch-action: manipulation;
   }
 
   .tool-btn-primary {
@@ -673,6 +909,14 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 
   .tool-file-btn input {
     display: none;
+  }
+
+  .tool-btn-primary:disabled,
+  .tool-btn-secondary:disabled,
+  .tool-input:disabled,
+  .tool-textarea:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .tool-status {
@@ -1116,6 +1360,26 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     letter-spacing: 0.08em;
   }
 
+  .tool-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    color: color-mix(in oklab, var(--foreground) 78%, transparent);
+  }
+
+  .tool-grid-2 label {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .tool-highlight mark {
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
+    color: inherit;
+    border-radius: 0.2rem;
+    padding: 0 0.1rem;
+  }
+
 </style>
 
 <script>
@@ -1128,6 +1392,9 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
   import "@/scripts/tools/translator";
+  import "@/scripts/tools/data-toolset";
+  import "@/scripts/tools/text-toolset";
+  import "@/scripts/tools/regex-tester";
 </script>
 
 <script>

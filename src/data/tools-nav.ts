@@ -93,6 +93,62 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#timestamp-converter",
+        label: {
+          en: "Timestamp Converter",
+          zh: "时间戳转换器",
+        },
+      },
+      {
+        href: "/tools#text-processor",
+        label: {
+          en: "Batch Text Processor",
+          zh: "批量文本处理器",
+        },
+      },
+      {
+        href: "/tools#json-toolbox",
+        label: {
+          en: "JSON / YAML / TOML Toolbox",
+          zh: "JSON / YAML / TOML 工具箱",
+        },
+      },
+      {
+        href: "/tools#url-toolbox",
+        label: {
+          en: "URL Toolbox",
+          zh: "URL 工具箱",
+        },
+      },
+      {
+        href: "/tools#regex-tester",
+        label: {
+          en: "Regex Tester",
+          zh: "正则测试器",
+        },
+      },
+      {
+        href: "/tools#text-redactor",
+        label: {
+          en: "Sensitive Data Redactor",
+          zh: "敏感信息脱敏器",
+        },
+      },
+      {
+        href: "/tools#language-detector",
+        label: {
+          en: "Language Detector",
+          zh: "语言检测器",
+        },
+      },
+      {
+        href: "/tools#text-translator",
+        label: {
+          en: "Multilingual Translator",
+          zh: "多语言翻译",
+        },
+      },
+      {
         href: "/tools#random-string",
         label: {
           en: "Random String Generator",
