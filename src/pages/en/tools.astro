@@ -333,6 +333,44 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="text-translator" class="tool-card">
+          <h3>Multilingual Translator</h3>
+          <p>Auto-detect source language and translate into multiple target languages.</p>
+          <span class="tool-badge">New</span>
+
+          <form class="tool-form" data-translate-form data-locale="en" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Source text</span>
+              <textarea class="tool-textarea" data-translate-input placeholder="Enter text to translate..."></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label style="flex:1;min-width:120px;display:grid;gap:0.25rem;">
+                <span class="tool-label">Source language</span>
+                <select class="tool-input" data-translate-source></select>
+              </label>
+              <label style="flex:1;min-width:120px;display:grid;gap:0.25rem;">
+                <span class="tool-label">Target language</span>
+                <select class="tool-input" data-translate-target></select>
+              </label>
+            </div>
+
+            <div class="tool-actions">
+              <button type="submit" class="tool-btn-primary" data-translate-submit>Translate</button>
+              <button type="button" class="tool-btn-secondary" data-translate-swap>Swap</button>
+              <button type="button" class="tool-btn-secondary" data-translate-copy disabled>Copy output</button>
+              <button type="button" class="tool-btn-secondary" data-translate-clear>Clear</button>
+            </div>
+
+            <p class="tool-status" data-translate-status aria-live="polite">Calls translator service through a secure tools-worker proxy.</p>
+
+            <label>
+              <span class="tool-label">Translated text</span>
+              <textarea class="tool-textarea" data-translate-output readonly placeholder="Translation will appear here"></textarea>
+            </label>
+          </form>
+        </article>
+
         <!-- Image-to-SVG is a fun tool and is listed under Fun Utilities above. -->
       </div>
     </section>
@@ -1105,6 +1143,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   import "@/scripts/tools/astro-roast";
   import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
+  import "@/scripts/tools/translator";
 </script>
 
 <script>

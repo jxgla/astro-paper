@@ -333,6 +333,44 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="text-translator" class="tool-card">
+          <h3>多语言翻译</h3>
+          <p>支持自动检测源语言，选择目标语言后快速翻译文本。</p>
+          <span class="tool-badge">New</span>
+
+          <form class="tool-form" data-translate-form data-locale="zh" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">原文</span>
+              <textarea class="tool-textarea" data-translate-input placeholder="输入要翻译的内容..."></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label style="flex:1;min-width:120px;display:grid;gap:0.25rem;">
+                <span class="tool-label">源语言</span>
+                <select class="tool-input" data-translate-source></select>
+              </label>
+              <label style="flex:1;min-width:120px;display:grid;gap:0.25rem;">
+                <span class="tool-label">目标语言</span>
+                <select class="tool-input" data-translate-target></select>
+              </label>
+            </div>
+
+            <div class="tool-actions">
+              <button type="submit" class="tool-btn-primary" data-translate-submit>翻译</button>
+              <button type="button" class="tool-btn-secondary" data-translate-swap>交换</button>
+              <button type="button" class="tool-btn-secondary" data-translate-copy disabled>复制译文</button>
+              <button type="button" class="tool-btn-secondary" data-translate-clear>清空</button>
+            </div>
+
+            <p class="tool-status" data-translate-status aria-live="polite">通过 tools-worker 安全代理调用翻译服务。</p>
+
+            <label>
+              <span class="tool-label">译文</span>
+              <textarea class="tool-textarea" data-translate-output readonly placeholder="翻译结果会显示在这里"></textarea>
+            </label>
+          </form>
+        </article>
+
         <!-- 图片转 SVG 归类为趣味小工具，见上方 Fun 区域。 -->
       </div>
     </section>
@@ -1089,6 +1127,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
   import "@/scripts/tools/astro-roast";
   import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
+  import "@/scripts/tools/translator";
 </script>
 
 <script>
