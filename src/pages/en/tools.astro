@@ -285,31 +285,48 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
       </div>
     </section>
 
+    <section id="quick-links" class="tools-section">
+      <h2>Quick Links</h2>
+      <div class="tools-grid">
+        <article id="doc-converter" class="tool-card">
+          <h3>Document Converter</h3>
+          <p>Standalone subpage version for basic md, tex, html, and docx conversions.</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/en/tools/doc-converter">Open converter</a>
+            <p class="tool-status">This first release validates the subpage workflow. Complex formatting is not guaranteed yet.</p>
+          </div>
+        </article>
+
+        <article id="pixelpunk-image-host" class="tool-card">
+          <h3>Image Hosting / Upload</h3>
+          <p>Open the PixelPunk image host to upload files fast, grab direct links, and reuse them in Markdown or webpages.</p>
+          <span class="tool-badge">Hot</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="https://pic.410666.xyz" target="_blank" rel="noreferrer">Open image host</a>
+            <p class="tool-status">This tool currently uses a direct external link for a cleaner and more reliable upload workflow.</p>
+          </div>
+        </article>
+
+        <article id="address-generator" class="tool-card">
+          <h3>Address Generator</h3>
+          <p>Standalone static page for quickly generating test address profiles.</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "This now opens the standalone address generator directly."
+                : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section id="efficiency" class="tools-section">
       <h2>Productivity Tools</h2>
       <div class="tools-grid">
-        <div class="tool-link-stack">
-          <article id="doc-converter" class="tool-card tool-card-compact">
-            <h3>Document Converter</h3>
-            <p>Standalone subpage version for basic md, tex, html, and docx conversions.</p>
-            <div class="tool-link-meta">
-              <span class="tool-badge">Experimental</span>
-              <a class="tool-btn-primary tool-btn-compact" href="/en/tools/doc-converter">Open converter</a>
-            </div>
-            <p class="tool-status">This first release validates the subpage workflow. Complex formatting is not guaranteed yet.</p>
-          </article>
-
-          <article id="pixelpunk-image-host" class="tool-card tool-card-compact">
-            <h3>Image Hosting / Upload</h3>
-            <p>Open the PixelPunk image host to upload files fast, grab direct links, and reuse them in Markdown or webpages.</p>
-            <div class="tool-link-meta">
-              <span class="tool-badge">Hot</span>
-              <a class="tool-btn-primary tool-btn-compact" href="https://pic.410666.xyz" target="_blank" rel="noreferrer">Open image host</a>
-            </div>
-            <p class="tool-status">This tool currently uses a direct external link for a cleaner and more reliable upload workflow.</p>
-          </article>
-        </div>
-
         <article id="timestamp-converter" class="tool-card">
           <h3>Timestamp Converter</h3>
           <p>Convert Unix seconds, Unix milliseconds, and ISO strings into local time, UTC, and common timezone outputs.</p>
@@ -825,38 +842,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     gap: 0.55rem;
   }
 
-  .tool-link-stack {
-    display: grid;
-    gap: 0.7rem;
-    align-content: start;
-  }
-
-  .tool-card-compact {
-    padding: 0.8rem 0.85rem;
-  }
-
-  .tool-card-compact h3 {
-    margin-bottom: 0.25rem;
-  }
-
-  .tool-card-compact .tool-status {
-    margin-top: 0.45rem;
-  }
-
-  .tool-link-meta {
-    margin-top: 0.55rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-  }
-
-  .tool-btn-compact {
-    min-height: 2.35rem;
-    padding: 0.6rem 0.9rem;
-    width: auto;
-  }
 
   .tool-label {
     font-size: 0.75rem;

@@ -285,31 +285,50 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
       </div>
     </section>
 
+    <section id="quick-links" class="tools-section">
+      <h2>快速入口</h2>
+      <div class="tools-grid">
+        <article id="doc-converter" class="tool-card">
+          <h3>文档格式转换</h3>
+          <p>独立子页面版本，支持 md、tex、html、docx 的基础互转。</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="/tools/doc-converter">打开转换器</a>
+            <p class="tool-status">当前优先验证独立子页面链路，复杂格式暂不保证完全保真。</p>
+          </div>
+        </article>
+
+        <article id="pixelpunk-image-host" class="tool-card">
+          <h3>图床 / 图片上传</h3>
+          <p>直达 PixelPunk 图床，适合快速上传图片、获取外链并用于 Markdown 或网页引用。</p>
+          <span class="tool-badge">Hot</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href="https://pic.410666.xyz" target="_blank" rel="noreferrer">打开图床</a>
+            <p class="tool-status">当前采用独立站直链接入，上传、管理与外链复制体验更稳定。</p>
+          </div>
+        </article>
+
+        <article id="address-generator" class="tool-card">
+          <h3>地址生成器</h3>
+          <p>独立静态页面，适合快速生成测试用地址资料。</p>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
+              打开工具
+            </a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "当前直接跳转到独立地址生成器。"
+                : "未配置环境变量时将使用默认独立域名。"}
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section id="efficiency" class="tools-section">
       <h2>效率工具</h2>
       <div class="tools-grid">
-        <div class="tool-link-stack">
-          <article id="doc-converter" class="tool-card tool-card-compact">
-            <h3>文档格式转换</h3>
-            <p>独立子页面版本，支持 md、tex、html、docx 的基础互转。</p>
-            <div class="tool-link-meta">
-              <span class="tool-badge">Experimental</span>
-              <a class="tool-btn-primary tool-btn-compact" href="/tools/doc-converter">打开转换器</a>
-            </div>
-            <p class="tool-status">当前优先验证独立子页面链路，复杂格式暂不保证完全保真。</p>
-          </article>
-
-          <article id="pixelpunk-image-host" class="tool-card tool-card-compact">
-            <h3>图床 / 图片上传</h3>
-            <p>直达 PixelPunk 图床，适合快速上传图片、获取外链并用于 Markdown 或网页引用。</p>
-            <div class="tool-link-meta">
-              <span class="tool-badge">Hot</span>
-              <a class="tool-btn-primary tool-btn-compact" href="https://pic.410666.xyz" target="_blank" rel="noreferrer">打开图床</a>
-            </div>
-            <p class="tool-status">当前采用独立站直链接入，上传、管理与外链复制体验更稳定。</p>
-          </article>
-        </div>
-
         <article id="timestamp-converter" class="tool-card">
           <h3>时间戳转换器</h3>
           <p>支持 Unix 秒、毫秒和 ISO 时间互转，并输出本地时间、UTC 与常用时区结果。</p>
@@ -827,38 +846,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     gap: 0.55rem;
   }
 
-  .tool-link-stack {
-    display: grid;
-    gap: 0.7rem;
-    align-content: start;
-  }
-
-  .tool-card-compact {
-    padding: 0.8rem 0.85rem;
-  }
-
-  .tool-card-compact h3 {
-    margin-bottom: 0.25rem;
-  }
-
-  .tool-card-compact .tool-status {
-    margin-top: 0.45rem;
-  }
-
-  .tool-link-meta {
-    margin-top: 0.55rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-  }
-
-  .tool-btn-compact {
-    min-height: 2.35rem;
-    padding: 0.6rem 0.9rem;
-    width: auto;
-  }
 
   .tool-label {
     font-size: 0.75rem;
