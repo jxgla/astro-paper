@@ -660,22 +660,21 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
-        <article id="address-generator" class="tool-card tool-card-compact">
+        <article id="address-generator" class="tool-card">
           <h3>地址生成器</h3>
           <p>独立静态页面，适合快速生成测试用地址资料。</p>
-          <div class="tool-link-meta">
-            <span class="tool-badge">Experimental</span>
-            <a class="tool-btn-primary tool-btn-compact" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
               打开工具
             </a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "当前直接跳转到独立地址生成器。"
+                : "未配置环境变量时将使用默认独立域名。"}
+            </p>
           </div>
-          <p class="tool-status">
-            {addressToolUrl
-              ? "当前直接跳转到独立地址生成器。"
-              : "未配置环境变量时将使用默认独立域名。"}
-          </p>
         </article>
-        </div>
 
         <article id="temp-mail" class="tool-card">
           <h3>临时邮箱</h3>

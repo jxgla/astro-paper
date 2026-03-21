@@ -660,20 +660,19 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
-        <article id="address-generator" class="tool-card tool-card-compact">
+        <article id="address-generator" class="tool-card">
           <h3>Address Generator</h3>
           <p>Standalone static page for quickly generating test address profiles.</p>
-          <div class="tool-link-meta">
-            <span class="tool-badge">Experimental</span>
-            <a class="tool-btn-primary tool-btn-compact" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
+          <span class="tool-badge">Experimental</span>
+          <div class="tool-form">
+            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
+            <p class="tool-status">
+              {addressToolUrl
+                ? "This now opens the standalone address generator directly."
+                : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
+            </p>
           </div>
-          <p class="tool-status">
-            {addressToolUrl
-              ? "This now opens the standalone address generator directly."
-              : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
-          </p>
         </article>
-        </div>
 
         <article id="temp-mail" class="tool-card">
           <h3>Temporary Mailbox</h3>
