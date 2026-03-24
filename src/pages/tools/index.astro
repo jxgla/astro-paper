@@ -6,7 +6,6 @@ import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
-const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 ---
 
 <Layout title={`Tools | ${SITE.title}`}>
@@ -308,21 +307,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>地址生成器</h3>
-          <p>独立静态页面，适合快速生成测试用地址资料。</p>
-          <span class="tool-badge">Experimental</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
-              打开工具
-            </a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "当前直接跳转到独立地址生成器。"
-                : "未配置环境变量时将使用默认独立域名。"}
-            </p>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -736,21 +720,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>地址生成器</h3>
-          <p>独立静态页面，适合快速生成测试用地址资料。</p>
-          <span class="tool-badge">Experimental</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">
-              打开工具
-            </a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "当前直接跳转到独立地址生成器。"
-                : "未配置环境变量时将使用默认独立域名。"}
-            </p>
-          </div>
-        </article>
 
         <article id="temp-mail" class="tool-card">
           <h3>临时邮箱</h3>
@@ -761,7 +730,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
             <div class="tool-actions">
               <button type="button" class="tool-btn-primary" data-temp-mail-create>生成邮箱</button>
               <button type="button" class="tool-btn-secondary" data-temp-mail-refresh>刷新收件箱</button>
-              <button type="button" class="tool-btn-secondary" data-temp-mail-auto>自动刷新：开</button>
+              <button type="button" class="tool-btn-secondary" data-temp-mail-auto>自动刷新：关</button>
             </div>
 
             <p class="tool-status" data-temp-mail-status>点击生成临时邮箱后即可开始收件。</p>
@@ -2107,7 +2076,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     const apiUrl = `${apiBase}${TEMP_MAIL_API_PATH}`;
     let currentMailbox = "";
     const MANUAL_REFRESH_COOLDOWN_MS = 5000;
-    let autoRefreshOn = true;
+    let autoRefreshOn = false;
     let autoTimer = 0;
     let latestOtp = "";
     let lastManualRefreshAt = 0;

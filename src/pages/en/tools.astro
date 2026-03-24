@@ -6,7 +6,6 @@ import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
-const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
 ---
 
 <Layout title={`Tools | ${SITE.title}`}>
@@ -308,19 +307,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>Address Generator</h3>
-          <p>Standalone static page for quickly generating test address profiles.</p>
-          <span class="tool-badge">Experimental</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "This now opens the standalone address generator directly."
-                : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
-            </p>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -734,19 +720,6 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </div>
         </article>
 
-        <article id="address-generator" class="tool-card">
-          <h3>Address Generator</h3>
-          <p>Standalone static page for quickly generating test address profiles.</p>
-          <span class="tool-badge">Experimental</span>
-          <div class="tool-form">
-            <a class="tool-btn-primary" href={addressToolUrl || "https://address.410666.xyz"} target="_blank" rel="noreferrer">Open tool</a>
-            <p class="tool-status">
-              {addressToolUrl
-                ? "This now opens the standalone address generator directly."
-                : "The standalone domain is used until `PUBLIC_ADDRESS_TOOL_URL` is configured."}
-            </p>
-          </div>
-        </article>
 
         <article id="temp-mail" class="tool-card">
           <h3>Temporary Mailbox</h3>
@@ -757,7 +730,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
             <div class="tool-actions">
               <button type="button" class="tool-btn-primary" data-temp-mail-create>Create mailbox</button>
               <button type="button" class="tool-btn-secondary" data-temp-mail-refresh>Refresh inbox</button>
-              <button type="button" class="tool-btn-secondary" data-temp-mail-auto>Auto refresh: ON</button>
+              <button type="button" class="tool-btn-secondary" data-temp-mail-auto>Auto refresh: OFF</button>
             </div>
 
             <p class="tool-status" data-temp-mail-status>Generate a mailbox first, then refresh the inbox.</p>
@@ -2121,7 +2094,7 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
     const apiUrl = `${apiBase}${TEMP_MAIL_API_PATH}`;
     let currentMailbox = "";
     const MANUAL_REFRESH_COOLDOWN_MS = 5000;
-    let autoRefreshOn = true;
+    let autoRefreshOn = false;
     let autoTimer = 0;
     let latestOtp = "";
     let lastManualRefreshAt = 0;

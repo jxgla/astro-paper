@@ -74,8 +74,8 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
   },
   {
     title: {
-      en: "Productivity",
-      zh: "效率工具",
+      en: "Quick Links",
+      zh: "快速入口",
     },
     items: [
       {
@@ -92,6 +92,21 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
           zh: "图床 / 图片上传",
         },
       },
+      {
+        href: "/tools#address-generator",
+        label: {
+          en: "Address Generator",
+          zh: "地址生成器",
+        },
+      },
+    ],
+  },
+  {
+    title: {
+      en: "Productivity",
+      zh: "效率工具",
+    },
+    items: [
       {
         href: "/tools#timestamp-converter",
         label: {
@@ -171,10 +186,10 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
-        href: "/tools#address-generator",
+        href: "/tools#ctf-desensitizer",
         label: {
-          en: "Address Generator",
-          zh: "地址生成器",
+          en: "CTF Desensitizer",
+          zh: "CTF 脱敏替换器",
         },
       },
       {
