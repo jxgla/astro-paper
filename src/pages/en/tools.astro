@@ -677,6 +677,63 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="ctf-desensitizer" class="tool-card">
+          <h3>CTF Desensitizer</h3>
+          <p>Detect likely company identifiers inside domains/URLs/hostnames and replace them with example1, example2, etc. Supports full reverse restore.</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-ctf-desensitizer data-locale="en">
+            <label>
+              <span class="tool-label">Input code / text (max 5000 lines)</span>
+              <textarea class="tool-textarea" data-ctf-input placeholder="Paste script or code snippet, or import a .py file"></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label class="tool-file-btn">
+                Import .py
+                <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
+              </label>
+              <button type="button" class="tool-btn-primary" data-ctf-sanitize>Sanitize</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-reverse>Reverse</button>
+            </div>
+
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>Copy output</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>Download output</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-clear>Clear</button>
+            </div>
+
+            <p class="tool-status" data-ctf-status>Runs fully in browser. No upload, no server dependency.</p>
+
+            <label>
+              <span class="tool-label">Mapping (original → placeholder)</span>
+              <textarea class="tool-textarea" data-ctf-mapping readonly placeholder="No mapping yet"></textarea>
+            </label>
+
+            <label>
+              <span class="tool-label">Mapping JSON (paste, edit, upload, or download)</span>
+              <textarea class="tool-textarea" data-ctf-mapping-json placeholder='{
+  "cloudflare": "example1"
+}'></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label class="tool-file-btn">
+                Upload JSON
+                <input type="file" accept=".json,application/json" data-ctf-mapping-file />
+              </label>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>Export JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>Use JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>Download JSON</button>
+            </div>
+
+            <label>
+              <span class="tool-label">Output</span>
+              <textarea class="tool-textarea" data-ctf-output readonly placeholder="Transformed output will appear here"></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="address-generator" class="tool-card">
           <h3>Address Generator</h3>
           <p>Standalone static page for quickly generating test address profiles.</p>

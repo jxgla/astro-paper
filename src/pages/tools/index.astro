@@ -679,6 +679,63 @@ const addressToolUrl = import.meta.env.PUBLIC_ADDRESS_TOOL_URL || "";
           </form>
         </article>
 
+        <article id="ctf-desensitizer" class="tool-card">
+          <h3>CTF 脱敏替换器</h3>
+          <p>本地识别域名/URL/主机名中的疑似公司标识并替换为 example1、example2，支持映射回填还原。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-ctf-desensitizer data-locale="zh">
+            <label>
+              <span class="tool-label">输入代码 / 文本（最多 5000 行）</span>
+              <textarea class="tool-textarea" data-ctf-input placeholder="粘贴脚本或代码片段，支持 .py 文件导入"></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label class="tool-file-btn">
+                导入 .py
+                <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
+              </label>
+              <button type="button" class="tool-btn-primary" data-ctf-sanitize>脱敏替换</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-reverse>映射还原</button>
+            </div>
+
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>下载结果</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-clear>清空</button>
+            </div>
+
+            <p class="tool-status" data-ctf-status>纯前端本地处理，不上传任何文本；优先识别 URL/域名中的公司标识。</p>
+
+            <label>
+              <span class="tool-label">替换映射（原文 → 占位符）</span>
+              <textarea class="tool-textarea" data-ctf-mapping readonly placeholder="暂无映射"></textarea>
+            </label>
+
+            <label>
+              <span class="tool-label">映射 JSON（可粘贴、编辑、上传或下载）</span>
+              <textarea class="tool-textarea" data-ctf-mapping-json placeholder='{
+  "cloudflare": "example1"
+}'></textarea>
+            </label>
+
+            <div class="tool-actions">
+              <label class="tool-file-btn">
+                上传 JSON
+                <input type="file" accept=".json,application/json" data-ctf-mapping-file />
+              </label>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>导出 JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>读取 JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>下载 JSON</button>
+            </div>
+
+            <label>
+              <span class="tool-label">处理结果</span>
+              <textarea class="tool-textarea" data-ctf-output readonly placeholder="处理结果会显示在这里"></textarea>
+            </label>
+          </div>
+        </article>
+
         <article id="address-generator" class="tool-card">
           <h3>地址生成器</h3>
           <p>独立静态页面，适合快速生成测试用地址资料。</p>

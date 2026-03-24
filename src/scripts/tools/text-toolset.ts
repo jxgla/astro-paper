@@ -161,9 +161,494 @@ function initTextRedactor() {
   });
 }
 
+const CTF_MAX_LINES = 5000;
+
+const CTF_I18N = {
+  zh: {
+    waiting: "等待输入。",
+    overLimit: `输入超出 ${CTF_MAX_LINES} 行，请精简后重试。`,
+    imported: (name: string, clipped: boolean) => `已导入 ${name}${clipped ? `（已截断到 ${CTF_MAX_LINES} 行）` : ""}`,
+    empty: "请先输入文本。",
+    noCandidate: "未检测到可替换的公司标识（域名/URL/主机名）。",
+    sanitized: (count: number) => `已脱敏：${count} 个标识符。`,
+    mappingMissing: "请先生成或粘贴映射。",
+    mappingInvalid: "映射格式无效，请使用“原文 -> exampleN”每行一条，或导入有效 JSON。",
+    reversed: "已根据映射还原。",
+    outputCopied: "结果已复制到剪贴板。",
+    outputDownloaded: "结果已下载。",
+    fileReadFailed: "读取文件失败，请重试。",
+    nothingToDownload: "没有可下载内容。",
+    mappingImported: (name: string) => `已导入映射 ${name}。`,
+    mappingExported: "已生成映射 JSON。",
+    mappingDownloaded: "映射 JSON 已下载。",
+    mappingJsonEmpty: "请先生成映射或输入映射 JSON。",
+    mappingApplied: "已读取映射 JSON。",
+  },
+  en: {
+    waiting: "Waiting for input.",
+    overLimit: `Input exceeds ${CTF_MAX_LINES} lines. Please shorten it.`,
+    imported: (name: string, clipped: boolean) => `Imported ${name}${clipped ? ` (trimmed to ${CTF_MAX_LINES} lines)` : ""}`,
+    empty: "Please enter text first.",
+    noCandidate: "No likely company identifiers found in domains/URLs/hostnames.",
+    sanitized: (count: number) => `Sanitized ${count} identifier(s).`,
+    mappingMissing: "Please generate or paste mapping first.",
+    mappingInvalid: "Invalid mapping. Use one line per entry: original -> exampleN, or import valid JSON.",
+    reversed: "Restored from mapping.",
+    outputCopied: "Output copied to clipboard.",
+    outputDownloaded: "Output downloaded.",
+    fileReadFailed: "Failed to read file. Please retry.",
+    nothingToDownload: "Nothing to download.",
+    mappingImported: (name: string) => `Imported mapping ${name}.`,
+    mappingExported: "Mapping JSON generated.",
+    mappingDownloaded: "Mapping JSON downloaded.",
+    mappingJsonEmpty: "Generate a mapping or paste mapping JSON first.",
+    mappingApplied: "Mapping JSON applied.",
+  },
+} as const;
+
+const HOST_IGNORE_LABELS = new Set([
+  "www",
+  "api",
+  "cdn",
+  "img",
+  "static",
+  "assets",
+  "edge",
+  "gateway",
+  "proxy",
+  "mail",
+  "smtp",
+  "imap",
+  "pop",
+  "ftp",
+  "auth",
+  "oauth",
+  "sso",
+  "login",
+  "account",
+  "admin",
+  "docs",
+  "blog",
+  "m",
+  "mobile",
+  "open",
+  "dev",
+  "test",
+  "staging",
+  "stage",
+  "prod",
+  "beta",
+  "sandbox",
+  "localhost",
+  "local",
+  "internal",
+  "lan",
+  "corp",
+  "office",
+  "intranet",
+  "com",
+  "net",
+  "org",
+  "gov",
+  "edu",
+  "io",
+  "app",
+  "cn",
+  "co",
+  "cc",
+  "me",
+  "top",
+  "xyz",
+  "vip",
+  "site",
+  "online",
+  "info",
+  "dev",
+  "us",
+  "uk",
+  "jp",
+  "de",
+  "fr",
+  "ru",
+  "in",
+  "hk",
+  "tw",
+]);
+
+function escapeRegExp(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function clipToLineLimit(value: string, limit = CTF_MAX_LINES) {
+  const lines = value.split(/\r?\n/);
+  if (lines.length <= limit) return { text: value, clipped: false };
+  return { text: lines.slice(0, limit).join("\n"), clipped: true };
+}
+
+function extractHostnames(text: string) {
+  const hosts = new Set<string>();
+  const urlRegex = /\bhttps?:\/\/[^\s"'<>`]+/gi;
+  const domainRegex = /\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}\b/gi;
+
+  for (const match of text.matchAll(urlRegex)) {
+    const raw = match[0];
+    try {
+      const host = new URL(raw).hostname.toLowerCase();
+      if (host) hosts.add(host);
+    } catch {
+      // noop
+    }
+  }
+
+  for (const match of text.matchAll(domainRegex)) {
+    const host = match[0].toLowerCase();
+    if (host) hosts.add(host);
+  }
+
+  return Array.from(hosts);
+}
+
+function extractCompanyCandidates(text: string) {
+  const hosts = extractHostnames(text);
+  const candidates = new Set<string>();
+
+  hosts.forEach(host => {
+    const labels = host.split(".").filter(Boolean);
+    labels.forEach(label => {
+      if (!/^[a-z][a-z0-9-]{2,}$/.test(label)) return;
+      if (HOST_IGNORE_LABELS.has(label)) return;
+      const letters = (label.match(/[a-z]/g) || []).length;
+      if (letters < 3) return;
+      candidates.add(label);
+    });
+  });
+
+  return Array.from(candidates).sort((a, b) => a.localeCompare(b));
+}
+
+function buildMapping(candidates: string[]) {
+  const mapping = new Map<string, string>();
+  candidates.forEach((token, index) => {
+    mapping.set(token, `example${index + 1}`);
+  });
+  return mapping;
+}
+
+function applyMapping(text: string, mapping: Map<string, string>) {
+  let output = text;
+  const entries = Array.from(mapping.entries()).sort((a, b) => b[0].length - a[0].length);
+  entries.forEach(([original, replacement]) => {
+    const pattern = new RegExp(`(?<![A-Za-z0-9])${escapeRegExp(original)}(?![A-Za-z0-9])`, "gi");
+    output = output.replace(pattern, replacement);
+  });
+  return output;
+}
+
+function parseMappingBlock(mappingText: string) {
+  const mapping = new Map<string, string>();
+  const lines = mappingText
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  for (const line of lines) {
+    const match = line.match(/^(.+?)\s*->\s*(example\d+)$/i);
+    if (!match) return null;
+    const original = match[1].trim();
+    const placeholder = match[2].trim().toLowerCase();
+    if (!original || !placeholder) return null;
+    mapping.set(original, placeholder);
+  }
+
+  return mapping;
+}
+
+function mappingToText(mapping: Map<string, string>) {
+  return Array.from(mapping.entries())
+    .map(([original, replacement]) => `${original} -> ${replacement}`)
+    .join("\n");
+}
+
+function mappingToJson(mapping: Map<string, string>) {
+  return JSON.stringify(Object.fromEntries(mapping), null, 2);
+}
+
+function parseMappingJson(mappingJson: string) {
+  try {
+    const parsed = JSON.parse(mappingJson) as Record<string, unknown>;
+    const mapping = new Map<string, string>();
+    for (const [original, replacement] of Object.entries(parsed)) {
+      if (typeof original !== "string" || typeof replacement !== "string") {
+        return null;
+      }
+      if (!original.trim() || !/^example\d+$/i.test(replacement.trim())) {
+        return null;
+      }
+      mapping.set(original.trim(), replacement.trim().toLowerCase());
+    }
+    return mapping;
+  } catch {
+    return null;
+  }
+}
+
+function countLines(value: string) {
+  if (!value) return 0;
+  return value.split(/\r?\n/).length;
+}
+
+function reverseWithMapping(text: string, mapping: Map<string, string>) {
+  let output = text;
+  const reverseEntries = Array.from(mapping.entries())
+    .map(([original, replacement]) => [replacement, original] as const)
+    .sort((a, b) => b[0].length - a[0].length);
+
+  reverseEntries.forEach(([placeholder, original]) => {
+    const pattern = new RegExp(`(?<![A-Za-z0-9])${escapeRegExp(placeholder)}(?![A-Za-z0-9])`, "gi");
+    output = output.replace(pattern, original);
+  });
+
+  return output;
+}
+
+function downloadText(filename: string, text: string) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function initCtfDesensitizer() {
+  const roots = document.querySelectorAll<HTMLElement>("[data-ctf-desensitizer]");
+  roots.forEach(root => {
+    if (root.dataset.inited === "1") return;
+    root.dataset.inited = "1";
+
+    const locale = safeLocale(root.dataset.locale);
+    const t = CTF_I18N[locale];
+    const input = root.querySelector<HTMLTextAreaElement>("[data-ctf-input]");
+    const output = root.querySelector<HTMLTextAreaElement>("[data-ctf-output]");
+    const mappingBox = root.querySelector<HTMLTextAreaElement>("[data-ctf-mapping]");
+    const mappingJsonBox = root.querySelector<HTMLTextAreaElement>("[data-ctf-mapping-json]");
+    const status = root.querySelector<HTMLElement>("[data-ctf-status]");
+    const fileInput = root.querySelector<HTMLInputElement>("[data-ctf-file]");
+    const mappingFileInput = root.querySelector<HTMLInputElement>("[data-ctf-mapping-file]");
+    const sanitizeBtn = root.querySelector<HTMLButtonElement>("[data-ctf-sanitize]");
+    const reverseBtn = root.querySelector<HTMLButtonElement>("[data-ctf-reverse]");
+    const copyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-copy]");
+    const downloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-download]");
+    const clearBtn = root.querySelector<HTMLButtonElement>("[data-ctf-clear]");
+    const mappingExportBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-export]");
+    const mappingApplyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-apply]");
+    const mappingDownloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-download]");
+
+    if (
+      !input ||
+      !output ||
+      !mappingBox ||
+      !mappingJsonBox ||
+      !status ||
+      !fileInput ||
+      !mappingFileInput ||
+      !sanitizeBtn ||
+      !reverseBtn ||
+      !copyBtn ||
+      !downloadBtn ||
+      !clearBtn ||
+      !mappingExportBtn ||
+      !mappingApplyBtn ||
+      !mappingDownloadBtn
+    ) {
+      return;
+    }
+
+    const sync = () => {
+      const hasOutput = !!output.value.trim();
+      const hasMappingJson = !!mappingJsonBox.value.trim();
+      copyBtn.disabled = !hasOutput;
+      downloadBtn.disabled = !hasOutput;
+      mappingDownloadBtn.disabled = !hasMappingJson;
+    };
+
+    const setMapping = (mapping: Map<string, string>) => {
+      mappingBox.value = mappingToText(mapping);
+      mappingJsonBox.value = mappingToJson(mapping);
+      sync();
+    };
+
+    const sanitizeFromInput = () => {
+      const raw = input.value;
+      if (!raw.trim()) {
+        status.textContent = t.empty;
+        return;
+      }
+      if (countLines(raw) > CTF_MAX_LINES) {
+        status.textContent = t.overLimit;
+        return;
+      }
+
+      const candidates = extractCompanyCandidates(raw);
+      if (!candidates.length) {
+        output.value = raw;
+        mappingBox.value = "";
+        mappingJsonBox.value = "";
+        status.textContent = t.noCandidate;
+        sync();
+        return;
+      }
+
+      const mapping = buildMapping(candidates);
+      output.value = applyMapping(raw, mapping);
+      setMapping(mapping);
+      status.textContent = t.sanitized(mapping.size);
+      sync();
+    };
+
+    sanitizeBtn.addEventListener("click", sanitizeFromInput);
+
+    reverseBtn.addEventListener("click", () => {
+      const mappingText = mappingBox.value.trim();
+      const mappingJson = mappingJsonBox.value.trim();
+      if (!mappingText && !mappingJson) {
+        status.textContent = t.mappingMissing;
+        return;
+      }
+
+      const parsed = mappingText ? parseMappingBlock(mappingText) : parseMappingJson(mappingJson);
+      if (!parsed || !parsed.size) {
+        status.textContent = t.mappingInvalid;
+        return;
+      }
+
+      const source = output.value || input.value;
+      if (!source.trim()) {
+        status.textContent = t.empty;
+        return;
+      }
+      output.value = reverseWithMapping(source, parsed);
+      setMapping(parsed);
+      status.textContent = t.reversed;
+      sync();
+    });
+
+    copyBtn.addEventListener("click", () => {
+      if (!output.value.trim()) return;
+      copyText(output.value, () => (status.textContent = t.outputCopied), () => (status.textContent = I18N[locale].copyFailed));
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!output.value.trim()) {
+        status.textContent = t.nothingToDownload;
+        return;
+      }
+      downloadText("ctf-desensitized.txt", output.value);
+      status.textContent = t.outputDownloaded;
+    });
+
+    mappingExportBtn.addEventListener("click", () => {
+      const mappingText = mappingBox.value.trim();
+      if (!mappingText) {
+        status.textContent = t.mappingJsonEmpty;
+        return;
+      }
+      const parsed = parseMappingBlock(mappingText);
+      if (!parsed || !parsed.size) {
+        status.textContent = t.mappingInvalid;
+        return;
+      }
+      mappingJsonBox.value = mappingToJson(parsed);
+      status.textContent = t.mappingExported;
+      sync();
+    });
+
+    mappingApplyBtn.addEventListener("click", () => {
+      const mappingJson = mappingJsonBox.value.trim();
+      if (!mappingJson) {
+        status.textContent = t.mappingJsonEmpty;
+        return;
+      }
+      const parsed = parseMappingJson(mappingJson);
+      if (!parsed || !parsed.size) {
+        status.textContent = t.mappingInvalid;
+        return;
+      }
+      mappingBox.value = mappingToText(parsed);
+      mappingJsonBox.value = mappingToJson(parsed);
+      status.textContent = t.mappingApplied;
+      sync();
+    });
+
+    mappingDownloadBtn.addEventListener("click", () => {
+      if (!mappingJsonBox.value.trim()) {
+        status.textContent = t.mappingJsonEmpty;
+        return;
+      }
+      downloadText("ctf-desensitizer-mapping.json", mappingJsonBox.value);
+      status.textContent = t.mappingDownloaded;
+    });
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      output.value = "";
+      mappingBox.value = "";
+      mappingJsonBox.value = "";
+      fileInput.value = "";
+      mappingFileInput.value = "";
+      status.textContent = t.waiting;
+      sync();
+    });
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const clipped = clipToLineLimit(text, CTF_MAX_LINES);
+        input.value = clipped.text;
+        status.textContent = t.imported(file.name, clipped.clipped);
+      } catch {
+        status.textContent = t.fileReadFailed;
+      }
+    });
+
+    mappingFileInput.addEventListener("change", async () => {
+      const file = mappingFileInput.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = parseMappingJson(text);
+        if (!parsed || !parsed.size) {
+          status.textContent = t.mappingInvalid;
+          return;
+        }
+        setMapping(parsed);
+        status.textContent = t.mappingImported(file.name);
+      } catch {
+        status.textContent = t.fileReadFailed;
+      }
+    });
+
+    input.addEventListener("input", () => {
+      const clipped = clipToLineLimit(input.value, CTF_MAX_LINES);
+      if (clipped.clipped) {
+        input.value = clipped.text;
+        status.textContent = t.overLimit;
+      }
+    });
+
+    sync();
+  });
+}
+
 function init() {
   initTextProcessor();
   initTextRedactor();
+  initCtfDesensitizer();
 }
 
 document.addEventListener("astro:page-load", init);
