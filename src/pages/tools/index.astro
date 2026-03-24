@@ -323,7 +323,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="efficiency" class="tools-section">
       <h2>效率工具</h2>
       <div class="tools-grid">
-        <article id="timestamp-converter" class="tool-card">
+        <article id="timestamp-converter" class="tool-card" data-tool-expandable>
           <h3>时间戳转换器</h3>
           <p>支持 Unix 秒、毫秒和 ISO 时间互转，并输出本地时间、UTC 与常用时区结果。</p>
           <span class="tool-badge">New</span>
@@ -346,7 +346,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="text-processor" class="tool-card">
+        <article id="text-processor" class="tool-card" data-tool-expandable>
           <h3>批量文本处理器</h3>
           <p>适合去重、去空行、加前后缀、批量替换、大小写转换和行号整理。</p>
           <span class="tool-badge">New</span>
@@ -389,7 +389,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="json-toolbox" class="tool-card">
+        <article id="json-toolbox" class="tool-card" data-tool-expandable>
           <h3>JSON / YAML / TOML 工具箱</h3>
           <p>格式化、校验、JSON 压缩，并支持 JSON / YAML / TOML 之间的基础转换。</p>
           <span class="tool-badge">New</span>
@@ -434,7 +434,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="url-toolbox" class="tool-card">
+        <article id="url-toolbox" class="tool-card" data-tool-expandable>
           <h3>URL 工具箱</h3>
           <p>支持 URL 编解码、Query 解析、Base64 解码、JWT 解码和 URL 结构拆解。</p>
           <span class="tool-badge">New</span>
@@ -467,7 +467,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="regex-tester" class="tool-card">
+        <article id="regex-tester" class="tool-card" data-tool-expandable>
           <h3>正则测试器</h3>
           <p>输入 pattern、flags 和测试文本，即时查看匹配结果、捕获组和高亮预览。</p>
           <span class="tool-badge">New</span>
@@ -494,7 +494,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="text-redactor" class="tool-card">
+        <article id="text-redactor" class="tool-card" data-tool-expandable>
           <h3>敏感信息脱敏器</h3>
           <p>自动脱敏邮箱、手机号、token、cookie 和长 ID 串，生成适合贴工单或发群聊的文本。</p>
           <span class="tool-badge">New</span>
@@ -523,7 +523,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="random-string" class="tool-card">
+        <article id="random-string" class="tool-card" data-tool-expandable>
           <h3>随机字符串生成器</h3>
           <p>选择长度，一键生成随机字符串，用作随机密码。纯前端生成，不上传、不走后端。</p>
           <span class="tool-badge">New</span>
@@ -548,7 +548,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </form>
         </article>
 
-        <article id="language-detector" class="tool-card">
+        <article id="language-detector" class="tool-card" data-tool-expandable>
           <h3>语言检测器</h3>
           <p>快速判断文本主要语言、脚本占比和推荐翻译方向，适合作为翻译前置判断。</p>
           <span class="tool-badge">New</span>
@@ -570,7 +570,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="text-translator" class="tool-card">
+        <article id="text-translator" class="tool-card" data-tool-expandable>
           <h3>多语言翻译</h3>
           <p>支持自动检测源语言、多目标语言翻译，并可输出对照文本方便复制和比对。</p>
           <span class="tool-badge">New</span>
@@ -621,7 +621,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="experimental" class="tools-section">
       <h2>实验工具</h2>
       <div class="tools-grid">
-        <article id="clash-yaml" class="tool-card">
+        <article id="clash-yaml" class="tool-card" data-tool-expandable>
           <h3>Clash YAML 订阅转换</h3>
           <p>将节点/订阅内容转换为 Clash YAML 订阅格式，支持 vless/vmess/trojan/ss 以及 Base64 通用订阅。</p>
           <span class="tool-badge">Beta</span>
@@ -673,7 +673,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </form>
         </article>
 
-        <article id="ctf-desensitizer" class="tool-card">
+        <article id="ctf-desensitizer" class="tool-card" data-tool-expandable>
           <h3>CTF 脱敏替换器</h3>
           <p>本地识别域名/URL/主机名中的疑似公司标识并替换为 example1、example2，支持映射回填还原。</p>
           <span class="tool-badge">New</span>
@@ -731,7 +731,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
         </article>
 
 
-        <article id="temp-mail" class="tool-card">
+        <article id="temp-mail" class="tool-card" data-tool-expandable>
           <h3>临时邮箱</h3>
           <p>快速生成临时邮箱用于注册验证与一次性收件场景。</p>
           <span class="tool-badge">Beta</span>
@@ -768,7 +768,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="vps-residual-value" class="tool-card">
+        <article id="vps-residual-value" class="tool-card" data-tool-expandable>
           <h3>VPS 剩余周期价值</h3>
           <p>仅按已支付金额、总周期与到期时间计算剩余价值，不引入市场比价或人为系数。</p>
           <span class="tool-badge">New</span>
@@ -823,6 +823,16 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
       </div>
     </section>
   </Main>
+  <div class="temp-mail-modal tool-expand-modal" data-tool-expand-modal hidden>
+    <div class="temp-mail-modal-backdrop" data-tool-expand-close></div>
+    <div class="temp-mail-modal-panel tool-expand-panel" role="dialog" aria-modal="true" aria-label="工具详情">
+      <div class="temp-mail-modal-head tool-expand-head">
+        <strong data-tool-expand-title>工具详情</strong>
+        <button type="button" class="tool-btn-secondary" data-tool-expand-close>关闭</button>
+      </div>
+      <div class="tool-expand-slot" data-tool-expand-slot></div>
+    </div>
+  </div>
   <Footer />
 </Layout>
 
@@ -863,7 +873,64 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     background: color-mix(in oklab, var(--background) 95%, transparent);
   }
 
-  .tool-card h3 {
+  .tool-card[data-tool-expandable] {
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .tool-card[data-tool-expandable]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+    border-color: color-mix(in oklab, var(--accent) 25%, var(--foreground) 10%);
+  }
+
+  .tool-card[data-tool-expandable] > :not(h3):not(p):not(.tool-badge) {
+    display: none;
+  }
+
+  .tool-card[data-tool-expanded="true"] {
+    cursor: default;
+  }
+
+  .tool-card[data-tool-expanded="true"] > :not(h3):not(p):not(.tool-badge) {
+    display: revert;
+  }
+
+  .tool-card[data-tool-expanded="true"] .tool-form,
+  .tool-card[data-tool-expanded="true"] form,
+  .tool-card[data-tool-expanded="true"] .vps-value-panel,
+  .tool-card[data-tool-expanded="true"] .tool-result,
+  .tool-card[data-tool-expanded="true"] .tool-result-wrap,
+  .tool-card[data-tool-expanded="true"] .tool-mailbox-row,
+  .tool-card[data-tool-expanded="true"] .tool-mailbox,
+  .tool-card[data-tool-expanded="true"] .mbti-grid,
+  .tool-card[data-tool-expanded="true"] .mbti-score-card,
+  .tool-card[data-tool-expanded="true"] .mbti-share-title,
+  .tool-card[data-tool-expanded="true"] .mbti-dimension-grid,
+  .tool-card[data-tool-expanded="true"] .mbti-poster-preview,
+  .tool-card[data-tool-expanded="true"] .temp-mail-modal,
+  .tool-card[data-tool-expanded="true"] .temp-mail-otp,
+  .tool-card[data-tool-expanded="true"] .tool-grid-2,
+  .tool-card[data-tool-expanded="true"] .tool-actions,
+  .tool-card[data-tool-expanded="true"] label {
+    display: revert;
+  }
+
+  .tool-card[data-tool-expanded="true"] {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .tool-card[data-tool-expanded="true"] h3,
+  .tool-card[data-tool-expanded="true"] > p,
+  .tool-card[data-tool-expanded="true"] > .tool-badge {
+    display: none;
+  }
+
+  .tool-card p {
     margin: 0 0 0.35rem;
     font-size: 0.95rem;
     font-weight: 700;
@@ -1214,6 +1281,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     position: absolute;
     inset: 0;
     background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(10px);
   }
 
   .temp-mail-modal-panel {
@@ -1259,6 +1327,46 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     background: color-mix(in oklab, #10b981 16%, var(--background) 84%);
     font-size: 0.78rem;
     font-weight: 700;
+  }
+
+  .tool-expand-modal {
+    z-index: 60;
+  }
+
+  .tool-expand-panel {
+    width: min(920px, calc(100vw - 1rem));
+    max-height: calc(100dvh - 1rem);
+    padding: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .tool-expand-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-bottom: 0.35rem;
+    background: color-mix(in oklab, var(--background) 98%, transparent);
+  }
+
+  .tool-expand-slot {
+    min-height: 0;
+  }
+
+  body.tool-expand-open {
+    overflow: hidden;
+  }
+
+  @media (max-width: 720px) {
+    .tool-expand-panel {
+      inset: auto 0 0 0;
+      left: 0;
+      top: auto;
+      transform: none;
+      width: 100vw;
+      max-height: 92dvh;
+      border-radius: 1rem 1rem 0 0;
+      padding: 0.9rem;
+    }
   }
 
   .tool-badge {
@@ -2592,6 +2700,91 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     syncCopyState();
   }
 
+  function initToolCardExpand() {
+    const modal = document.querySelector("[data-tool-expand-modal]");
+    const slot = document.querySelector("[data-tool-expand-slot]");
+    const titleEl = document.querySelector("[data-tool-expand-title]");
+    const closeBtns = document.querySelectorAll("[data-tool-expand-close]");
+    const cards = document.querySelectorAll("[data-tool-expandable]");
+    if (!(modal instanceof HTMLElement) || !(slot instanceof HTMLElement) || !(titleEl instanceof HTMLElement)) return;
+    if (modal.dataset.inited === "1") return;
+    modal.dataset.inited = "1";
+
+    let activeCard = null;
+    let originParent = null;
+    let originNextSibling = null;
+    let originTrigger = null;
+
+    const closeExpandedCard = () => {
+      if (!(activeCard instanceof HTMLElement) || !(originParent instanceof HTMLElement)) {
+        modal.hidden = true;
+        document.body.classList.remove("tool-expand-open");
+        return;
+      }
+      activeCard.dataset.toolExpanded = "false";
+      if (originNextSibling && originNextSibling.parentNode === originParent) {
+        originParent.insertBefore(activeCard, originNextSibling);
+      } else {
+        originParent.appendChild(activeCard);
+      }
+      modal.hidden = true;
+      document.body.classList.remove("tool-expand-open");
+      if (originTrigger instanceof HTMLElement) {
+        originTrigger.focus();
+      }
+      activeCard = null;
+      originParent = null;
+      originNextSibling = null;
+      originTrigger = null;
+    };
+
+    const openExpandedCard = (card, trigger) => {
+      if (!(card instanceof HTMLElement)) return;
+      if (activeCard === card) return;
+      if (activeCard) closeExpandedCard();
+      originParent = card.parentElement;
+      originNextSibling = card.nextElementSibling;
+      originTrigger = trigger instanceof HTMLElement ? trigger : card;
+      activeCard = card;
+      activeCard.dataset.toolExpanded = "true";
+      titleEl.textContent = card.querySelector("h3")?.textContent || "工具详情";
+      slot.appendChild(card);
+      modal.hidden = false;
+      document.body.classList.add("tool-expand-open");
+    };
+
+    cards.forEach(card => {
+      if (!(card instanceof HTMLElement)) return;
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-expanded", "false");
+      card.addEventListener("click", e => {
+        if (card.dataset.toolExpanded === "true") return;
+        const target = e.target;
+        if (target instanceof HTMLElement && target.closest("a, button, input, textarea, select, label")) {
+          return;
+        }
+        card.setAttribute("aria-expanded", "true");
+        openExpandedCard(card, card);
+      });
+      card.addEventListener("keydown", e => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        if (card.dataset.toolExpanded === "true") return;
+        e.preventDefault();
+        card.setAttribute("aria-expanded", "true");
+        openExpandedCard(card, card);
+      });
+    });
+
+    closeBtns.forEach(btn => btn.addEventListener("click", closeExpandedCard));
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && !modal.hidden) {
+        closeExpandedCard();
+      }
+    });
+  }
+
+  document.addEventListener("astro:page-load", initToolCardExpand);
   document.addEventListener("astro:page-load", initClashTool);
   document.addEventListener("astro:page-load", initMbtiTool);
   document.addEventListener("astro:page-load", initTempMailTool);
