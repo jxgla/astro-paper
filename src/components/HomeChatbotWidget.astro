@@ -4,7 +4,7 @@ interface Props {
 }
 
 const { locale = "zh" } = Astro.props as Props;
-const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "";
+const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "https://blogvisitor.gemnwong.dpdns.org/v1/chat/completions";
 const chatbotMetricsEndpoint = import.meta.env.PUBLIC_CHATBOT_METRICS_ENDPOINT || "";
 
 const copy = locale === "en"

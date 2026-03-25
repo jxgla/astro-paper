@@ -149,7 +149,7 @@ PUBLIC_GOOGLE_SITE_VERIFICATION=your-google-site-verification-value
 The homepage chatbot widget reads public runtime variables from `.env`.
 
 ```bash
-PUBLIC_CHATBOT_API_ENDPOINT=https://your-worker-or-gateway-endpoint
+PUBLIC_CHATBOT_API_ENDPOINT=https://blogvisitor.gemnwong.dpdns.org/v1/chat/completions
 PUBLIC_CHATBOT_METRICS_ENDPOINT=https://your-metrics-endpoint(optional)
 ```
 
