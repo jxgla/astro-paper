@@ -136,35 +136,10 @@ const isEnHome = currentPath === "/en";
             {isEn ? "Fun" : "Fun"}
           </a>
         </li>
-        <li id="tools-nav-item" class="col-span-2 sm:relative">
-          <button
-            type="button"
-            id="tools-menu-trigger"
-            class:list={[
-              "w-full cursor-pointer rounded-xl border border-border bg-background/90 px-4 py-3 text-center font-medium whitespace-nowrap hover:text-accent sm:border-0 sm:bg-transparent sm:px-2 sm:py-1",
-              { "active-nav": isToolsRoute },
-            ]}
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
+        <li class="col-span-2">
+          <a href={withLocale("/tools")} class:list={{ "active-nav": isToolsRoute || isActive("/tools") }}>
             {isEn ? "Tools" : "Tools"}
-          </button>
-
-          <div
-            id="tools-dropdown"
-            class="tools-dropdown sm:absolute sm:top-full sm:left-1/2 sm:z-40 sm:mt-2 sm:w-[30rem] sm:-translate-x-1/2 sm:rounded-xl sm:border sm:border-border sm:bg-background sm:p-3 sm:shadow-lg"
-          >
-            <div class="grid gap-3 sm:grid-cols-3">
-              {TOOL_NAV_SECTIONS.map(section => (
-                <section class="rounded-lg border border-border/70 p-3">
-                  <h3 class="mb-2 text-sm font-semibold">{isEn ? section.title.en : section.title.zh}</h3>
-                  {section.items.map(item => (
-                    <a class="tools-link" href={withLocale(item.href)}>{isEn ? item.label.en : item.label.zh}</a>
-                  ))}
-                </section>
-              ))}
-            </div>
-          </div>
+          </a>
         </li>
         <li class="col-span-2">
           <a href={withLocale("/about")} class:list={{ "active-nav": isActive("/about") }}>
@@ -251,26 +226,6 @@ const isEnHome = currentPath === "/en";
 </header>
 
 <style>
-  .tools-dropdown {
-    display: none;
-  }
-
-  #tools-nav-item[data-open="true"] #tools-dropdown {
-    display: block;
-  }
-
-  .tools-link {
-    display: block;
-    padding: 0.42rem 0;
-    font-size: 0.86rem;
-    line-height: 1.4;
-    color: color-mix(in oklab, var(--foreground) 88%, transparent);
-  }
-
-  .tools-link:hover {
-    color: var(--accent);
-  }
-
   .secret-entry-trigger {
     display: inline-flex;
     align-items: center;
@@ -336,25 +291,10 @@ const isEnHome = currentPath === "/en";
     const menuItems = document.querySelector("#menu-items") as HTMLElement | null;
     const menuIcon = document.querySelector("#menu-icon") as HTMLElement | null;
     const closeIcon = document.querySelector("#close-icon") as HTMLElement | null;
-    const toolsNavItem = document.querySelector("#tools-nav-item") as HTMLElement | null;
-    const toolsTrigger = document.querySelector("#tools-menu-trigger") as HTMLElement | null;
-    const toolsDropdown = document.querySelector("#tools-dropdown") as HTMLElement | null;
 
-    if (!menuBtn || !menuItems || !menuIcon || !closeIcon || !toolsNavItem || !toolsTrigger || !toolsDropdown) return;
+    if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
     if (menuBtn.dataset.bound === "1") return;
     menuBtn.dataset.bound = "1";
-
-    const closeToolsMobileMenu = () => {
-      toolsNavItem.setAttribute("data-open", "false");
-      toolsTrigger.setAttribute("aria-expanded", "false");
-    };
-
-    const toggleToolsMenu = (forceOpen?: boolean) => {
-      const isOpen = toolsNavItem.getAttribute("data-open") === "true";
-      const next = typeof forceOpen === "boolean" ? forceOpen : !isOpen;
-      toolsNavItem.setAttribute("data-open", next ? "true" : "false");
-      toolsTrigger.setAttribute("aria-expanded", next ? "true" : "false");
-    };
 
     menuBtn.addEventListener("click", () => {
       const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
@@ -365,30 +305,6 @@ const isEnHome = currentPath === "/en";
       menuItems.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
-
-      if (openMenu) {
-        closeToolsMobileMenu();
-      }
-    });
-
-    toolsTrigger.addEventListener("click", e => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleToolsMenu();
-    });
-
-    toolsDropdown.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", () => {
-        closeToolsMobileMenu();
-      });
-    });
-
-    document.addEventListener("click", e => {
-      const target = e.target;
-      if (!(target instanceof Node)) return;
-      if (!toolsNavItem.contains(target)) {
-        toggleToolsMenu(false);
-      }
     });
   }
 
