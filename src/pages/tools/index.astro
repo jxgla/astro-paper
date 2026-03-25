@@ -14,7 +14,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
     <section id="fun" class="tools-section">
       <h2>趣味小工具</h2>
       <div class="tools-grid">
-        <article id="mbti-match" class="tool-card">
+        <article id="mbti-match" class="tool-card" data-tool-expandable>
           <h3>MBTI 匹配测试</h3>
           <p>看看你和 TA 是一见来电、慢热变香，还是典型的高甜高拉扯组合。</p>
           <span class="tool-badge">New</span>
@@ -81,7 +81,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </form>
         </article>
 
-        <article id="emoji-dna" class="tool-card">
+        <article id="emoji-dna" class="tool-card" data-tool-expandable>
           <h3>Emoji DNA</h3>
           <p>粘贴聊天片段，看看你的表情气质与四维“浓度”。纯本地分析。</p>
           <span class="tool-badge">New</span>
@@ -109,7 +109,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="nickname-gen" class="tool-card">
+        <article id="nickname-gen" class="tool-card" data-tool-expandable>
           <h3>网名生成器</h3>
           <p>选择风格，一键生成一批可用又有梗的网名。</p>
           <span class="tool-badge">New</span>
@@ -141,7 +141,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="astro-roast" class="tool-card">
+        <article id="astro-roast" class="tool-card" data-tool-expandable>
           <h3>星座嘴替</h3>
           <p>玄学嘴替 vs 理工嘴硬：都很欠，但你会觉得很准。</p>
           <span class="tool-badge">New</span>
@@ -173,7 +173,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="poem-generator" class="tool-card">
+        <article id="poem-generator" class="tool-card" data-tool-expandable>
           <h3>藏头 / 藏尾诗</h3>
           <p>输入 2-8 个中文关键词，生成一首可直接分享的藏头或藏尾诗。奇数字数只会在首尾补成双数句。</p>
           <span class="tool-badge">AI</span>
@@ -207,7 +207,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="pixel-avatar" class="tool-card">
+        <article id="pixel-avatar" class="tool-card" data-tool-expandable>
           <h3>像素头像</h3>
           <p>本地上传图片，一键转成 32×32 像素头像，支持下载 PNG / SVG。</p>
           <span class="tool-badge">New</span>
@@ -238,7 +238,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
-        <article id="image-to-svg" class="tool-card">
+        <article id="image-to-svg" class="tool-card" data-tool-expandable>
           <h3>图片转 SVG</h3>
           <p>在浏览器本地把 PNG/JPG 矢量化为 SVG。更适合 Logo / 插画，照片类可能会更“碎”。</p>
           <span class="tool-badge">New</span>
