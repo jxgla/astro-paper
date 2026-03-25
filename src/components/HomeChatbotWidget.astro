@@ -4,7 +4,7 @@ interface Props {
 }
 
 const { locale = "zh" } = Astro.props as Props;
-const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "https://blogvisitor.gemnwong.dpdns.org/v1/chat/completions";
+const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "https://blogvisitor.gemnwong.dpdns.org/";
 const chatbotMetricsEndpoint = import.meta.env.PUBLIC_CHATBOT_METRICS_ENDPOINT || "";
 
 const copy = locale === "en"
@@ -758,7 +758,7 @@ const copy = locale === "en"
         thinkingEl.remove();
 
         if (!res.ok) {
-          const err = (data && data.error) || `HTTP ${res.status}`;
+          const err = (data && (data.detail?.error?.message || data.detail || data.error)) || `HTTP ${res.status}`;
           addBubble(String(err), false);
           emitMetric("error", {
             status: res.status,
