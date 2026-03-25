@@ -314,13 +314,13 @@ function extractCompanyCandidates(text: string) {
 
   hosts.forEach(host => {
     const labels = host.split(".").filter(Boolean);
-    labels.forEach(label => {
-      if (!/^[a-z][a-z0-9-]{2,}$/.test(label)) return;
-      if (HOST_IGNORE_LABELS.has(label)) return;
-      const letters = (label.match(/[a-z]/g) || []).length;
-      if (letters < 3) return;
-      candidates.add(label);
-    });
+    const registrable = labels.length >= 2 ? labels[labels.length - 2] : labels[0] || "";
+    if (!registrable) return;
+    if (!/^[a-z][a-z0-9-]{2,}$/.test(registrable)) return;
+    if (HOST_IGNORE_LABELS.has(registrable)) return;
+    const letters = (registrable.match(/[a-z]/g) || []).length;
+    if (letters < 3) return;
+    candidates.add(registrable);
   });
 
   return Array.from(candidates).sort((a, b) => a.localeCompare(b));
@@ -519,18 +519,21 @@ function initCtfDesensitizer() {
         return;
       }
 
-      const parsed = mappingText ? parseMappingBlock(mappingText) : parseMappingJson(mappingJson);
+      const parsed = mappingJson ? parseMappingJson(mappingJson) : parseMappingBlock(mappingText);
       if (!parsed || !parsed.size) {
         status.textContent = t.mappingInvalid;
         return;
       }
 
-      const source = output.value || input.value;
+      const source = output.value.trim() ? output.value : input.value;
       if (!source.trim()) {
         status.textContent = t.empty;
         return;
       }
-      output.value = reverseWithMapping(source, parsed);
+
+      const restored = reverseWithMapping(source, parsed);
+      input.value = restored;
+      output.value = source;
       setMapping(parsed);
       status.textContent = t.reversed;
       sync();
