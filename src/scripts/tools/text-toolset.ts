@@ -176,6 +176,8 @@ const CTF_I18N = {
     reversed: "已根据映射还原。",
     outputCopied: "结果已复制到剪贴板。",
     outputDownloaded: "结果已下载。",
+    inputCopied: "输入已复制到剪贴板。",
+    inputDownloaded: "输入已下载。",
     fileReadFailed: "读取文件失败，请重试。",
     nothingToDownload: "没有可下载内容。",
     mappingImported: (name: string) => `已导入映射 ${name}。`,
@@ -196,6 +198,8 @@ const CTF_I18N = {
     reversed: "Restored from mapping.",
     outputCopied: "Output copied to clipboard.",
     outputDownloaded: "Output downloaded.",
+    inputCopied: "Input copied to clipboard.",
+    inputDownloaded: "Input downloaded.",
     fileReadFailed: "Failed to read file. Please retry.",
     nothingToDownload: "Nothing to download.",
     mappingImported: (name: string) => `Imported mapping ${name}.`,
@@ -426,6 +430,8 @@ function initCtfDesensitizer() {
     const mappingFileInput = root.querySelector<HTMLInputElement>("[data-ctf-mapping-file]");
     const sanitizeBtn = root.querySelector<HTMLButtonElement>("[data-ctf-sanitize]");
     const reverseBtn = root.querySelector<HTMLButtonElement>("[data-ctf-reverse]");
+    const inputCopyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-copy]");
+    const inputDownloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-download]");
     const copyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-copy]");
     const downloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-download]");
     const clearBtn = root.querySelector<HTMLButtonElement>("[data-ctf-clear]");
@@ -443,6 +449,8 @@ function initCtfDesensitizer() {
       !mappingFileInput ||
       !sanitizeBtn ||
       !reverseBtn ||
+      !inputCopyBtn ||
+      !inputDownloadBtn ||
       !copyBtn ||
       !downloadBtn ||
       !clearBtn ||
@@ -454,8 +462,11 @@ function initCtfDesensitizer() {
     }
 
     const sync = () => {
+      const hasInput = !!input.value.trim();
       const hasOutput = !!output.value.trim();
       const hasMappingJson = !!mappingJsonBox.value.trim();
+      inputCopyBtn.disabled = !hasInput;
+      inputDownloadBtn.disabled = !hasInput;
       copyBtn.disabled = !hasOutput;
       downloadBtn.disabled = !hasOutput;
       mappingDownloadBtn.disabled = !hasMappingJson;
@@ -521,6 +532,20 @@ function initCtfDesensitizer() {
       setMapping(parsed);
       status.textContent = t.reversed;
       sync();
+    });
+
+    inputCopyBtn.addEventListener("click", () => {
+      if (!input.value.trim()) return;
+      copyText(input.value, () => (status.textContent = t.inputCopied), () => (status.textContent = I18N[locale].copyFailed));
+    });
+
+    inputDownloadBtn.addEventListener("click", () => {
+      if (!input.value.trim()) {
+        status.textContent = t.nothingToDownload;
+        return;
+      }
+      downloadText("ctf-input.txt", input.value);
+      status.textContent = t.inputDownloaded;
     });
 
     copyBtn.addEventListener("click", () => {

@@ -683,6 +683,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <span class="tool-label">Input code / text (max 5000 lines)</span>
               <textarea class="tool-textarea" data-ctf-input placeholder="Paste script or code snippet, or import a .py file"></textarea>
             </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-input-copy disabled>Copy input</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-input-download disabled>Download input</button>
+            </div>
 
             <div class="tool-actions">
               <label class="tool-file-btn">
@@ -730,6 +734,10 @@ alibaba"></textarea>
               <span class="tool-label">Output</span>
               <textarea class="tool-textarea" data-ctf-output placeholder="Transformed output appears here. You can edit it before restoring from the mapping."></textarea>
             </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>Copy output</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>Download output</button>
+            </div>
           </div>
         </article>
 

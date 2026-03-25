@@ -683,6 +683,10 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <span class="tool-label">输入代码 / 文本（最多 5000 行）</span>
               <textarea class="tool-textarea" data-ctf-input placeholder="粘贴脚本或代码片段，支持 .py 文件导入"></textarea>
             </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-input-copy disabled>复制输入</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-input-download disabled>下载输入</button>
+            </div>
 
             <div class="tool-actions">
               <label class="tool-file-btn">
@@ -730,6 +734,10 @@ alibaba"></textarea>
               <span class="tool-label">处理结果</span>
               <textarea class="tool-textarea" data-ctf-output placeholder="处理结果会显示在这里，也可以手动修改后再做映射还原"></textarea>
             </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>复制结果</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>下载结果</button>
+            </div>
           </div>
         </article>
 
