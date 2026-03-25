@@ -702,8 +702,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <p class="tool-status" data-ctf-status>Runs fully in browser. No upload, no server dependency.</p>
 
             <label>
-              <span class="tool-label">Mapping (original → placeholder)</span>
-              <textarea class="tool-textarea" data-ctf-mapping readonly placeholder="No mapping yet"></textarea>
+              <span class="tool-label">Only replace these terms (one per line, optional)</span>
+              <textarea class="tool-textarea" data-ctf-targets placeholder="For example:
+cloudflare
+baidu
+alibaba"></textarea>
             </label>
 
             <label>

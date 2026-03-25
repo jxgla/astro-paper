@@ -702,8 +702,11 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             <p class="tool-status" data-ctf-status>纯前端本地处理，不上传任何文本；优先识别 URL/域名中的公司标识。</p>
 
             <label>
-              <span class="tool-label">替换映射（原文 → 占位符）</span>
-              <textarea class="tool-textarea" data-ctf-mapping readonly placeholder="暂无映射"></textarea>
+              <span class="tool-label">仅替换这些词（每行一个，可选）</span>
+              <textarea class="tool-textarea" data-ctf-targets placeholder="例如：
+cloudflare
+baidu
+alibaba"></textarea>
             </label>
 
             <label>

@@ -326,6 +326,17 @@ function extractCompanyCandidates(text: string) {
   return Array.from(candidates).sort((a, b) => a.localeCompare(b));
 }
 
+function parseManualTargets(raw: string) {
+  return Array.from(
+    new Set(
+      raw
+        .split(/\r?\n/)
+        .map(line => line.trim().toLowerCase())
+        .filter(line => /^[a-z][a-z0-9-]{2,}$/.test(line) && !HOST_IGNORE_LABELS.has(line))
+    )
+  ).sort((a, b) => a.localeCompare(b));
+}
+
 function buildMapping(candidates: string[]) {
   const mapping = new Map<string, string>();
   candidates.forEach((token, index) => {
@@ -342,31 +353,6 @@ function applyMapping(text: string, mapping: Map<string, string>) {
     output = output.replace(pattern, replacement);
   });
   return output;
-}
-
-function parseMappingBlock(mappingText: string) {
-  const mapping = new Map<string, string>();
-  const lines = mappingText
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(Boolean);
-
-  for (const line of lines) {
-    const match = line.match(/^(.+?)\s*->\s*(example\d+)$/i);
-    if (!match) return null;
-    const original = match[1].trim();
-    const placeholder = match[2].trim().toLowerCase();
-    if (!original || !placeholder) return null;
-    mapping.set(original, placeholder);
-  }
-
-  return mapping;
-}
-
-function mappingToText(mapping: Map<string, string>) {
-  return Array.from(mapping.entries())
-    .map(([original, replacement]) => `${original} -> ${replacement}`)
-    .join("\n");
 }
 
 function mappingToJson(mapping: Map<string, string>) {
@@ -433,7 +419,7 @@ function initCtfDesensitizer() {
     const t = CTF_I18N[locale];
     const input = root.querySelector<HTMLTextAreaElement>("[data-ctf-input]");
     const output = root.querySelector<HTMLTextAreaElement>("[data-ctf-output]");
-    const mappingBox = root.querySelector<HTMLTextAreaElement>("[data-ctf-mapping]");
+    const targetsBox = root.querySelector<HTMLTextAreaElement>("[data-ctf-targets]");
     const mappingJsonBox = root.querySelector<HTMLTextAreaElement>("[data-ctf-mapping-json]");
     const status = root.querySelector<HTMLElement>("[data-ctf-status]");
     const fileInput = root.querySelector<HTMLInputElement>("[data-ctf-file]");
@@ -450,7 +436,7 @@ function initCtfDesensitizer() {
     if (
       !input ||
       !output ||
-      !mappingBox ||
+      !targetsBox ||
       !mappingJsonBox ||
       !status ||
       !fileInput ||
@@ -476,7 +462,6 @@ function initCtfDesensitizer() {
     };
 
     const setMapping = (mapping: Map<string, string>) => {
-      mappingBox.value = mappingToText(mapping);
       mappingJsonBox.value = mappingToJson(mapping);
       sync();
     };
@@ -492,10 +477,10 @@ function initCtfDesensitizer() {
         return;
       }
 
-      const candidates = extractCompanyCandidates(raw);
+      const manualTargets = parseManualTargets(targetsBox.value);
+      const candidates = manualTargets.length ? manualTargets : extractCompanyCandidates(raw);
       if (!candidates.length) {
         output.value = raw;
-        mappingBox.value = "";
         mappingJsonBox.value = "";
         status.textContent = t.noCandidate;
         sync();
@@ -512,14 +497,13 @@ function initCtfDesensitizer() {
     sanitizeBtn.addEventListener("click", sanitizeFromInput);
 
     reverseBtn.addEventListener("click", () => {
-      const mappingText = mappingBox.value.trim();
       const mappingJson = mappingJsonBox.value.trim();
-      if (!mappingText && !mappingJson) {
+      if (!mappingJson) {
         status.textContent = t.mappingMissing;
         return;
       }
 
-      const parsed = mappingJson ? parseMappingJson(mappingJson) : parseMappingBlock(mappingText);
+      const parsed = parseMappingJson(mappingJson);
       if (!parsed || !parsed.size) {
         status.textContent = t.mappingInvalid;
         return;
@@ -554,12 +538,12 @@ function initCtfDesensitizer() {
     });
 
     mappingExportBtn.addEventListener("click", () => {
-      const mappingText = mappingBox.value.trim();
-      if (!mappingText) {
+      const mappingJson = mappingJsonBox.value.trim();
+      if (!mappingJson) {
         status.textContent = t.mappingJsonEmpty;
         return;
       }
-      const parsed = parseMappingBlock(mappingText);
+      const parsed = parseMappingJson(mappingJson);
       if (!parsed || !parsed.size) {
         status.textContent = t.mappingInvalid;
         return;
@@ -580,7 +564,6 @@ function initCtfDesensitizer() {
         status.textContent = t.mappingInvalid;
         return;
       }
-      mappingBox.value = mappingToText(parsed);
       mappingJsonBox.value = mappingToJson(parsed);
       status.textContent = t.mappingApplied;
       sync();
@@ -598,7 +581,7 @@ function initCtfDesensitizer() {
     clearBtn.addEventListener("click", () => {
       input.value = "";
       output.value = "";
-      mappingBox.value = "";
+      targetsBox.value = "";
       mappingJsonBox.value = "";
       fileInput.value = "";
       mappingFileInput.value = "";
