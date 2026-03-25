@@ -1,5 +1,7 @@
 ---
 title: "komari from Zero to Usable: A Beginner-Friendly Guide to Getting It Installed and Actually Useful"
+pubDatetime: 2026-03-25T10:00:00Z
+modDatetime: 2026-03-25T12:21:00Z
 description: "A practical guide for complete beginners to Komari: how to choose a deployment method, what to check after your first login, how to add nodes, switch themes, enable offline/expiry/load alerts, run latency tests, and avoid the most common pitfalls."
 tags:
   - Komari
