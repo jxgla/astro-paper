@@ -685,9 +685,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             </label>
             <div class="tool-actions">
               <button type="button" class="tool-btn-secondary" data-ctf-input-paste>Paste input</button>
-            </div>
-
-            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-input-copy>Copy input</button>
               <label class="tool-file-btn">
                 Import .py
                 <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
@@ -721,6 +719,7 @@ openai"></textarea>
               </label>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>Export JSON</button>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>Use JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>Download JSON</button>
             </div>
 
             <label>
@@ -732,7 +731,6 @@ openai"></textarea>
               <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>Copy output</button>
               <button type="button" class="tool-btn-secondary" data-ctf-download disabled>Download output</button>
               <button type="button" class="tool-btn-secondary" data-ctf-reverse>Reverse</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>Download JSON</button>
             </div>
           </div>
         </article>

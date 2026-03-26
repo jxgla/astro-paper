@@ -685,9 +685,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
             </label>
             <div class="tool-actions">
               <button type="button" class="tool-btn-secondary" data-ctf-input-paste>粘贴输入</button>
-            </div>
-
-            <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-input-copy>复制输入</button>
               <label class="tool-file-btn">
                 导入 .py
                 <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
@@ -721,6 +719,7 @@ openai"></textarea>
               </label>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>导出 JSON</button>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>读取 JSON</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>下载 JSON</button>
             </div>
 
             <label>
@@ -732,7 +731,6 @@ openai"></textarea>
               <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>复制结果</button>
               <button type="button" class="tool-btn-secondary" data-ctf-download disabled>下载结果</button>
               <button type="button" class="tool-btn-secondary" data-ctf-reverse>映射还原</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>下载 JSON</button>
             </div>
           </div>
         </article>

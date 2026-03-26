@@ -492,6 +492,7 @@ function initCtfDesensitizer() {
     const sanitizeBtn = root.querySelector<HTMLButtonElement>("[data-ctf-sanitize]");
     const reverseBtn = root.querySelector<HTMLButtonElement>("[data-ctf-reverse]");
     const inputPasteBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-paste]");
+    const inputCopyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-copy]");
     const outputPasteBtn = root.querySelector<HTMLButtonElement>("[data-ctf-output-paste]");
     const copyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-copy]");
     const downloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-download]");
@@ -512,6 +513,7 @@ function initCtfDesensitizer() {
       !sanitizeBtn ||
       !reverseBtn ||
       !inputPasteBtn ||
+      !inputCopyBtn ||
       !outputPasteBtn ||
       !copyBtn ||
       !downloadBtn ||
@@ -619,6 +621,11 @@ function initCtfDesensitizer() {
 
     inputPasteBtn.addEventListener("click", () => {
       void readClipboardTo(input, t.inputPasted);
+    });
+
+    inputCopyBtn.addEventListener("click", () => {
+      if (!input.value.trim()) return;
+      copyText(input.value, () => (status.textContent = t.inputCopied), () => (status.textContent = I18N[locale].copyFailed));
     });
 
     outputPasteBtn.addEventListener("click", () => {
