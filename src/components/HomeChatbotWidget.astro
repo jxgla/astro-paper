@@ -4,7 +4,7 @@ interface Props {
 }
 
 const { locale = "zh" } = Astro.props as Props;
-const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "https://blogvisitor.gemnwong.dpdns.org/";
+const chatbotApi = import.meta.env.PUBLIC_CHATBOT_API_ENDPOINT || "https://api.gemnwong.dpdns.org/";
 const chatbotMetricsEndpoint = import.meta.env.PUBLIC_CHATBOT_METRICS_ENDPOINT || "";
 
 const copy = locale === "en"
@@ -104,6 +104,9 @@ const copy = locale === "en"
     <p class="homebot-footer">{copy.footer}</p>
   </section>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 
 <style>
   .homebot {
@@ -512,8 +515,21 @@ const copy = locale === "en"
     const looksLikeSeparator = row => row.every(cell => /^:?-{3,}:?$/.test(cell.trim()));
 
     const renderMarkdown = markdownText => {
-      const src = String(markdownText || "").replace(/\r\n/g, "\n");
-      const lines = src.split("\n");
+      const src = String(markdownText || "").trim();
+      if (!src) {
+        return `<p>${textMap.empty}</p>`;
+      }
+
+      if (typeof window.marked?.parse === "function" && typeof window.DOMPurify?.sanitize === "function") {
+        try {
+          const html = window.marked.parse(src, { breaks: true, gfm: true });
+          return window.DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) || `<p>${textMap.empty}</p>`;
+        } catch {
+          // fallback to lightweight renderer below
+        }
+      }
+
+      const lines = src.replace(/\r\n/g, "\n").split("\n");
       const out = [];
       let i = 0;
 
