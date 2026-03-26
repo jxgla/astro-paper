@@ -494,6 +494,9 @@ const copy = locale === "en"
     let isOpen = false;
     let isMaximized = false;
     let isPending = false;
+    const pageSessionId = typeof crypto?.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const escapeHtml = inputText =>
       String(inputText)
@@ -761,7 +764,7 @@ const copy = locale === "en"
         const res = await fetch(api, {
           method: "POST",
           headers,
-          body: JSON.stringify({ message: text }),
+          body: JSON.stringify({ message: text, sessionId: pageSessionId }),
         });
 
         let data = null;
