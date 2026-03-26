@@ -169,7 +169,7 @@ const CTF_I18N = {
     overLimit: `输入超出 ${CTF_MAX_LINES} 行，请精简后重试。`,
     imported: (name: string, clipped: boolean) => `已导入 ${name}${clipped ? `（已截断到 ${CTF_MAX_LINES} 行）` : ""}`,
     empty: "请先输入文本。",
-    noCandidate: "未检测到可替换的公司标识（域名/URL/主机名）。",
+    noCandidate: "未检测到需要自动替换的敏感公司名。默认只自动识别白名单公司名，也可手动填写脱敏词。",
     sanitized: (count: number) => `已脱敏：${count} 个标识符。`,
     mappingMissing: "请先生成或粘贴映射。",
     mappingInvalid: "映射格式无效，请使用“原文 -> exampleN”每行一条，或导入有效 JSON。",
@@ -178,6 +178,9 @@ const CTF_I18N = {
     outputDownloaded: "结果已下载。",
     inputCopied: "输入已复制到剪贴板。",
     inputDownloaded: "输入已下载。",
+    inputPasted: "已粘贴到输入框。",
+    outputPasted: "已粘贴到结果框。",
+    pasteFailed: "读取剪贴板失败，请检查浏览器权限。",
     fileReadFailed: "读取文件失败，请重试。",
     nothingToDownload: "没有可下载内容。",
     mappingImported: (name: string) => `已导入映射 ${name}。`,
@@ -191,7 +194,7 @@ const CTF_I18N = {
     overLimit: `Input exceeds ${CTF_MAX_LINES} lines. Please shorten it.`,
     imported: (name: string, clipped: boolean) => `Imported ${name}${clipped ? ` (trimmed to ${CTF_MAX_LINES} lines)` : ""}`,
     empty: "Please enter text first.",
-    noCandidate: "No likely company identifiers found in domains/URLs/hostnames.",
+    noCandidate: "No sensitive company names found for auto-replace. By default only allowlisted company names are auto-detected; you can also enter custom targets.",
     sanitized: (count: number) => `Sanitized ${count} identifier(s).`,
     mappingMissing: "Please generate or paste mapping first.",
     mappingInvalid: "Invalid mapping. Use one line per entry: original -> exampleN, or import valid JSON.",
@@ -200,6 +203,9 @@ const CTF_I18N = {
     outputDownloaded: "Output downloaded.",
     inputCopied: "Input copied to clipboard.",
     inputDownloaded: "Input downloaded.",
+    inputPasted: "Pasted into input.",
+    outputPasted: "Pasted into output.",
+    pasteFailed: "Clipboard read failed. Please check browser permission.",
     fileReadFailed: "Failed to read file. Please retry.",
     nothingToDownload: "Nothing to download.",
     mappingImported: (name: string) => `Imported mapping ${name}.`,
@@ -279,6 +285,94 @@ const HOST_IGNORE_LABELS = new Set([
   "tw",
 ]);
 
+const DEFAULT_CTF_AUTO_TARGETS = [
+  "openai",
+  "chatgpt",
+  "anthropic",
+  "claude",
+  "google",
+  "gemini",
+  "deepmind",
+  "amazon",
+  "aws",
+  "microsoft",
+  "azure",
+  "github",
+  "meta",
+  "facebook",
+  "instagram",
+  "whatsapp",
+  "x",
+  "twitter",
+  "tesla",
+  "xai",
+  "grok",
+  "bytedance",
+  "tiktok",
+  "alibaba",
+  "alipay",
+  "taobao",
+  "tmall",
+  "tencent",
+  "wechat",
+  "qq",
+  "baidu",
+  "jd",
+  "douyin",
+  "kuaishou",
+  "meituan",
+  "didi",
+  "pinduoduo",
+  "xiaomi",
+  "huawei",
+  "oppo",
+  "vivo",
+  "netease",
+  "bilibili",
+  "weibo",
+  "sina",
+  "yandex",
+  "vk",
+  "mailru",
+  "naver",
+  "kakao",
+  "line",
+  "rakuten",
+  "sony",
+  "nintendo",
+  "softbank",
+  "oracle",
+  "ibm",
+  "intel",
+  "amd",
+  "nvidia",
+  "qualcomm",
+  "broadcom",
+  "cloudflare",
+  "digitalocean",
+  "vercel",
+  "netlify",
+  "mongodb",
+  "redis",
+  "snowflake",
+  "salesforce",
+  "slack",
+  "zoom",
+  "paypal",
+  "stripe",
+  "visa",
+  "mastercard",
+  "uber",
+  "airbnb",
+  "linkedin",
+  "reddit",
+  "snap",
+  "spotify",
+  "netflix",
+  "disney",
+  "apple",
+];
+
 function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -289,45 +383,12 @@ function clipToLineLimit(value: string, limit = CTF_MAX_LINES) {
   return { text: lines.slice(0, limit).join("\n"), clipped: true };
 }
 
-function extractHostnames(text: string) {
-  const hosts = new Set<string>();
-  const urlRegex = /\bhttps?:\/\/[^\s"'<>`]+/gi;
-  const domainRegex = /\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}\b/gi;
-
-  for (const match of text.matchAll(urlRegex)) {
-    const raw = match[0];
-    try {
-      const host = new URL(raw).hostname.toLowerCase();
-      if (host) hosts.add(host);
-    } catch {
-      // noop
-    }
-  }
-
-  for (const match of text.matchAll(domainRegex)) {
-    const host = match[0].toLowerCase();
-    if (host) hosts.add(host);
-  }
-
-  return Array.from(hosts);
-}
-
 function extractCompanyCandidates(text: string) {
-  const hosts = extractHostnames(text);
-  const candidates = new Set<string>();
-
-  hosts.forEach(host => {
-    const labels = host.split(".").filter(Boolean);
-    const registrable = labels.length >= 2 ? labels[labels.length - 2] : labels[0] || "";
-    if (!registrable) return;
-    if (!/^[a-z][a-z0-9-]{2,}$/.test(registrable)) return;
-    if (HOST_IGNORE_LABELS.has(registrable)) return;
-    const letters = (registrable.match(/[a-z]/g) || []).length;
-    if (letters < 3) return;
-    candidates.add(registrable);
+  const lowered = text.toLowerCase();
+  return DEFAULT_CTF_AUTO_TARGETS.filter(token => {
+    const pattern = new RegExp(`(?<![A-Za-z0-9])${escapeRegExp(token)}(?![A-Za-z0-9])`, "i");
+    return pattern.test(lowered);
   });
-
-  return Array.from(candidates).sort((a, b) => a.localeCompare(b));
 }
 
 function parseManualTargets(raw: string) {
@@ -430,14 +491,15 @@ function initCtfDesensitizer() {
     const mappingFileInput = root.querySelector<HTMLInputElement>("[data-ctf-mapping-file]");
     const sanitizeBtn = root.querySelector<HTMLButtonElement>("[data-ctf-sanitize]");
     const reverseBtn = root.querySelector<HTMLButtonElement>("[data-ctf-reverse]");
-    const inputCopyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-copy]");
-    const inputDownloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-download]");
+    const inputPasteBtn = root.querySelector<HTMLButtonElement>("[data-ctf-input-paste]");
+    const outputPasteBtn = root.querySelector<HTMLButtonElement>("[data-ctf-output-paste]");
     const copyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-copy]");
     const downloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-download]");
     const clearBtn = root.querySelector<HTMLButtonElement>("[data-ctf-clear]");
     const mappingExportBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-export]");
     const mappingApplyBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-apply]");
     const mappingDownloadBtn = root.querySelector<HTMLButtonElement>("[data-ctf-mapping-download]");
+    const lockBtn = root.querySelector<HTMLButtonElement>("[data-ctf-lock-toggle]");
 
     if (
       !input ||
@@ -449,32 +511,53 @@ function initCtfDesensitizer() {
       !mappingFileInput ||
       !sanitizeBtn ||
       !reverseBtn ||
-      !inputCopyBtn ||
-      !inputDownloadBtn ||
+      !inputPasteBtn ||
+      !outputPasteBtn ||
       !copyBtn ||
       !downloadBtn ||
       !clearBtn ||
       !mappingExportBtn ||
       !mappingApplyBtn ||
-      !mappingDownloadBtn
+      !mappingDownloadBtn ||
+      !lockBtn
     ) {
       return;
     }
 
+    let lockProtected = true;
+
     const sync = () => {
-      const hasInput = !!input.value.trim();
       const hasOutput = !!output.value.trim();
       const hasMappingJson = !!mappingJsonBox.value.trim();
-      inputCopyBtn.disabled = !hasInput;
-      inputDownloadBtn.disabled = !hasInput;
       copyBtn.disabled = !hasOutput;
       downloadBtn.disabled = !hasOutput;
       mappingDownloadBtn.disabled = !hasMappingJson;
+      lockBtn.textContent = lockProtected ? (locale === "zh" ? "解锁" : "Unlock") : locale === "zh" ? "锁定" : "Lock";
     };
 
     const setMapping = (mapping: Map<string, string>) => {
       mappingJsonBox.value = mappingToJson(mapping);
       sync();
+    };
+
+    const readClipboardTo = async (target: HTMLTextAreaElement, successMessage: string) => {
+      try {
+        const text = await navigator.clipboard.readText();
+        target.value = text;
+        if (target === input) {
+          const clipped = clipToLineLimit(target.value, CTF_MAX_LINES);
+          if (clipped.clipped) {
+            target.value = clipped.text;
+            status.textContent = t.overLimit;
+            sync();
+            return;
+          }
+        }
+        status.textContent = successMessage;
+        sync();
+      } catch {
+        status.textContent = t.pasteFailed;
+      }
     };
 
     const sanitizeFromInput = () => {
@@ -492,7 +575,7 @@ function initCtfDesensitizer() {
       const candidates = manualTargets.length ? manualTargets : extractCompanyCandidates(raw);
       if (!candidates.length) {
         output.value = raw;
-        mappingJsonBox.value = "";
+        if (!lockProtected) mappingJsonBox.value = "";
         status.textContent = t.noCandidate;
         sync();
         return;
@@ -534,18 +617,12 @@ function initCtfDesensitizer() {
       sync();
     });
 
-    inputCopyBtn.addEventListener("click", () => {
-      if (!input.value.trim()) return;
-      copyText(input.value, () => (status.textContent = t.inputCopied), () => (status.textContent = I18N[locale].copyFailed));
+    inputPasteBtn.addEventListener("click", () => {
+      void readClipboardTo(input, t.inputPasted);
     });
 
-    inputDownloadBtn.addEventListener("click", () => {
-      if (!input.value.trim()) {
-        status.textContent = t.nothingToDownload;
-        return;
-      }
-      downloadText("ctf-input.txt", input.value);
-      status.textContent = t.inputDownloaded;
+    outputPasteBtn.addEventListener("click", () => {
+      void readClipboardTo(output, t.outputPasted);
     });
 
     copyBtn.addEventListener("click", () => {
@@ -603,11 +680,18 @@ function initCtfDesensitizer() {
       status.textContent = t.mappingDownloaded;
     });
 
+    lockBtn.addEventListener("click", () => {
+      lockProtected = !lockProtected;
+      sync();
+    });
+
     clearBtn.addEventListener("click", () => {
       input.value = "";
       output.value = "";
-      targetsBox.value = "";
-      mappingJsonBox.value = "";
+      if (!lockProtected) {
+        targetsBox.value = "";
+        mappingJsonBox.value = "";
+      }
       fileInput.value = "";
       mappingFileInput.value = "";
       status.textContent = t.waiting;
@@ -622,6 +706,7 @@ function initCtfDesensitizer() {
         const clipped = clipToLineLimit(text, CTF_MAX_LINES);
         input.value = clipped.text;
         status.textContent = t.imported(file.name, clipped.clipped);
+        sync();
       } catch {
         status.textContent = t.fileReadFailed;
       }
@@ -650,7 +735,12 @@ function initCtfDesensitizer() {
         input.value = clipped.text;
         status.textContent = t.overLimit;
       }
+      sync();
     });
+
+    output.addEventListener("input", sync);
+    targetsBox.addEventListener("input", sync);
+    mappingJsonBox.addEventListener("input", sync);
 
     sync();
   });

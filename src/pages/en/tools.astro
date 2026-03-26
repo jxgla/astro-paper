@@ -675,7 +675,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
         <article id="ctf-desensitizer" data-tool-expandable>
           <h3>CTF Desensitizer</h3>
-          <p>Detect likely company identifiers inside domains/URLs/hostnames and replace them with example1, example2, etc. Supports full reverse restore.</p>
+          <p>By default it only auto-detects allowlisted sensitive company names and replaces them with example1, example2, etc. You can also provide custom targets and reverse from mapping.</p>
           <span class="tool-badge">New</span>
 
           <div class="tool-form" data-ctf-desensitizer data-locale="en">
@@ -684,8 +684,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <textarea class="tool-textarea" data-ctf-input placeholder="Paste script or code snippet, or import a .py file"></textarea>
             </label>
             <div class="tool-actions">
-              <button type="button" class="tool-btn-secondary" data-ctf-input-copy disabled>Copy input</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-input-download disabled>Download input</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-input-paste>Paste input</button>
             </div>
 
             <div class="tool-actions">
@@ -694,29 +693,24 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
                 <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
               </label>
               <button type="button" class="tool-btn-primary" data-ctf-sanitize>Sanitize</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-reverse>Reverse</button>
-            </div>
-
-            <div class="tool-actions">
-              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>Copy output</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>Download output</button>
               <button type="button" class="tool-btn-secondary" data-ctf-clear>Clear</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-lock-toggle>Unlock</button>
             </div>
 
-            <p class="tool-status" data-ctf-status>Runs fully in browser. No upload, no server dependency.</p>
+            <p class="tool-status" data-ctf-status>Runs fully in browser. No upload, no server dependency. Auto-detect defaults to an allowlist of sensitive company names.</p>
 
             <label>
               <span class="tool-label">Only replace these terms (one per line, optional)</span>
               <textarea class="tool-textarea" data-ctf-targets placeholder="For example:
-cloudflare
-baidu
-alibaba"></textarea>
+amazon
+google
+openai"></textarea>
             </label>
 
             <label>
               <span class="tool-label">Mapping JSON (paste, edit, upload, or download)</span>
               <textarea class="tool-textarea" data-ctf-mapping-json placeholder='{
-  "cloudflare": "example1"
+  "amazon": "example1"
 }'></textarea>
             </label>
 
@@ -727,7 +721,6 @@ alibaba"></textarea>
               </label>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>Export JSON</button>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>Use JSON</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>Download JSON</button>
             </div>
 
             <label>
@@ -735,8 +728,11 @@ alibaba"></textarea>
               <textarea class="tool-textarea" data-ctf-output placeholder="Transformed output appears here. You can edit it before restoring from the mapping."></textarea>
             </label>
             <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-output-paste>Paste output</button>
               <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>Copy output</button>
               <button type="button" class="tool-btn-secondary" data-ctf-download disabled>Download output</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-reverse>Reverse</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>Download JSON</button>
             </div>
           </div>
         </article>

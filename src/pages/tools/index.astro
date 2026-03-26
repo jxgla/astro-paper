@@ -675,7 +675,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
         <article id="ctf-desensitizer" class="tool-card" data-tool-expandable>
           <h3>CTF 脱敏替换器</h3>
-          <p>本地识别域名/URL/主机名中的疑似公司标识并替换为 example1、example2，支持映射回填还原。</p>
+          <p>默认只自动识别敏感公司名白名单并替换为 example1、example2；也支持手动指定脱敏词和映射回填还原。</p>
           <span class="tool-badge">New</span>
 
           <div class="tool-form" data-ctf-desensitizer data-locale="zh">
@@ -684,8 +684,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <textarea class="tool-textarea" data-ctf-input placeholder="粘贴脚本或代码片段，支持 .py 文件导入"></textarea>
             </label>
             <div class="tool-actions">
-              <button type="button" class="tool-btn-secondary" data-ctf-input-copy disabled>复制输入</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-input-download disabled>下载输入</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-input-paste>粘贴输入</button>
             </div>
 
             <div class="tool-actions">
@@ -694,29 +693,24 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
                 <input type="file" accept=".py,.txt,text/plain" data-ctf-file />
               </label>
               <button type="button" class="tool-btn-primary" data-ctf-sanitize>脱敏替换</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-reverse>映射还原</button>
-            </div>
-
-            <div class="tool-actions">
-              <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>复制结果</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-download disabled>下载结果</button>
               <button type="button" class="tool-btn-secondary" data-ctf-clear>清空</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-lock-toggle>解锁</button>
             </div>
 
-            <p class="tool-status" data-ctf-status>纯前端本地处理，不上传任何文本；优先识别 URL/域名中的公司标识。</p>
+            <p class="tool-status" data-ctf-status>纯前端本地处理，不上传任何文本；默认仅自动识别敏感公司名白名单。</p>
 
             <label>
               <span class="tool-label">仅替换这些词（每行一个，可选）</span>
               <textarea class="tool-textarea" data-ctf-targets placeholder="例如：
-cloudflare
-baidu
-alibaba"></textarea>
+amazon
+google
+openai"></textarea>
             </label>
 
             <label>
               <span class="tool-label">映射 JSON（可粘贴、编辑、上传或下载）</span>
               <textarea class="tool-textarea" data-ctf-mapping-json placeholder='{
-  "cloudflare": "example1"
+  "amazon": "example1"
 }'></textarea>
             </label>
 
@@ -727,7 +721,6 @@ alibaba"></textarea>
               </label>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-export>导出 JSON</button>
               <button type="button" class="tool-btn-secondary" data-ctf-mapping-apply>读取 JSON</button>
-              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>下载 JSON</button>
             </div>
 
             <label>
@@ -735,8 +728,11 @@ alibaba"></textarea>
               <textarea class="tool-textarea" data-ctf-output placeholder="处理结果会显示在这里，也可以手动修改后再做映射还原"></textarea>
             </label>
             <div class="tool-actions">
+              <button type="button" class="tool-btn-secondary" data-ctf-output-paste>粘贴结果</button>
               <button type="button" class="tool-btn-secondary" data-ctf-copy disabled>复制结果</button>
               <button type="button" class="tool-btn-secondary" data-ctf-download disabled>下载结果</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-reverse>映射还原</button>
+              <button type="button" class="tool-btn-secondary" data-ctf-mapping-download disabled>下载 JSON</button>
             </div>
           </div>
         </article>
