@@ -14,6 +14,16 @@ export type ToolNavSection = {
   items: ToolNavItem[];
 };
 
+import { FUN_AI_TOOL_CARDS } from "./tools-cards";
+
+const FUN_AI_NAV_ITEMS: ToolNavItem[] = FUN_AI_TOOL_CARDS.map(card => ({
+  href: `/tools#${card.cardId}`,
+  label: {
+    en: card.locale.en.title,
+    zh: card.locale.zh.title,
+  },
+}));
+
 export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
   {
     title: {
@@ -70,34 +80,7 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
           zh: "图片转 SVG",
         },
       },
-      {
-        href: "/tools#headline-rewriter",
-        label: {
-          en: "Headline Rewriter",
-          zh: "标题改写器",
-        },
-      },
-      {
-        href: "/tools#bio-generator",
-        label: {
-          en: "Bio / Signature Generator",
-          zh: "Bio / 签名生成器",
-        },
-      },
-      {
-        href: "/tools#abstract-meme-text",
-        label: {
-          en: "Abstract Meme Text Generator",
-          zh: "抽象梗文生成器",
-        },
-      },
-      {
-        href: "/tools#social-post-compressor",
-        label: {
-          en: "Social Post Compressor",
-          zh: "社媒压缩器",
-        },
-      },
+      ...FUN_AI_NAV_ITEMS,
     ],
   },
   {

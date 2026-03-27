@@ -4,8 +4,10 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Main from "@/layouts/Main.astro";
 import { SITE } from "@/config";
+import { FUN_AI_TOOL_CARDS } from "@/data/tools-cards";
 
 const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-worker.mehjx.workers.dev";
+const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.locale.zh }));
 ---
 
 <Layout title={`Tools | ${SITE.title}`}>
@@ -307,6 +309,43 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
           </div>
         </article>
 
+        {funAiCards.map(card => (
+          <article id={card.cardId} class="tool-card" data-tool-expandable>
+            <h3>{card.content.title}</h3>
+            <p>{card.content.description}</p>
+            <span class="tool-badge">{card.badge}</span>
+            <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id={card.toolId} data-max-input={card.toolId === "headline-rewriter" ? "1200" : card.toolId === "bio-generator" ? "1600" : card.toolId === "meme-text" ? "800" : "4000"} data-tools-api-base={toolsApiBase}>
+              <label>
+                <span class="tool-label">{card.content.inputLabel}</span>
+                <textarea class="tool-textarea" data-ai-input placeholder={card.content.inputPlaceholder}></textarea>
+              </label>
+              <div class="tool-grid-2">
+                <label>
+                  <span class="tool-label">{card.content.modeLabel}</span>
+                  <select class="tool-input" data-ai-mode>
+                    {card.content.modeOptions.map(option => <option value={option.value}>{option.label}</option>)}
+                  </select>
+                </label>
+              </div>
+              <div class="tool-actions">
+                <button type="button" class="tool-btn-primary" data-ai-submit>{card.content.primaryLabel}</button>
+                <button type="button" class="tool-btn-secondary" data-ai-reroll>{card.content.rerollLabel}</button>
+                <button type="button" class="tool-btn-secondary" data-ai-copy disabled>{card.content.copyLabel}</button>
+                <button type="button" class="tool-btn-secondary" data-ai-clear>{card.content.clearLabel}</button>
+              </div>
+              <p class="tool-status" data-ai-status>{card.content.status}</p>
+              <div class="tool-status" data-ai-note hidden></div>
+              <label>
+                <span class="tool-label" data-ai-output-label>{card.content.outputLabel}</span>
+                <textarea class="tool-textarea" data-ai-output readonly placeholder={card.content.outputPlaceholder}></textarea>
+              </label>
+              <div data-ai-options-wrap hidden>
+                <p class="tool-label">{card.content.alternativesLabel}</p>
+                <div class="nickname-tiles" data-ai-options></div>
+              </div>
+            </div>
+          </article>
+        ))}
 
       </div>
     </section>
