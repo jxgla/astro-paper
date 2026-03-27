@@ -20,6 +20,7 @@ type AiResponse = {
 type ToolDefaults = {
   status: string;
   outputLabel?: string;
+  title?: string;
 };
 
 type ToolConfig = {
@@ -64,32 +65,32 @@ const I18N = {
 
 const TOOL_DEFAULTS: Record<ToolId, Record<Locale, ToolDefaults>> = {
   "tone-rewriter": {
-    zh: { status: "适合发送前做最后一轮口吻润色。", outputLabel: "结果" },
-    en: { status: "Useful for polishing messages before sending them.", outputLabel: "Result" },
+    zh: { status: "适合发送前做最后一轮口吻润色。", outputLabel: "结果", title: "语气重写器" },
+    en: { status: "Useful for polishing messages before sending them.", outputLabel: "Result", title: "Tone Rewriter" },
   },
   summarizer: {
-    zh: { status: "适合先快速压缩，再决定是否继续细读。", outputLabel: "摘要结果" },
-    en: { status: "Good for trimming long text into something fast to review.", outputLabel: "Summary" },
+    zh: { status: "适合先快速压缩，再决定是否继续细读。", outputLabel: "摘要结果", title: "长文本摘要器" },
+    en: { status: "Good for trimming long text into something fast to review.", outputLabel: "Summary", title: "Long Text Summarizer" },
   },
   "prompt-optimizer": {
-    zh: { status: "适合你知道目标，但不知道怎样把需求说清楚的时候。", outputLabel: "优化后的 Prompt" },
-    en: { status: "Best when you know the goal but want a clearer AI-ready instruction.", outputLabel: "Optimized prompt" },
+    zh: { status: "适合你知道目标，但不知道怎样把需求说清楚的时候。", outputLabel: "优化后的 Prompt", title: "Prompt 优化器" },
+    en: { status: "Best when you know the goal but want a clearer AI-ready instruction.", outputLabel: "Optimized prompt", title: "Prompt Optimizer" },
   },
   "headline-rewriter": {
-    zh: { status: "适合标题意思对了，但还不够抓眼的时候。", outputLabel: "已选标题" },
-    en: { status: "Helpful when your original title is clear but not punchy enough.", outputLabel: "Selected headline" },
+    zh: { status: "适合标题意思对了，但还不够抓眼的时候。", outputLabel: "已选标题", title: "标题改写器" },
+    en: { status: "Helpful when your original title is clear but not punchy enough.", outputLabel: "Selected headline", title: "Headline Rewriter" },
   },
   "bio-generator": {
-    zh: { status: "适合需要一段短、干净、可直接粘贴的自我介绍时使用。", outputLabel: "生成结果" },
-    en: { status: "Useful when you need something short, clean, and easy to paste.", outputLabel: "Generated bio" },
+    zh: { status: "适合需要一段短、干净、可直接粘贴的自我介绍时使用。", outputLabel: "生成结果", title: "Bio / 签名生成器" },
+    en: { status: "Useful when you need something short, clean, and easy to paste.", outputLabel: "Generated bio", title: "Bio / Signature Generator" },
   },
   "meme-text": {
-    zh: { status: "更适合短句梗文，不适合长笑话或完整段子。", outputLabel: "生成结果" },
-    en: { status: "Best for short shareable text instead of full jokes or essays.", outputLabel: "Generated text" },
+    zh: { status: "更适合短句梗文，不适合长笑话或完整段子。", outputLabel: "生成结果", title: "抽象梗文生成器" },
+    en: { status: "Best for short shareable text instead of full jokes or essays.", outputLabel: "Generated text", title: "Abstract Meme Text Generator" },
   },
   "social-compressor": {
-    zh: { status: "适合你已经写太长，想快速压成可发版本的时候。", outputLabel: "压缩结果" },
-    en: { status: "Good when you already wrote too much and need something post-ready.", outputLabel: "Compressed version" },
+    zh: { status: "适合你已经写太长，想快速压成可发版本的时候。", outputLabel: "压缩结果", title: "社媒压缩器" },
+    en: { status: "Good when you already wrote too much and need something post-ready.", outputLabel: "Compressed version", title: "Social Post Compressor" },
   },
 };
 
@@ -467,6 +468,7 @@ function initAiTextTools() {
     const outputLabel = root.querySelector<HTMLElement>("[data-ai-output-label]");
     const note = root.querySelector<HTMLElement>("[data-ai-note]");
     const status = root.querySelector<HTMLElement>("[data-ai-status]");
+    const titleEl = root.querySelector<HTMLElement>("[data-ai-tool-title]");
     const submit = root.querySelector<HTMLButtonElement>("[data-ai-submit]");
     const reroll = root.querySelector<HTMLButtonElement>("[data-ai-reroll]");
     const copy = root.querySelector<HTMLButtonElement>("[data-ai-copy]");
@@ -477,6 +479,9 @@ function initAiTextTools() {
 
     if (outputLabel && defaults?.[locale]?.outputLabel) {
       outputLabel.textContent = defaults[locale].outputLabel;
+    }
+    if (titleEl && defaults?.[locale]?.title) {
+      titleEl.textContent = defaults[locale].title;
     }
 
     let busy = false;

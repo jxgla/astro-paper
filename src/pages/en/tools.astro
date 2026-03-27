@@ -310,11 +310,11 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
         </article>
 
         {funAiCards.map(card => (
-          <article id={card.cardId} class="tool-card" data-tool-expandable>
-            <h3>{card.content.title}</h3>
+          <article id={card.cardId} class={`tool-card tool-card-accent tool-card-accent-${card.accent}`} data-tool-expandable>
+            <h3 data-ai-tool-title>{card.content.title}</h3>
             <p>{card.content.description}</p>
             <span class="tool-badge">{card.badge}</span>
-            <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id={card.toolId} data-max-input={card.toolId === "headline-rewriter" ? "1200" : card.toolId === "bio-generator" ? "1600" : card.toolId === "meme-text" ? "800" : "4000"} data-tools-api-base={toolsApiBase}>
+            <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id={card.toolId} data-max-input={card.maxInput} data-tools-api-base={toolsApiBase}>
               <label>
                 <span class="tool-label">{card.content.inputLabel}</span>
                 <textarea class="tool-textarea" data-ai-input placeholder={card.content.inputPlaceholder}></textarea>
@@ -1060,6 +1060,34 @@ openai"></textarea>
     border-radius: 0.9rem;
     padding: 0.9rem;
     background: color-mix(in oklab, var(--background) 95%, transparent);
+  }
+
+  .tool-card-accent-violet {
+    background:
+      radial-gradient(circle at top right, rgba(139, 92, 246, 0.14), transparent 40%),
+      color-mix(in oklab, var(--background) 95%, transparent);
+    border-color: color-mix(in oklab, #8b5cf6 22%, var(--foreground) 10%);
+  }
+
+  .tool-card-accent-emerald {
+    background:
+      radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 40%),
+      color-mix(in oklab, var(--background) 95%, transparent);
+    border-color: color-mix(in oklab, #10b981 22%, var(--foreground) 10%);
+  }
+
+  .tool-card-accent-orange {
+    background:
+      radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 40%),
+      color-mix(in oklab, var(--background) 95%, transparent);
+    border-color: color-mix(in oklab, #f97316 22%, var(--foreground) 10%);
+  }
+
+  .tool-card-accent-sky {
+    background:
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.14), transparent 40%),
+      color-mix(in oklab, var(--background) 95%, transparent);
+    border-color: color-mix(in oklab, #0ea5e9 22%, var(--foreground) 10%);
   }
 
   .tool-card[data-tool-expandable] {

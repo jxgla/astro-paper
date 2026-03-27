@@ -4,6 +4,8 @@ export type ToolsCardDefinition = {
   cardId: "headline-rewriter" | "bio-generator" | "abstract-meme-text" | "social-post-compressor";
   toolId: "headline-rewriter" | "bio-generator" | "meme-text" | "social-compressor";
   badge: string;
+  maxInput: "1200" | "1600" | "800" | "4000";
+  accent: string;
   locale: {
     en: {
       title: string;
@@ -45,6 +47,8 @@ export const FUN_AI_TOOL_CARDS: ToolsCardDefinition[] = [
     cardId: "headline-rewriter",
     toolId: "headline-rewriter",
     badge: "AI",
+    maxInput: "1200",
+    accent: "violet",
     locale: {
       en: {
         title: "Headline Rewriter",
@@ -92,6 +96,8 @@ export const FUN_AI_TOOL_CARDS: ToolsCardDefinition[] = [
     cardId: "bio-generator",
     toolId: "bio-generator",
     badge: "AI",
+    maxInput: "1600",
+    accent: "emerald",
     locale: {
       en: {
         title: "Bio / Signature Generator",
@@ -139,6 +145,8 @@ export const FUN_AI_TOOL_CARDS: ToolsCardDefinition[] = [
     cardId: "abstract-meme-text",
     toolId: "meme-text",
     badge: "AI",
+    maxInput: "800",
+    accent: "orange",
     locale: {
       en: {
         title: "Abstract Meme Text Generator",
@@ -186,6 +194,8 @@ export const FUN_AI_TOOL_CARDS: ToolsCardDefinition[] = [
     cardId: "social-post-compressor",
     toolId: "social-compressor",
     badge: "AI",
+    maxInput: "4000",
+    accent: "sky",
     locale: {
       en: {
         title: "Social Post Compressor",
