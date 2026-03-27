@@ -70,6 +70,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
           zh: "图片转 SVG",
         },
       },
+      {
+        href: "/tools#abstract-meme-text",
+        label: {
+          en: "Abstract Meme Text Generator",
+          zh: "抽象梗文生成器",
+        },
+      },
     ],
   },
   {
@@ -161,6 +168,48 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         label: {
           en: "Multilingual Translator",
           zh: "多语言翻译",
+        },
+      },
+      {
+        href: "/tools#tone-rewriter",
+        label: {
+          en: "Tone Rewriter",
+          zh: "语气重写器",
+        },
+      },
+      {
+        href: "/tools#long-text-summarizer",
+        label: {
+          en: "Long Text Summarizer",
+          zh: "长文本摘要器",
+        },
+      },
+      {
+        href: "/tools#prompt-optimizer",
+        label: {
+          en: "Prompt Optimizer",
+          zh: "Prompt 优化器",
+        },
+      },
+      {
+        href: "/tools#headline-rewriter",
+        label: {
+          en: "Headline Rewriter",
+          zh: "标题改写器",
+        },
+      },
+      {
+        href: "/tools#bio-generator",
+        label: {
+          en: "Bio / Signature Generator",
+          zh: "Bio / 签名生成器",
+        },
+      },
+      {
+        href: "/tools#social-post-compressor",
+        label: {
+          en: "Social Post Compressor",
+          zh: "社媒压缩器",
         },
       },
       {

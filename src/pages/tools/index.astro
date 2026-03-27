@@ -111,7 +111,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
         <article id="nickname-gen" class="tool-card" data-tool-expandable>
           <h3>网名生成器</h3>
-          <p>选择风格，一键生成一批可用又有梗的网名。</p>
+          <p>支持风格、平台和语言偏好，一次生成一批更贴场景的网名。</p>
           <span class="tool-badge">New</span>
 
           <div class="tool-form" data-nickname-gen data-locale="zh">
@@ -119,18 +119,44 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <span class="tool-label">关键词（可选）</span>
               <input class="tool-input" data-nickname-key type="text" placeholder="例如：观者 / vibe" />
             </label>
-            <label>
-              <span class="tool-label">风格</span>
-              <select class="tool-input" data-nickname-style>
-                <option value="cyber">赛博</option>
-                <option value="xianxia">仙侠</option>
-                <option value="minimal">极简</option>
-                <option value="japan">日系</option>
-                <option value="abstract">抽象</option>
-                <option value="emo">emo</option>
-                <option value="biz">商务</option>
-              </select>
-            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">风格</span>
+                <select class="tool-input" data-nickname-style>
+                  <option value="cyber">赛博</option>
+                  <option value="xianxia">仙侠</option>
+                  <option value="minimal">极简</option>
+                  <option value="japan">日系</option>
+                  <option value="abstract">抽象</option>
+                  <option value="emo">emo</option>
+                  <option value="biz">商务</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">平台</span>
+                <select class="tool-input" data-nickname-platform>
+                  <option value="generic">通用</option>
+                  <option value="github">GitHub</option>
+                  <option value="discord">Discord</option>
+                  <option value="x">X / Twitter</option>
+                  <option value="xiaohongshu">小红书</option>
+                  <option value="bilibili">Bilibili</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">输出语言</span>
+                <select class="tool-input" data-nickname-language>
+                  <option value="mixed">中英混合</option>
+                  <option value="en">英文</option>
+                  <option value="zh">中文</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">最大长度</span>
+                <input class="tool-input" data-nickname-max type="number" min="6" max="28" step="1" value="18" />
+              </label>
+            </div>
+            <label><input type="checkbox" data-nickname-no-symbols /> 尽量不用符号</label>
             <div class="tool-actions">
               <button type="button" class="tool-btn-primary" data-nickname-generate>生成</button>
               <button type="button" class="tool-btn-secondary" data-nickname-more>再来一批</button>
@@ -612,6 +638,276 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <textarea class="tool-textarea" data-translate-bilingual readonly placeholder="原文与译文对照会显示在这里"></textarea>
             </label>
           </form>
+        </article>
+
+        <article id="tone-rewriter" class="tool-card" data-tool-expandable>
+          <h3>语气重写器</h3>
+          <p>把原文改得更礼貌、更简洁、更正式、更随意，或者更像客服 / PM 口吻。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="tone-rewriter" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">原文</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="粘贴你想改写的消息、评论或草稿"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">语气</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="polite">更礼貌</option>
+                  <option value="concise">更简洁</option>
+                  <option value="formal">更正式</option>
+                  <option value="casual">更随意</option>
+                  <option value="support">客服风格</option>
+                  <option value="pm">产品经理风格</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>重写</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合发送前做最后一轮口吻润色。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>结果</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="改写结果会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="long-text-summarizer" class="tool-card" data-tool-expandable>
+          <h3>长文本摘要器</h3>
+          <p>把长文、会议纪要或线程内容压成 TL;DR、要点列表、关键结论或适合发社媒的短摘要。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="summarizer" data-max-input="6000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">原文</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="粘贴长文章、会议记录或文档片段"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">摘要形式</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="tldr">TL;DR</option>
+                  <option value="bullets">要点列表</option>
+                  <option value="takeaways">关键结论</option>
+                  <option value="social">社媒短摘要</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>生成摘要</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合先快速压缩，再决定是否继续细读。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>摘要结果</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="摘要会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="prompt-optimizer" class="tool-card" data-tool-expandable>
+          <h3>Prompt 优化器</h3>
+          <p>把模糊想法改成更适合 AI 使用的 prompt，支持编程、写作和分析场景。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="prompt-optimizer" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">原始意图</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="直接写你想让 AI 做什么，即使很乱也没关系"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Prompt 风格</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="coding">编程</option>
+                  <option value="writing">写作</option>
+                  <option value="analysis">分析</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>优化</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合你知道目标，但不知道怎样把需求说清楚的时候。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>优化后的 Prompt</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="优化后的 prompt 会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="headline-rewriter" class="tool-card" data-tool-expandable>
+          <h3>标题改写器</h3>
+          <p>把草稿标题或主题改成更适合博客、社媒或 SEO 的标题版本。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="headline-rewriter" data-max-input="1200" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">主题或原标题</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="输入主题、文章摘要，或一个普通标题"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">目标</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="blog">博客标题</option>
+                  <option value="social">社媒标题</option>
+                  <option value="seo">SEO 友好</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>改写</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合标题意思对了，但还不够抓眼的时候。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>已选标题</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="结果会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="bio-generator" class="tool-card" data-tool-expandable>
+          <h3>Bio / 签名生成器</h3>
+          <p>根据你的身份、风格和兴趣，快速生成 GitHub bio、社媒简介或个人网站介绍。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="bio-generator" data-max-input="1600" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">关于你</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="描述你的角色、气质、兴趣或想让别人记住你的点"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">输出格式</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="github">GitHub bio</option>
+                  <option value="social">社媒简介</option>
+                  <option value="site">个人站介绍</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>生成</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合需要一段短、干净、可直接粘贴的自我介绍时使用。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>生成结果</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="生成结果会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="abstract-meme-text" class="tool-card" data-tool-expandable>
+          <h3>抽象梗文生成器</h3>
+          <p>根据人物、主题或情绪，生成轻量、抽象、适合转发的短梗文本。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="meme-text" data-max-input="800" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">主题或 vibe</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="描述你想做梗的对象、场景或情绪"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">风格</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="absurd">抽象离谱</option>
+                  <option value="dry">冷面干巴</option>
+                  <option value="dramatic">戏剧化</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>生成</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>更适合短句梗文，不适合长笑话或完整段子。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label">生成结果</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="结果会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="social-post-compressor" class="tool-card" data-tool-expandable>
+          <h3>社媒压缩器</h3>
+          <p>把长文压成一句版、三句版或 tweet 长度，方便快速发社媒或同步动态。</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="zh" data-tool-id="social-compressor" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">原文</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="粘贴完整长文、线程或笔记"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">目标格式</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="oneline">一句版</option>
+                  <option value="threeline">三句版</option>
+                  <option value="tweet">Tweet 长度</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>压缩</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>换一版</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>复制</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>清空</button>
+            </div>
+            <p class="tool-status" data-ai-status>适合你已经写太长，想快速压成可发版本的时候。</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>压缩结果</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="压缩结果会显示在这里"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">候选版本</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
         </article>
 
         <!-- 图片转 SVG 归类为趣味小工具，见上方 Fun 区域。 -->
@@ -1566,6 +1862,7 @@ openai"></textarea>
   import "@/scripts/tools/data-toolset";
   import "@/scripts/tools/text-toolset";
   import "@/scripts/tools/regex-tester";
+  import "@/scripts/tools/ai-tools";
 </script>
 
 <script>

@@ -111,7 +111,7 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
 
         <article id="nickname-gen" data-tool-expandable>
           <h3>Nickname Generator</h3>
-          <p>Generate meme-ready nicknames with a style knob.</p>
+          <p>Generate meme-ready names with style, platform, and language controls.</p>
           <span class="tool-badge">New</span>
 
           <div class="tool-form" data-nickname-gen data-locale="en">
@@ -119,18 +119,44 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <span class="tool-label">Keyword (optional)</span>
               <input class="tool-input" data-nickname-key type="text" placeholder="e.g. vibe" />
             </label>
-            <label>
-              <span class="tool-label">Style</span>
-              <select class="tool-input" data-nickname-style>
-                <option value="cyber">Cyber</option>
-                <option value="xianxia">Xianxia</option>
-                <option value="minimal">Minimal</option>
-                <option value="japan">J-Style</option>
-                <option value="abstract">Abstract</option>
-                <option value="emo">Emo</option>
-                <option value="biz">Business</option>
-              </select>
-            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Style</span>
+                <select class="tool-input" data-nickname-style>
+                  <option value="cyber">Cyber</option>
+                  <option value="xianxia">Xianxia</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="japan">J-Style</option>
+                  <option value="abstract">Abstract</option>
+                  <option value="emo">Emo</option>
+                  <option value="biz">Business</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">Platform</span>
+                <select class="tool-input" data-nickname-platform>
+                  <option value="generic">Generic</option>
+                  <option value="github">GitHub</option>
+                  <option value="discord">Discord</option>
+                  <option value="x">X / Twitter</option>
+                  <option value="xiaohongshu">Xiaohongshu</option>
+                  <option value="bilibili">Bilibili</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">Output language</span>
+                <select class="tool-input" data-nickname-language>
+                  <option value="mixed">Mixed</option>
+                  <option value="en">English</option>
+                  <option value="zh">Chinese</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">Max length</span>
+                <input class="tool-input" data-nickname-max type="number" min="6" max="28" step="1" value="18" />
+              </label>
+            </div>
+            <label><input type="checkbox" data-nickname-no-symbols /> Avoid symbols</label>
             <div class="tool-actions">
               <button type="button" class="tool-btn-primary" data-nickname-generate>Generate</button>
               <button type="button" class="tool-btn-secondary" data-nickname-more>More</button>
@@ -612,6 +638,276 @@ const toolsApiBase = import.meta.env.PUBLIC_TOOLS_API_BASE || "https://tools-wor
               <textarea class="tool-textarea" data-translate-bilingual readonly placeholder="Source + translation will appear here"></textarea>
             </label>
           </form>
+        </article>
+
+        <article id="tone-rewriter" data-tool-expandable>
+          <h3>Tone Rewriter</h3>
+          <p>Rewrite text to sound more polite, concise, formal, casual, support-ready, or PM-ready.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="tone-rewriter" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Source text</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Paste the message, comment, or draft you want to rewrite"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Tone</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="polite">More polite</option>
+                  <option value="concise">More concise</option>
+                  <option value="formal">More formal</option>
+                  <option value="casual">More casual</option>
+                  <option value="support">Customer support</option>
+                  <option value="pm">Product manager</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Rewrite</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Useful for polishing messages before sending them.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Result</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Rewritten text will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="long-text-summarizer" data-tool-expandable>
+          <h3>Long Text Summarizer</h3>
+          <p>Turn long notes, docs, or pasted threads into a TL;DR, bullet summary, key takeaways, or social-sized recap.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="summarizer" data-max-input="6000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Source text</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Paste a long article, meeting notes, or document excerpt"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Summary style</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="tldr">TL;DR</option>
+                  <option value="bullets">Bullet summary</option>
+                  <option value="takeaways">Key takeaways</option>
+                  <option value="social">Social post summary</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Summarize</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Good for trimming long text into something fast to review.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Summary</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Summary will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="prompt-optimizer" data-tool-expandable>
+          <h3>Prompt Optimizer</h3>
+          <p>Turn rough intent into a stronger prompt for coding, writing, or analysis tasks.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="prompt-optimizer" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Rough intent</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Describe what you want the AI to do, even if it is messy"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Prompt style</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="coding">Coding</option>
+                  <option value="writing">Writing</option>
+                  <option value="analysis">Analysis</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Optimize</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Best when you know the goal but want a clearer AI-ready instruction.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Optimized prompt</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="A stronger prompt will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="headline-rewriter" data-tool-expandable>
+          <h3>Headline Rewriter</h3>
+          <p>Generate stronger blog, social, or SEO-friendly titles from a rough headline or topic.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="headline-rewriter" data-max-input="1200" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Topic or draft headline</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Paste a topic, a post summary, or a rough title"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Goal</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="blog">Blog title</option>
+                  <option value="social">Social title</option>
+                  <option value="seo">SEO-friendly</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Rewrite</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Helpful when your original title is clear but not punchy enough.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Selected headline</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Headline result will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="bio-generator" data-tool-expandable>
+          <h3>Bio / Signature Generator</h3>
+          <p>Create short bios for GitHub, social profiles, or personal-site intros from a rough self-description.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="bio-generator" data-max-input="1600" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">About you</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Describe your role, vibe, interests, or what you want people to know"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Format</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="github">GitHub bio</option>
+                  <option value="social">Social bio</option>
+                  <option value="site">Personal site intro</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Generate</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Useful when you need something short, clean, and easy to paste.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Generated bio</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Generated bio will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="abstract-meme-text" data-tool-expandable>
+          <h3>Abstract Meme Text Generator</h3>
+          <p>Generate weird, lightweight, shareable meme lines from a topic, mood, or internet situation.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="meme-text" data-max-input="800" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Topic or vibe</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Describe the vibe, person, or situation you want meme text for"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Flavor</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="absurd">Absurd</option>
+                  <option value="dry">Dry</option>
+                  <option value="dramatic">Dramatic</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Generate</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Best for short shareable text instead of full jokes or essays.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Generated text</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Generated meme text will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="social-post-compressor" data-tool-expandable>
+          <h3>Social Post Compressor</h3>
+          <p>Compress long text into a one-line, three-line, or tweet-length shareable version.</p>
+          <span class="tool-badge">AI</span>
+          <div class="tool-form" data-ai-text-tool data-locale="en" data-tool-id="social-compressor" data-max-input="4000" data-tools-api-base={toolsApiBase}>
+            <label>
+              <span class="tool-label">Source text</span>
+              <textarea class="tool-textarea" data-ai-input placeholder="Paste the full post, thread, or note you want to compress"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Target format</span>
+                <select class="tool-input" data-ai-mode>
+                  <option value="oneline">One line</option>
+                  <option value="threeline">Three lines</option>
+                  <option value="tweet">Tweet length</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-ai-submit>Compress</button>
+              <button type="button" class="tool-btn-secondary" data-ai-reroll>Another version</button>
+              <button type="button" class="tool-btn-secondary" data-ai-copy disabled>Copy</button>
+              <button type="button" class="tool-btn-secondary" data-ai-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-ai-status>Good when you already wrote too much and need something post-ready.</p>
+            <div class="tool-status" data-ai-note hidden></div>
+            <label>
+              <span class="tool-label" data-ai-output-label>Compressed version</span>
+              <textarea class="tool-textarea" data-ai-output readonly placeholder="Compressed result will appear here"></textarea>
+            </label>
+            <div data-ai-options-wrap hidden>
+              <p class="tool-label">Alternatives</p>
+              <div class="nickname-tiles" data-ai-options></div>
+            </div>
+          </div>
         </article>
 
         <!-- Image-to-SVG is a fun tool and is listed under Fun Utilities above. -->
@@ -1584,6 +1880,7 @@ openai"></textarea>
   import "@/scripts/tools/data-toolset";
   import "@/scripts/tools/text-toolset";
   import "@/scripts/tools/regex-tester";
+  import "@/scripts/tools/ai-tools";
 </script>
 
 <script>
