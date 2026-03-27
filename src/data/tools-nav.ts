@@ -71,10 +71,31 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#headline-rewriter",
+        label: {
+          en: "Headline Rewriter",
+          zh: "标题改写器",
+        },
+      },
+      {
+        href: "/tools#bio-generator",
+        label: {
+          en: "Bio / Signature Generator",
+          zh: "Bio / 签名生成器",
+        },
+      },
+      {
         href: "/tools#abstract-meme-text",
         label: {
           en: "Abstract Meme Text Generator",
           zh: "抽象梗文生成器",
+        },
+      },
+      {
+        href: "/tools#social-post-compressor",
+        label: {
+          en: "Social Post Compressor",
+          zh: "社媒压缩器",
         },
       },
     ],
@@ -189,27 +210,6 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         label: {
           en: "Prompt Optimizer",
           zh: "Prompt 优化器",
-        },
-      },
-      {
-        href: "/tools#headline-rewriter",
-        label: {
-          en: "Headline Rewriter",
-          zh: "标题改写器",
-        },
-      },
-      {
-        href: "/tools#bio-generator",
-        label: {
-          en: "Bio / Signature Generator",
-          zh: "Bio / 签名生成器",
-        },
-      },
-      {
-        href: "/tools#social-post-compressor",
-        label: {
-          en: "Social Post Compressor",
-          zh: "社媒压缩器",
         },
       },
       {
