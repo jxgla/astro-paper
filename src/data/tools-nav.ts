@@ -46,6 +46,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#symbol-picker",
+        label: {
+          en: "Symbol / Emoji Picker",
+          zh: "符号 / Emoji 速拷器",
+        },
+      },
+      {
         href: "/tools#nickname-gen",
         label: {
           en: "Nickname Generator",

@@ -111,6 +111,22 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="symbol-picker" class="tool-card tool-card-accent tool-card-accent-violet" data-tool-expandable>
+          <h3>Symbol / Emoji Picker</h3>
+          <p>Browse interesting symbols and emoji by category, then click once to copy. Runs fully in your browser.</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-symbol-picker data-locale="en">
+            <label>
+              <span class="tool-label">Search symbols or names</span>
+              <input class="tool-input" data-symbol-picker-search type="text" autocomplete="off" placeholder="Search a symbol, category, or emoji name" />
+            </label>
+            <p class="tool-status" data-symbol-picker-status aria-live="polite">Showing a curated set of copy-ready symbols. Click any tile to copy.</p>
+            <p class="symbol-picker-source" data-symbol-picker-source></p>
+            <div class="symbol-picker-shell" data-symbol-picker-groups></div>
+          </div>
+        </article>
+
         <article id="nickname-gen" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
           <h3>Nickname Generator</h3>
           <p>Generate meme-ready names with style, platform, and language controls.</p>
@@ -1609,6 +1625,97 @@ openai"></textarea>
     line-height: 1;
   }
 
+  .symbol-picker-source {
+    margin: 0;
+    font-size: 0.78rem;
+    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  }
+
+  .symbol-picker-source a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .symbol-picker-shell {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .symbol-picker-group {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.8rem;
+    border-radius: 0.95rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--background) 94%, #0f172a 6%);
+  }
+
+  .symbol-picker-group-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .symbol-picker-group-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .symbol-picker-group-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .symbol-picker-group-hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  }
+
+  .symbol-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 0.45rem;
+  }
+
+  .symbol-picker-tile {
+    border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+    background: color-mix(in oklab, var(--background) 96%, #0f172a 4%);
+    border-radius: 0.85rem;
+    padding: 0.65rem 0.45rem;
+    display: grid;
+    gap: 0.35rem;
+    place-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .symbol-picker-tile:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in oklab, var(--accent) 36%, transparent);
+  }
+
+  .symbol-picker-tile.is-copied {
+    border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.16);
+  }
+
+  .symbol-picker-char {
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .symbol-picker-name {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    color: color-mix(in oklab, var(--foreground) 76%, transparent);
+    word-break: break-word;
+  }
+
   .emoji-pill small {
     font-size: 0.7rem;
     opacity: 0.8;
@@ -1788,6 +1895,7 @@ openai"></textarea>
   // This ensures `@/` imports are resolved at build time and the browser gets .js.
   import "@/scripts/tools/image-to-svg";
   import "@/scripts/tools/emoji-dna";
+  import "@/scripts/tools/symbol-picker";
   import "@/scripts/tools/nickname-gen";
   import "@/scripts/tools/astro-roast";
   import "@/scripts/tools/poem-generator";
