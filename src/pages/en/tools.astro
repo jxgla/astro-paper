@@ -605,6 +605,44 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="alias-email" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
+          <h3>Email Alias Generator</h3>
+          <p>Generate batches of alias addresses from one email with configurable count, length, and character set. Local-only.</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-email-alias-gen data-locale="en">
+            <label>
+              <span class="tool-label">Base email</span>
+              <input class="tool-input" data-email-alias-input type="email" inputmode="email" placeholder="e.g. odmnxzmusi191@hotmail.com" autocomplete="off" />
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Count</span>
+                <input class="tool-input" data-email-alias-count type="number" min="1" max="40" step="1" value="12" />
+              </label>
+              <label>
+                <span class="tool-label">Alias length</span>
+                <input class="tool-input" data-email-alias-length type="number" min="2" max="16" step="1" value="6" />
+              </label>
+              <label>
+                <span class="tool-label">Character set</span>
+                <select class="tool-input" data-email-alias-charset>
+                  <option value="lower">Lowercase letters</option>
+                  <option value="alnum" selected>Letters + numbers</option>
+                  <option value="mixed">Upper/lower + numbers</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-email-alias-generate>Generate</button>
+              <button type="button" class="tool-btn-secondary" data-email-alias-more>More</button>
+              <button type="button" class="tool-btn-secondary" data-email-alias-copyall disabled>Copy all</button>
+            </div>
+            <p class="tool-status" data-email-alias-status aria-live="polite">Supports standard + aliases. Gmail / Googlemail also gets dot variants. Runs locally only.</p>
+            <div class="nickname-tiles" data-email-alias-list></div>
+          </div>
+        </article>
+
         <article id="random-string" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
           <h3>Random String Generator</h3>
           <p>Pick a length and generate a random string for passwords. Client-side only — nothing is uploaded.</p>
@@ -1893,6 +1931,7 @@ openai"></textarea>
 <script>
   // NOTE: No attributes on this <script> so Astro will process & bundle it.
   // This ensures `@/` imports are resolved at build time and the browser gets .js.
+  import "@/scripts/tools/email-alias-gen";
   import "@/scripts/tools/image-to-svg";
   import "@/scripts/tools/emoji-dna";
   import "@/scripts/tools/symbol-picker";

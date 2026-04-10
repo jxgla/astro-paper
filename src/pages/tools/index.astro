@@ -605,6 +605,44 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="alias-email" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
+          <h3>别名邮箱</h3>
+          <p>输入邮箱后批量生成别名地址，支持数量、位数和字符集设置。纯本地生成。</p>
+          <span class="tool-badge">New</span>
+
+          <div class="tool-form" data-email-alias-gen data-locale="zh">
+            <label>
+              <span class="tool-label">原始邮箱</span>
+              <input class="tool-input" data-email-alias-input type="email" inputmode="email" placeholder="例如：odmnxzmusi191@hotmail.com" autocomplete="off" />
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">生成数量</span>
+                <input class="tool-input" data-email-alias-count type="number" min="1" max="40" step="1" value="12" />
+              </label>
+              <label>
+                <span class="tool-label">别名位数</span>
+                <input class="tool-input" data-email-alias-length type="number" min="2" max="16" step="1" value="6" />
+              </label>
+              <label>
+                <span class="tool-label">字符集</span>
+                <select class="tool-input" data-email-alias-charset>
+                  <option value="lower">小写字母</option>
+                  <option value="alnum" selected>字母 + 数字</option>
+                  <option value="mixed">大小写 + 数字</option>
+                </select>
+              </label>
+            </div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-email-alias-generate>生成</button>
+              <button type="button" class="tool-btn-secondary" data-email-alias-more>再来一批</button>
+              <button type="button" class="tool-btn-secondary" data-email-alias-copyall disabled>复制全部</button>
+            </div>
+            <p class="tool-status" data-email-alias-status aria-live="polite">支持通用 + 别名；Gmail / Googlemail 会额外混入点号变体。纯本地生成，不联网。</p>
+            <div class="nickname-tiles" data-email-alias-list></div>
+          </div>
+        </article>
+
         <article id="random-string" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
           <h3>随机字符串生成器</h3>
           <p>选择长度，一键生成随机字符串，用作随机密码。纯前端生成，不上传、不走后端。</p>
@@ -2027,6 +2065,7 @@ openai"></textarea>
 <script>
   // NOTE: No attributes on this <script> so Astro will process & bundle it.
   // This ensures `@/` imports are resolved at build time and the browser gets .js.
+  import "@/scripts/tools/email-alias-gen";
   import "@/scripts/tools/image-to-svg";
   import "@/scripts/tools/emoji-dna";
   import "@/scripts/tools/symbol-picker";
