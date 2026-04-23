@@ -553,15 +553,15 @@ import profileImg from '../_profile.png';
       <div class="composer-right">
         <div id="model-picker">
           <button id="model-trigger" type="button" title="Choose model">
-            <span id="model-label">grok-4.1-fast</span>
+            <span id="model-label">auto</span>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div id="model-dropdown">
             <div class="model-group-label">Grok</div>
-            <div class="model-item active" data-value="grok-4.1-fast"><span class="mi-icon">⚡</span><span>grok-4.1-fast</span></div>
-            <div class="model-item" data-value="grok-4.1-mini"><span class="mi-icon">🔹</span><span>grok-4.1-mini</span></div>
-            <div class="model-item" data-value="grok-4.1-thinking"><span class="mi-icon">🧠</span><span>grok-4.1-thinking</span></div>
-            <div class="model-item" data-value="grok-4.20-beta"><span class="mi-icon">🧪</span><span>grok-4.20-beta</span></div>
+            <div class="model-item active" data-value="auto"><span class="mi-icon">✨</span><span>auto</span></div>
+            <div class="model-item" data-value="fast"><span class="mi-icon">⚡</span><span>fast</span></div>
+            <div class="model-item" data-value="reasoning"><span class="mi-icon">🧠</span><span>reasoning</span></div>
+            <div class="model-item" data-value="expert"><span class="mi-icon">🎯</span><span>expert</span></div>
             <div class="model-group-label" style="margin-top:4px">GPT</div>
             <div class="model-item" data-value="gpt-5.4"><span class="mi-icon">🌟</span><span>gpt-5.4</span></div>
             <div class="model-item" data-value="gpt-5.2"><span class="mi-icon">✨</span><span>gpt-5.2</span></div>
@@ -610,7 +610,7 @@ import profileImg from '../_profile.png';
   const modelTrigger = document.getElementById("model-trigger");
   const modelLabel   = document.getElementById("model-label");
   const modelDropdown= document.getElementById("model-dropdown");
-  let selectedModel  = "grok-4.1-fast";
+  let selectedModel  = "auto";
   const attachBtn   = document.getElementById("attach-btn");
   const attachFile  = document.getElementById("attach-file");
   const previewBar  = document.getElementById("img-preview-bar");
