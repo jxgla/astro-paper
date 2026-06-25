@@ -2,7 +2,7 @@ export {};
 
 const AI_API_PATH = "/api/tools/ai-text";
 const AI_DIRECT_URL = import.meta.env.DEV ? "http://localhost:8787/v1/chat" : "https://mirror.410666.xyz/v1/chat";
-const AI_DIRECT_MODEL = "grok-4.1-fast";
+const AI_DIRECT_MODEL = "4.3-fast";
 
 type Locale = "zh" | "en";
 type ToolId = "tone-rewriter" | "summarizer" | "prompt-optimizer" | "headline-rewriter" | "bio-generator" | "meme-text" | "social-compressor";

@@ -245,7 +245,7 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
               <button type="button" class="tool-btn-primary" data-poem-generate>Generate</button>
               <button type="button" class="tool-btn-secondary" data-poem-copy disabled>Copy</button>
             </div>
-            <p class="tool-status" data-poem-status aria-live="polite">Chinese only. The request uses grok-4.1-thinking.</p>
+            <p class="tool-status" data-poem-status aria-live="polite">Chinese only. The request uses 4.3-fast.</p>
             <div class="poem-meta" data-poem-meta></div>
             <pre class="tool-result poem-output" data-poem-output></pre>
           </div>
@@ -2418,7 +2418,7 @@ openai"></textarea>
         renderAnalysis(data.data || {});
         if (action === "deep" && data?.data?.deepAnalysis) {
           deepResultEl.hidden = false;
-          deepResultEl.innerHTML = `<h4>AI Deep Read · ${esc(data?.data?.aiModel || "grok-4.1-fast")}</h4><div>${esc(data.data.deepAnalysis).replaceAll("\n", "<br>")}</div>`;
+          deepResultEl.innerHTML = `<h4>AI Deep Read · ${esc(data?.data?.aiModel || "4.3-fast")}</h4><div>${esc(data.data.deepAnalysis).replaceAll("\n", "<br>")}</div>`;
           latestPlainText = buildPlainText(data.data, data.data.deepAnalysis);
           status.textContent = `AI deep read completed${data.requestId ? ` (Request ID: ${data.requestId})` : ""}`;
         } else {

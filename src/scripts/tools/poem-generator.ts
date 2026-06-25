@@ -10,7 +10,7 @@ const POEM_API_URL = import.meta.env.DEV
 const LABELS = {
   en: {
     statusReady: "Chinese only. Use 2-8 characters. Odd counts will be padded at the edge.",
-    statusGenerating: "Generating with grok-4.1-thinking...",
+    statusGenerating: "Generating with 4.3-fast...",
     statusDone: "Poem generated.",
     statusCopied: "Copied.",
     statusCopyFail: "Copy failed.",
@@ -31,7 +31,7 @@ const LABELS = {
   },
   zh: {
     statusReady: "仅支持纯中文输入，建议 2-8 个字；奇数字数会自动在首尾补成双数句。",
-    statusGenerating: "正在调用 grok-4.1-thinking 生成...",
+    statusGenerating: "正在调用 4.3-fast 生成...",
     statusDone: "已生成。",
     statusCopied: "已复制。",
     statusCopyFail: "复制失败。",
@@ -224,7 +224,7 @@ async function fetchPoem(params: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "grok-4.1-thinking",
+      model: "4.3-fast",
       stream: false,
       messages: [
         {
