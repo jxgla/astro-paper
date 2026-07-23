@@ -12,3 +12,21 @@
 - `src/pages/en/tools.astro`: added the English quick-link card and external converter button.
 - `progress.md`: recorded this task, validation evidence, and the build environment limitation.
 - Rollback: remove the newly added `gpt-session-converter` article blocks from both tools pages and remove this progress entry, or reverse-apply the current task diff from version control.
+
+## 2026-07-23 - Task: Add aggregated cloud drive search quick entry
+### What was done
+- Added an aggregated cloud drive search card as the fifth quick-link card on both Chinese and English tools pages, opening `https://pansearch.410666.xyz/` in a new tab.
+- Documented the bilingual titles, target, and desktop placement for future maintenance.
+
+### Testing
+- A PowerShell structure check confirmed both quick-link sections contain five cards in the expected order and `pansearch` is the fifth card, which places it at the start of the second desktop row.
+- `Invoke-WebRequest -Method Head https://pansearch.410666.xyz/` returned HTTP 200.
+- `git diff --check -- src/pages/tools/index.astro src/pages/en/tools.astro docs/tools-quick-links.md` completed successfully; Git reported only line-ending normalization warnings for the existing Astro files.
+- The Astro build could not be run because `node`, `npm`, and `pnpm` are not available in the current PowerShell PATH and `node_modules/.bin` is absent.
+
+### Notes
+- `src/pages/tools/index.astro`: added the Chinese aggregated cloud drive search card to the quick links section.
+- `src/pages/en/tools.astro`: added the English aggregated cloud drive search card to the quick links section.
+- `docs/tools-quick-links.md`: documented the card placement, bilingual labels, target URL, and external-link behavior.
+- `progress.md`: recorded the implementation, validation evidence, build limitation, and rollback method.
+- Rollback: remove the `pansearch` article blocks from both tools pages, delete `docs/tools-quick-links.md`, and remove this progress entry, or reverse-apply the current task diff from version control.
