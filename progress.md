@@ -30,3 +30,26 @@
 - `docs/tools-quick-links.md`: documented the card placement, bilingual labels, target URL, and external-link behavior.
 - `progress.md`: recorded the implementation, validation evidence, build limitation, and rollback method.
 - Rollback: remove the `pansearch` article blocks from both tools pages, delete `docs/tools-quick-links.md`, and remove this progress entry, or reverse-apply the current task diff from version control.
+
+## 2026-08-14 - Task: Add proxy format converter to productivity tools
+### What was done
+- Added a bilingual proxy format converter card that automatically recognizes common line-based proxy formats and regenerates the output when the selected layout or protocol prefix changes.
+- Added newline-preserving copy-all and clear actions, invalid-line reporting, credential-omission reporting, IPv4/domain/bracketed-IPv6 handling, and local-only processing.
+- Added the converter to the tools navigation and documented its accepted inputs, output choices, and credential behavior.
+
+### Testing
+- A Node/TypeScript function harness passed 10 assertions covering `host:port`, colon-auth, auth-first, protocol-prefixed, bracketed IPv6, invalid ports, invalid input, credential encoding, output layout, and prefix behavior.
+- Playwright against the local Astro development server passed 8 desktop assertions for automatic conversion, mixed-format input, invalid-line reporting, format/prefix selection, copy-button state, newline-preserving clipboard output, and horizontal overflow; 4 mobile assertions confirmed conversion and a 390 px viewport without horizontal overflow.
+- `astro check` completed against the current source snapshot: 84 files, 0 errors, and 0 warnings.
+- `git diff --check` completed successfully; Git reported only existing line-ending normalization warnings for the touched tracked files.
+- Prettier check passed for `src/scripts/tools/proxy-format-converter.ts`.
+- The full `npm run build` completed Astro checks and the 107-module Vite client bundle, then failed during unrelated static OG-image generation because `fonts.googleapis.com` timed out; a complete production build could not be confirmed in this network environment.
+
+### Notes
+- `src/data/tools-nav.ts`: added the bilingual productivity navigation entry.
+- `src/pages/tools/index.astro`: added the Chinese converter card and loaded its browser module before the existing TOML module.
+- `src/pages/en/tools.astro`: added the English converter card and loaded its browser module before the existing TOML module.
+- `src/scripts/tools/proxy-format-converter.ts`: added local proxy parsing, formatting, automatic conversion, copy, clear, validation status, and bilingual messages.
+- `docs/proxy-format-converter.md`: documented supported input formats, output layouts, prefixes, and credential handling.
+- `progress.md`: recorded implementation, validation evidence, the external build limitation, and rollback instructions.
+- Rollback: run `git restore -- src/data/tools-nav.ts src/pages/tools/index.astro src/pages/en/tools.astro progress.md`, then remove `docs/proxy-format-converter.md` and `src/scripts/tools/proxy-format-converter.ts`.

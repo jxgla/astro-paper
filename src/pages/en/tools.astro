@@ -448,6 +448,46 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="proxy-format-converter" class="tool-card tool-card-accent tool-card-accent-orange" data-tool-expandable>
+          <h3>Proxy Format Converter</h3>
+          <p>Auto-detect common proxy formats and batch-convert the host, port, credentials, and protocol prefix layout.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-proxy-converter data-locale="en">
+            <label>
+              <span class="tool-label">Input proxies (one per line)</span>
+              <textarea class="tool-textarea" data-proxy-input placeholder="Examples:&#10;127.0.0.1:8080&#10;127.0.0.1:8080:user:pass&#10;user:pass@127.0.0.1:8080&#10;socks5://user:pass@127.0.0.1:1080" spellcheck="false"></textarea>
+            </label>
+            <div class="tool-grid-2">
+              <label>
+                <span class="tool-label">Output format</span>
+                <select class="tool-input" data-proxy-format>
+                  <option value="host-port-user-pass">HOST:PORT:USER:PASS</option>
+                  <option value="user-pass-host-port">USER:PASS@HOST:PORT</option>
+                  <option value="host-port">HOST:PORT</option>
+                </select>
+              </label>
+              <label>
+                <span class="tool-label">Protocol prefix</span>
+                <select class="tool-input" data-proxy-prefix>
+                  <option value="">No prefix</option>
+                  <option value="http">http://</option>
+                  <option value="https">https://</option>
+                  <option value="socks5">socks5://</option>
+                </select>
+              </label>
+            </div>
+            <p class="tool-status" data-proxy-status aria-live="polite">Waiting for input. Everything stays in your browser.</p>
+            <label>
+              <span class="tool-label">Converted proxies</span>
+              <textarea class="tool-textarea" data-proxy-output readonly spellcheck="false"></textarea>
+            </label>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-proxy-copy disabled>Copy all</button>
+              <button type="button" class="tool-btn-secondary" data-proxy-clear>Clear</button>
+            </div>
+          </div>
+        </article>
+
         <article id="text-processor" class="tool-card tool-card-accent tool-card-accent-emerald" data-tool-expandable>
           <h3>Batch Text Processor</h3>
           <p>Clean lines, dedupe items, add prefixes or suffixes, batch replace text, and normalize case in one place.</p>
@@ -1960,6 +2000,7 @@ openai"></textarea>
   import "@/scripts/tools/poem-generator";
   import "@/scripts/tools/pixel-avatar";
   import "@/scripts/tools/translator";
+  import "@/scripts/tools/proxy-format-converter";
   import "@/scripts/tools/data-toolset";
   import "@/scripts/tools/text-toolset";
   import "@/scripts/tools/regex-tester";

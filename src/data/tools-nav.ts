@@ -133,6 +133,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#proxy-format-converter",
+        label: {
+          en: "Proxy Format Converter",
+          zh: "代理格式转换器",
+        },
+      },
+      {
         href: "/tools#text-processor",
         label: {
           en: "Batch Text Processor",
