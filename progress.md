@@ -53,3 +53,29 @@
 - `docs/proxy-format-converter.md`: documented supported input formats, output layouts, prefixes, and credential handling.
 - `progress.md`: recorded implementation, validation evidence, the external build limitation, and rollback instructions.
 - Rollback: run `git restore -- src/data/tools-nav.ts src/pages/tools/index.astro src/pages/en/tools.astro progress.md`, then remove `docs/proxy-format-converter.md` and `src/scripts/tools/proxy-format-converter.ts`.
+
+## 2026-10-29 - Task: Add local 2FA viewer to productivity tools
+### What was done
+- Added the 2FA viewer to the Chinese and English productivity sections and tools navigation, matching the existing expandable card interaction.
+- Added Base32 secret input, standard SHA1 / 6-digit / 30-second TOTP generation, countdown, automatic refresh, copy, clear, and invalid-input feedback. Computation stays in the browser without uploading or persisting secrets.
+- Clear and Astro navigation cancel pending updates and release active key state. Updated local usage documentation and ignored new docs as required by repository instructions.
+
+### Testing
+- `node "$env:TEMP\astro-twofa-test.mjs"` passed all assertions for the six RFC 6238 Appendix B SHA1 vectors (last six digits), leading zeros, normalization, padded/unpadded Base32, invalid input and a 30-second boundary.
+- `npx.cmd astro check`: 86 files, 0 errors, 0 warnings, 24 existing hints.
+- ESLint and Prettier checks passed for both new TypeScript modules; `git diff --check` passed, with line-ending normalization notices only.
+- Playwright against the local development server passed 17 assertions covering the RFC code, countdown, automatic boundary refresh, actual clipboard output, invalid input, normalization, clear, pending-import cancellation, unchanged browser storage, absence of the test secret in requests, clearing the old page on Astro navigation, English initialization and mobile layout at 390px.
+- `npm.cmd run build` passed after the final styling adjustment: 83 static pages generated and Pagefind completed successfully. The build log is at `$env:TEMP\astro-twofa-build.log`.
+- Playwright against the production preview on `127.0.0.1:4322` confirmed both language pages generate the RFC code, English refreshes at the boundary, the result uses the intended 32px font and mobile layout has no horizontal overflow.
+- Existing development-only `@iarna/toml` browser error (`global is not defined`) was observed in the unrelated data toolbox. The new viewer works in both development and production; that dependency was left outside this task scope.
+
+### Notes
+- `.gitignore`: ignored new files under `docs/`; existing tracked docs and progress history remain tracked.
+- `src/data/tools-nav.ts`: added the bilingual productivity navigation item.
+- `src/pages/tools/index.astro`: added the Chinese viewer card, code styling and browser module import.
+- `src/pages/en/tools.astro`: added the equivalent English card, styling and module import.
+- `src/scripts/tools/totp.ts`: added validated Base32 decoding and standard Web Crypto TOTP calculation.
+- `src/scripts/tools/twofa-viewer.ts`: added local input, refresh, countdown, clipboard, clear and page-transition lifecycle behavior.
+- `docs/twofa-viewer.md`: documented supported secrets, algorithm, privacy behavior, runtime requirements and verification.
+- `progress.md`: appended this implementation and validation record.
+- Rollback from the repository root (PowerShell): run `git restore -- .gitignore src/data/tools-nav.ts src/pages/tools/index.astro src/pages/en/tools.astro progress.md`, then `Remove-Item -LiteralPath 'src/scripts/tools/totp.ts', 'src/scripts/tools/twofa-viewer.ts', 'docs/twofa-viewer.md'`. The repository was clean before this task; no commit or deployment was performed.

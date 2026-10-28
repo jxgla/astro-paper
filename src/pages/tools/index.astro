@@ -448,6 +448,28 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="twofa-viewer" class="tool-card tool-card-accent tool-card-accent-violet" data-tool-expandable>
+          <h3>2FA查看器</h3>
+          <p>粘贴 2FA 密钥，自动生成当前验证码，每 30 秒刷新。</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-twofa-viewer data-locale="zh">
+            <label>
+              <span class="tool-label">2FA 密钥（Base32）</span>
+              <input class="tool-input" data-twofa-secret type="password" autocomplete="off" spellcheck="false" placeholder="粘贴绑定时保存的密钥，而非 6 位验证码" />
+            </label>
+            <label>
+              <span class="tool-label">当前验证码</span>
+              <input class="tool-input twofa-code" data-twofa-code type="text" value="------" readonly aria-live="polite" />
+            </label>
+            <p class="tool-status" data-twofa-countdown>等待输入密钥</p>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-twofa-copy disabled>复制验证码</button>
+              <button type="button" class="tool-btn-secondary" data-twofa-clear>清空</button>
+            </div>
+            <p class="tool-status" data-twofa-status aria-live="polite">仅在本地计算，不上传、不保存密钥。支持标准 6 位 / 30 秒 TOTP。</p>
+          </div>
+        </article>
+
         <article id="proxy-format-converter" class="tool-card tool-card-accent tool-card-accent-orange" data-tool-expandable>
           <h3>代理格式转换器</h3>
           <p>自动识别常见代理格式，批量转换账号、密码、地址和协议前缀的排列方式。</p>
@@ -1140,6 +1162,14 @@ openai"></textarea>
 </Layout>
 
 <style>
+  .tool-input.twofa-code {
+    font-family: monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-align: center;
+  }
+
   .tools-section {
     margin-top: 1.1rem;
   }
@@ -1983,6 +2013,7 @@ openai"></textarea>
   import "@/scripts/tools/pixel-avatar";
   import "@/scripts/tools/translator";
   import "@/scripts/tools/proxy-format-converter";
+  import "@/scripts/tools/twofa-viewer";
   import "@/scripts/tools/data-toolset";
   import "@/scripts/tools/text-toolset";
   import "@/scripts/tools/regex-tester";

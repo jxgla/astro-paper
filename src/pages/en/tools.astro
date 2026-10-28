@@ -448,6 +448,28 @@ const funAiCards = FUN_AI_TOOL_CARDS.map(card => ({ ...card, content: card.local
           </div>
         </article>
 
+        <article id="twofa-viewer" class="tool-card tool-card-accent tool-card-accent-violet" data-tool-expandable>
+          <h3>2FA Viewer</h3>
+          <p>Paste a 2FA secret to generate the current code, refreshed every 30 seconds.</p>
+          <span class="tool-badge">New</span>
+          <div class="tool-form" data-twofa-viewer data-locale="en">
+            <label>
+              <span class="tool-label">2FA secret (Base32)</span>
+              <input class="tool-input" data-twofa-secret type="password" autocomplete="off" spellcheck="false" placeholder="Paste your setup secret, not a 6-digit code" />
+            </label>
+            <label>
+              <span class="tool-label">Current code</span>
+              <input class="tool-input twofa-code" data-twofa-code type="text" value="------" readonly aria-live="polite" />
+            </label>
+            <p class="tool-status" data-twofa-countdown>Waiting for a secret</p>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn-primary" data-twofa-copy disabled>Copy code</button>
+              <button type="button" class="tool-btn-secondary" data-twofa-clear>Clear</button>
+            </div>
+            <p class="tool-status" data-twofa-status aria-live="polite">Calculated locally. Secrets are never uploaded or saved. Standard 6-digit / 30-second TOTP.</p>
+          </div>
+        </article>
+
         <article id="proxy-format-converter" class="tool-card tool-card-accent tool-card-accent-orange" data-tool-expandable>
           <h3>Proxy Format Converter</h3>
           <p>Auto-detect common proxy formats and batch-convert the host, port, credentials, and protocol prefix layout.</p>
@@ -1140,6 +1162,14 @@ openai"></textarea>
 </Layout>
 
 <style>
+  .tool-input.twofa-code {
+    font-family: monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-align: center;
+  }
+
   .tools-section {
     margin-top: 1.1rem;
   }
@@ -2001,6 +2031,7 @@ openai"></textarea>
   import "@/scripts/tools/pixel-avatar";
   import "@/scripts/tools/translator";
   import "@/scripts/tools/proxy-format-converter";
+  import "@/scripts/tools/twofa-viewer";
   import "@/scripts/tools/data-toolset";
   import "@/scripts/tools/text-toolset";
   import "@/scripts/tools/regex-tester";

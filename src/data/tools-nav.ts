@@ -133,6 +133,13 @@ export const TOOL_NAV_SECTIONS: ToolNavSection[] = [
         },
       },
       {
+        href: "/tools#twofa-viewer",
+        label: {
+          en: "2FA Viewer",
+          zh: "2FA查看器",
+        },
+      },
+      {
         href: "/tools#proxy-format-converter",
         label: {
           en: "Proxy Format Converter",
